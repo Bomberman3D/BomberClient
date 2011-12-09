@@ -29,9 +29,13 @@ void GameStage::OnEnter()
     sMapManager->FillDynamicRecords();
 }
 
-void GameStage::OnDraw(uint32 diff)
+void GameStage::OnBeforeDraw(uint32 diff)
 {
     sDisplay->DrawMap();
+}
+
+void GameStage::OnDraw(uint32 diff)
+{
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)

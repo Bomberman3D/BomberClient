@@ -79,6 +79,7 @@ void Application::Update()
 
     uint32 diff = uint32(clock() - m_lastUpdate);
 
+    m_currStage->OnBeforeDraw(diff);
     sDisplay->Update(diff);
     m_currStage->OnDraw(diff);
     m_currStage->OnUpdate(diff);
