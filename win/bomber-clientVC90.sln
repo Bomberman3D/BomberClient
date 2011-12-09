@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bomber-clientVC90", "bomber-clientVC90.vcproj", "{22E9A982-FCFA-4509-B963-5E282A0D1C14}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SOIL", "SOIL.vcproj", "{C32FB2B4-500C-43CD-A099-EECCE079D3F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22E9A982-FCFA-4509-B963-5E282A0D1C14}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22E9A982-FCFA-4509-B963-5E282A0D1C14}.Debug|Win32.Build.0 = Debug|Win32
+		{22E9A982-FCFA-4509-B963-5E282A0D1C14}.Release|Win32.ActiveCfg = Release|Win32
+		{22E9A982-FCFA-4509-B963-5E282A0D1C14}.Release|Win32.Build.0 = Release|Win32
+		{C32FB2B4-500C-43CD-A099-EECCE079D3F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C32FB2B4-500C-43CD-A099-EECCE079D3F1}.Debug|Win32.Build.0 = Debug|Win32
+		{C32FB2B4-500C-43CD-A099-EECCE079D3F1}.Release|Win32.ActiveCfg = Release|Win32
+		{C32FB2B4-500C-43CD-A099-EECCE079D3F1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
