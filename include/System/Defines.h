@@ -47,6 +47,15 @@ struct CVector3
     {
         multiply(a/mySize());
     }
+    CVector3 vectorMultiply(CVector3 second)
+    {
+        CVector3 result;
+        result.x = y*second.z - z*second.y;
+        result.y = z*second.x - x*second.z;
+        result.z = x*second.y - y*second.x;
+
+        return result;
+    }
 };
 
 struct CVector2

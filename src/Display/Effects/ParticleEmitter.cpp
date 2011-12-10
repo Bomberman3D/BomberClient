@@ -24,7 +24,7 @@ void ParticleEmitterMgr::Update()
 }
 
 Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
-                                    float angleMedX, float angleMedY, float angleMedZ, float angleTolX, float angleTolY, float angleTolZ,
+                                    float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                                     uint32 timeMed, uint32 timeTol, float speedMed, float speedTol,
                                     uint32 particleTimeMed, uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration)
 {
@@ -41,10 +41,8 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_height = height;
     pTemp->m_angleMedX = angleMedX;
     pTemp->m_angleMedY = angleMedY;
-    pTemp->m_angleMedZ = angleMedZ;
     pTemp->m_angleTolX = angleTolX;
     pTemp->m_angleTolY = angleTolY;
-    pTemp->m_angleTolZ = angleTolZ;
     pTemp->m_timeMed = timeMed;
     pTemp->m_timeTol = timeTol;
     pTemp->m_particleTimeMed = particleTimeMed;
@@ -56,6 +54,10 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_emitAnim = anim;
     pTemp->m_emitAnimFrameSkip = animFrameSkip;
 
+    // Uhly angleX a angleY (angleMed+angleTol) budou prohozene, kvuli lepsi predstavivosti
+    // angleX bude tedy uhel otoceni po ose Y, ale defakto "sirka" emitovani - proto osa X
+    // to same u angleY, to je defakto "vyska" emitovani, cili proto osa Y
+
     // Vypocet uhlopricek v obdelniku emittovani
     pTemp->startVector[0].x = pTemp->m_width / 2;
     pTemp->startVector[0].y = pTemp->m_height / 2;
@@ -64,17 +66,14 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->startVector[1].y = pTemp->m_height / 2;
     pTemp->startVector[1].z = 0;
 
-    /*for (uint8 i = 0; i < 2; i++)
+    for (uint8 i = 0; i < 2; i++)
     {
-        pTemp->startVector[i].y = pTemp->startVector[i].y * sin(pTemp->m_angleMedX);
-        pTemp->startVector[i].z = pTemp->startVector[i].x * cos(pTemp->m_angleMedX); // initial z coord
+        pTemp->startVector[i].y = pTemp->startVector[i].y * cos(angleMedY);
+        pTemp->startVector[i].z = pTemp->startVector[i].y * sin(angleMedY);
 
-        pTemp->startVector[i].x = pTemp->startVector[i].x * cos(pTemp->m_angleMedY);
-        pTemp->startVector[i].z = pTemp->startVector[i].z * sin(pTemp->m_angleMedY);
-
-        pTemp->startVector[i].x = pTemp->startVector[i].x * cos(pTemp->m_angleMedZ);
-        pTemp->startVector[i].y = pTemp->startVector[i].y * sin(pTemp->m_angleMedZ);
-    }*/
+        pTemp->startVector[i].z = pTemp->startVector[i].z + pTemp->startVector[i].x * sin(angleMedX);
+        pTemp->startVector[i].x = pTemp->startVector[i].x + pTemp->startVector[i].x * cos(angleMedX);
+    }
 
     pTemp->m_nextParticleTime = 0;
     pTemp->m_Particles.clear();
@@ -110,9 +109,7 @@ bool Emitter::Update()
         // TODO: prepocitat pro uhly!
         // vzdycky je v pocatku kolmy na obdelnik emittovani
         // pote se zapocita i nejaky nahodny uhel z rozmezi
-        pNew->trajVector.x = 0;
-        pNew->trajVector.y = 0;
-        pNew->trajVector.z = 1;
+        pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
 
         // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
         // vzdalenosti za 1 sekundu

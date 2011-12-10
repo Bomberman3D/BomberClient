@@ -66,7 +66,7 @@ class ParticleEmitterMgr
         void Update();
 
         Emitter* AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
-                            float angleMedX, float angleMedY, float angleMedZ, float angleTolX, float angleTolY, float angleTolZ,
+                            float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                             uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
                             uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration);
 
