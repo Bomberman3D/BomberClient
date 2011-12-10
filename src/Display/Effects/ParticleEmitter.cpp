@@ -26,7 +26,7 @@ void ParticleEmitterMgr::Update()
 Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
                                     float angleMedX, float angleMedY, float angleMedZ, float angleTolX, float angleTolY, float angleTolZ,
                                     uint32 timeMed, uint32 timeTol, float speedMed, float speedTol,
-                                    uint32 particleTimeMed, uint32 particleTimeTol, int32 duration)
+                                    uint32 particleTimeMed, uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration)
 {
     if (!templ || templ->m_type == DL_TYPE_NONE)
         return NULL;
@@ -53,6 +53,8 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_speedTol = speedTol;
     pTemp->m_endTime = clock()+duration;
     pTemp->m_emitting = true;
+    pTemp->m_emitAnim = anim;
+    pTemp->m_emitAnimFrameSkip = animFrameSkip;
 
     // Vypocet uhlopricek v obdelniku emittovani
     pTemp->startVector[0].x = pTemp->m_width / 2;
@@ -119,13 +121,13 @@ bool Emitter::Update()
         if (m_template->m_type == DL_TYPE_BILLBOARD)
         {
             BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
-            pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, ANIM_NONE /* TODO */, 1, temp->scale_x, temp->scale_y,
+            pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
                                                      temp->billboard_x, temp->billboard_y, true);
         }
         else if (m_template->m_type == DL_TYPE_MODEL)
         {
             ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
-            pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, ANIM_NONE /* TODO */, temp->scale, temp->rotate);
+            pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate);
         }
         // hypoteticky jina moznost nastat nemuze
 
