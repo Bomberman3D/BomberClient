@@ -120,7 +120,7 @@ bool Emitter::Update()
         {
             BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
             pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, ANIM_NONE /* TODO */, 1, temp->scale_x, temp->scale_y,
-                                                     temp->billboard_x, temp->billboard_y);
+                                                     temp->billboard_x, temp->billboard_y, true);
         }
         else if (m_template->m_type == DL_TYPE_MODEL)
         {

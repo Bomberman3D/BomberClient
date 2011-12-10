@@ -1,4 +1,5 @@
 #include <Global.h>
+#include <Helpers.h>
 #include <Display.h>
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
@@ -313,7 +314,7 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
     }
 }
 
-BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y)
+BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
     assert(pNew != NULL);
@@ -337,6 +338,20 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     pNew->billboard_x = billboard_x;
     pNew->billboard_y = billboard_y;
 
+    if (genGLDisplayList)
+    {
+        pNew->displayList = glGenLists(1);
+
+        glNewList(pNew->displayList,GL_COMPILE);
+            glBegin(GL_TRIANGLE_STRIP);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, pNew->scale_y , ( pNew->scale_x/2));
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0, 0             , ( pNew->scale_x/2));
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0, pNew->scale_y , (-pNew->scale_x/2));
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0             , (-pNew->scale_x/2));
+            glEnd();
+        glEndList();
+    }
+
     BillboardDisplayList.push_front(pNew);
 
     return pNew;
@@ -356,6 +371,11 @@ void Display::DrawBillboards()
             if (itr == BillboardDisplayList.end())
                 break;
         }
+
+        // Zabezpeceni proti vykreslovani billboardu, ktere jsou od nas vzdalene vice jak 14 jednotek
+        // - Zvysuje vykon
+        if (pythagoras_c(fabs(temp->x-fabs(m_targetX)), fabs(temp->z-fabs(m_targetZ))) > 14.0f)
+            continue;
 
         glLoadIdentity();
         glColor3ub(255, 255, 255);
@@ -386,12 +406,19 @@ void Display::DrawBillboards()
         if (temp->billboard_x)
             glRotatef(m_angleX, 0.0f, 0.0f, -1.0f);
 
-        glBegin(GL_QUADS);
-            glTexCoord2f(1.0f, 1.0f); glVertex3f(0, temp->scale_y , (-temp->scale_x/2));
-            glTexCoord2f(1.0f, 0.0f); glVertex3f(0, 0             , (-temp->scale_x/2));
-            glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0             , ( temp->scale_x/2));
-            glTexCoord2f(0.0f, 1.0f); glVertex3f(0, temp->scale_y , ( temp->scale_x/2));
-        glEnd();
+        if (temp->displayList > 0)
+        {
+            glCallList(temp->displayList);
+        }
+        else
+        {
+            glBegin(GL_TRIANGLE_STRIP);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, temp->scale_y , ( temp->scale_x/2));
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0, 0             , ( temp->scale_x/2));
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0, temp->scale_y , (-temp->scale_x/2));
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0             , (-temp->scale_x/2));
+            glEnd();
+        }
 
         // Nezapomeneme vypnout blending, jen jako slusnacci
         glDisable(GL_BLEND);

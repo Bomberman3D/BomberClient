@@ -20,6 +20,8 @@ typedef unsigned int   uint32;
 typedef unsigned short uint16;
 typedef unsigned char  uint8;
 
+typedef GLuint GLDisplayList;
+
 #define MAKE_PAIR32(a,b) uint32(((uint32(a & 0xFFFF    ) << 16) | (uint32(b & 0xFFFF    ))))
 #define MAKE_PAIR64(a,b) uint64(((uint64(a & 0xFFFFFFFF) << 32) | (uint64(b & 0xFFFFFFFF))))
 #define HIPART32(a) uint16(((a & 0xFFFF0000) >> 16))

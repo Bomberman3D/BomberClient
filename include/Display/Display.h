@@ -50,11 +50,13 @@ struct DisplayListRecord
     DisplayListRecord(uint32 type)
     {
         m_type = type;
+        displayList = 0;
     }
 
     float  x, y, z;
     uint32 m_type;
     bool   remove;
+    GLDisplayList displayList;
 };
 
 struct ModelDisplayListRecord: public DisplayListRecord
@@ -111,7 +113,8 @@ class Display
         BillboardDisplayListRecord* DrawBillboard(uint32 textureId, float x, float y, float z,
                                                   uint32 Animation = ANIM_NONE, uint32 animFrameSpeed = 1,
                                                   float scale_x = 1.0f, float scale_y = 1.0f,
-                                                  bool billboard_x = true, bool billboard_y = true);
+                                                  bool billboard_x = true, bool billboard_y = true,
+                                                  bool genGLDisplayList = false);
         bool RemoveRecordFromDisplayList(BillboardDisplayListRecord* target);
         void DrawBillboards();
         void FlushBillboardDisplayList();
