@@ -77,15 +77,13 @@ void Application::Update()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    uint32 diff = uint32(clock() - m_lastUpdate);
+    m_currStage->OnBeforeDraw(m_diff);
+    sDisplay->Update(m_diff);
+    m_currStage->OnDraw(m_diff);
+    m_currStage->OnUpdate(m_diff);
+    sTimer->Update(m_diff);
 
-    m_currStage->OnBeforeDraw(diff);
-    sDisplay->Update(diff);
-    m_currStage->OnDraw(diff);
-    m_currStage->OnUpdate(diff);
-    sTimer->Update(diff);
-
-    //Sleep(1);
+    m_diff = uint32(clock() - m_lastUpdate);
 
     m_lastUpdate = clock();
 }
@@ -411,6 +409,8 @@ bool Application::Init()
 
     if (!CreateGLWindow("BomberEngine",sConfig->WindowWidth,sConfig->WindowHeight,sConfig->ColorDepth,sConfig->fullscreen,sConfig->RefreshRate))
         return false;
+
+    m_diff = 0;
 
     ShowCursor(true);
 

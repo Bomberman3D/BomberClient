@@ -73,9 +73,8 @@ void GameStage::OnUpdate(uint32 diff)
         //SetVAngle( 0.05f*( mousePos.y-middleY),true);
     }
 
-    // Za jednu milisekundu musíme urazit 0.0125 jednotky
-    // TODO: "zkrasnit"
-    float dist = ((float(diff)/5.0f+1.0f)/10.0f)*0.125f;
+    // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
+    float dist = (float(diff)+1.0f)*0.002f;
     float angle_rad = PI*(-pPlayerRec->rotate+90.0f)/180.0f;
 
     if (sApplication->IsKeyPressed('W'))

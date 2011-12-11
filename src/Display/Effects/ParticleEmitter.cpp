@@ -140,6 +140,8 @@ bool Emitter::Update()
         // Pokud castice neexistuje, nebo neexistuje displaylist zaznam nebo uz je na scene moc dlouho
         if (!p || !p->m_record)
         {
+            if (p)
+                delete p;
             itr = m_Particles.erase(itr);
             continue;
         }
