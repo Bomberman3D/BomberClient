@@ -7,6 +7,7 @@
 #include <Effects/ParticleEmitter.h>
 #include <Map.h>
 #include <Gameplay.h>
+#include <Timer.h>
 
 void GameStage::OnEnter()
 {
@@ -67,9 +68,13 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         if (!pMap)
             return;
 
-        pMap->AddDynamicCell(floor(pPlayerRec->x)+1,floor(pPlayerRec->z)+1,DYNAMIC_TYPE_BOMB, 0, 0, NULL);
+        uint32 bx = floor(pPlayerRec->x)+1;
+        uint32 by = floor(pPlayerRec->z)+1;
+
+        pMap->AddDynamicCell(bx, by, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
         sMapManager->FillDynamicRecords();
         sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+        sGameplayMgr->AddBomb(bx, by);
     }
 }
 
@@ -163,4 +168,7 @@ void GameStage::OnUpdate(uint32 diff)
     // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci
     // Nutne pro spravne zobrazeni
     sDisplay->AdjustViewToTarget();
+
+    // Odsud budeme updatovat i GameplayMgr, proto nesmi byt nikde predtim return
+    sGameplayMgr->Update();
 }

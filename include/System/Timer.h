@@ -6,12 +6,18 @@
 
 struct TimerRecord
 {
-    uint32 maxtime; //milisekundy
-    uint32 remaintime; //milisekundy
+    clock_t expireTime;
     uint32 param1;
     uint32 param2;
     uint32 param3;
     void (*Handler)(uint32 param1, uint32 param2, uint32 param3);
+};
+
+struct TimerSetRecord
+{
+    clock_t expireTime;
+    uint32* target;
+    uint32  value;
 };
 
 class Timer
@@ -21,12 +27,14 @@ public:
     ~Timer() {};
 
     void Initialize();
-    void Update(uint32 diff);
+    void Update();
 
     void AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32),uint32 param1, uint32 param2, uint32 param3);
+    void AddTimedSetEvent(uint32 time, uint32* target, uint32 value);
 
 protected:
     std::list<TimerRecord> TimedEvents;
+    std::list<TimerSetRecord> TimedSetEvents;
 };
 
 #define sTimer Singleton<Timer>::instance()

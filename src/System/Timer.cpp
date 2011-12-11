@@ -10,30 +10,53 @@ void Timer::AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32), 
 {
     TimerRecord temp;
     temp.Handler = Handler;
-    temp.maxtime = time;
-    temp.remaintime = time;
+    temp.expireTime = clock()+time;
     temp.param1 = param1;
     temp.param2 = param2;
     temp.param3 = param3;
     TimedEvents.push_back(temp);
 }
 
-void Timer::Update(uint32 diff)
+void Timer::AddTimedSetEvent(uint32 time, uint32 *target, uint32 value)
 {
-    if (TimedEvents.empty())
-        return;
+    TimerSetRecord temp;
+    temp.expireTime = clock()+time;
+    temp.target = target;
+    temp.value  = value;
+    TimedSetEvents.push_back(temp);
+}
 
-    for (std::list<TimerRecord>::iterator itr = TimedEvents.begin(); itr != TimedEvents.end();)
+void Timer::Update()
+{
+    clock_t tnow = clock();
+
+    if (!TimedEvents.empty())
     {
-        if (itr->remaintime <= diff)
+        for (std::list<TimerRecord>::iterator itr = TimedEvents.begin(); itr != TimedEvents.end();)
         {
-            itr->Handler(itr->param1, itr->param2, itr->param3);
-            itr = TimedEvents.erase(itr);
+            if (itr->expireTime <= tnow)
+            {
+                if (itr->Handler != NULL)
+                    itr->Handler(itr->param1, itr->param2, itr->param3);
+                itr = TimedEvents.erase(itr);
+            }
+            else
+                ++itr;
         }
-        else
+    }
+
+    if (!TimedSetEvents.empty())
+    {
+        for (std::list<TimerSetRecord>::iterator itr = TimedSetEvents.begin(); itr != TimedSetEvents.end();)
         {
-            itr->remaintime -= diff;
-            ++itr;
+            if (itr->expireTime <= tnow)
+            {
+                if (itr->target != NULL)
+                    (*(itr->target)) = itr->value;
+                itr = TimedSetEvents.erase(itr);
+            }
+            else
+                ++itr;
         }
     }
 }

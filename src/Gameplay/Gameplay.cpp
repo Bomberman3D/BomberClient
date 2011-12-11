@@ -1,5 +1,7 @@
 #include <Global.h>
 #include <Gameplay.h>
+#include <Timer.h>
+#include <Map.h>
 
 GameplayMgr::GameplayMgr()
 {
@@ -16,6 +18,31 @@ void GameplayMgr::Update()
 {
     if (m_game)
         m_game->OnUpdate();
+
+    if (!BombMap.empty())
+    {
+        for (std::list<BombRecord*>::iterator itr = BombMap.begin(); itr != BombMap.end();)
+        {
+            if (!(*itr))
+            {
+                ++itr;
+                continue;
+            }
+
+            if ((*itr)->state == 1)
+            {
+                Map* pMap = (Map*)sMapManager->GetMap();
+                if (pMap)
+                {
+                    pMap->DestroyDynamicRecords((*itr)->x, (*itr)->y, DYNAMIC_TYPE_BOMB);
+                    itr = BombMap.erase(itr);
+                    continue;
+                }
+            }
+
+            ++itr;
+        }
+    }
 }
 
 void GameplayMgr::OnGameInit()
@@ -56,4 +83,15 @@ GameType GameplayMgr::GetGameType()
         return GAME_TYPE_NONE;
 
     return m_game->GetType();
+}
+
+void GameplayMgr::AddBomb(uint32 x, uint32 y)
+{
+    BombRecord* temp = new BombRecord;
+    temp->x = x;
+    temp->y = y;
+    temp->state = 0;
+    BombMap.push_back(temp);
+
+    sTimer->AddTimedSetEvent(2500, &temp->state, 1);
 }

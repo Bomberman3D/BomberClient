@@ -88,7 +88,7 @@ void MapManager::FillDynamicRecords()
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
                                 pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.45f, 0.0f, true));
-                                sAnimator->ChangeModelAnim(((ModelDisplayListRecord*)pMap->dynfield[3][2][0].special)->AnimTicket, ANIM_IDLE, 0, 8);
+                                sAnimator->ChangeModelAnim(((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special)->AnimTicket, ANIM_IDLE, 0, 8);
                             }
                             break;
                         case DYNAMIC_TYPE_BOX:
@@ -159,25 +159,30 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
     if (dynfield[x][y].empty())
         return;
 
-    for (uint32 i = 0; i < dynfield[x][y].size(); i++)
+    for (Map::DynamicCellSet::iterator itr = dynfield[x][y].begin(); itr != dynfield[x][y].end();)
     {
         // Odstranujeme jen specifikovany typ nebo pri type == -1 vsechny
-        if (type != -1 && dynfield[x][y][i].type != type)
+        if (type != -1 && (*itr).type != type)
+        {
+            ++itr;
             continue;
+        }
 
-        if (dynfield[x][y][i].type == DYNAMIC_TYPE_BOX)
+        if ((*itr).type == DYNAMIC_TYPE_BOX)
         {
             // TODO: animace?
-            if (dynfield[x][y][i].special != NULL)
-                sDisplay->RemoveRecordFromDisplayList((ModelDisplayListRecord*)dynfield[x][y][i].special);
+            if ((*itr).special != NULL)
+                sDisplay->RemoveRecordFromDisplayList((ModelDisplayListRecord*)(*itr).special);
         }
-        else if (dynfield[x][y][i].type == DYNAMIC_TYPE_BOMB)
+        else if ((*itr).type == DYNAMIC_TYPE_BOMB)
         {
             // TODO: animace! disappear, implementovat v animacich, aby po skonceni disappear sekvence objekt fakt zmizel
             //       pak odebrat tohle, nahradit to zmenou animace. Nezapomenout na vetsi frame skip pri normalni animaci
-            if (dynfield[x][y][i].special != NULL)
-                sDisplay->RemoveRecordFromDisplayList((ModelDisplayListRecord*)dynfield[x][y][i].special);
+            if ((*itr).special != NULL)
+                sDisplay->RemoveRecordFromDisplayList((ModelDisplayListRecord*)(*itr).special);
         }
+
+        itr = dynfield[x][y].erase(itr);
     }
 }
 
