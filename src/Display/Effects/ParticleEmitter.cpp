@@ -23,6 +23,8 @@ void ParticleEmitterMgr::Update()
             ++itr;
         else
         {
+            if ((*itr)->m_template)
+                delete (*itr)->m_template;
             delete (*itr);
             itr = Emitters.erase(itr);
         }
@@ -94,56 +96,70 @@ bool Emitter::Update()
 {
     clock_t tnow = clock();
 
-    if (m_nextParticleTime <= tnow)
+    if (m_endTime <= tnow)
     {
-        Particle* pNew = new Particle;
-        pNew->m_timeStart = tnow;
-
-        // Castice bude zit timeMed casu a nahodne + nebo - z celkove tolerance
-        // pokud timeTol == 0, tak samozrejme je cas konstantni
-        if (m_timeTol == 0)
-            pNew->m_timeMax = tnow + m_timeMed;
+        if (m_emitting)
+            m_emitting = false;
         else
-            pNew->m_timeMax = tnow + m_timeMed + (rand()%(m_timeTol*2) - m_timeTol);
-
-        // Vypocitame nasobky uhlopricnych vektoru
-        /* Nasobky jednotlivych vektoru se nejdrive sectou, abychom dostali bod na obdelniku, ze ktereho
-         * budou castice vychazet, a nasledne se vektorove vynasobi, abychom dostali vektor kolmy na oba
-         * uhlopricne, cimz ziskame vektor trajektorie
-         * Delky nasobku vektoru se mohou rovnat dohromady pouze polovine delky jedne uhlopricky (pripadne minus polovine)
-         * protoze jedine tak dostaneme bod uvnitr obdelnika. Kdyby byly vetsi, dostali bychom se "ven"
-         */
-        float mult = frand(-1.0f,1.0f);
-        float othermult = frand(fabs(mult)-1.0f,1.0f-fabs(mult));
-
-        pNew->m_startX = m_centerX + mult*startVector[0].x + othermult*startVector[1].x;
-        pNew->m_startY = m_centerY + mult*startVector[0].y + othermult*startVector[1].y;
-        pNew->m_startZ = m_centerZ + mult*startVector[0].z + othermult*startVector[1].z;
-
-        // vzdycky je v pocatku kolmy na obdelnik emittovani
-        // pote se zapocita i nejaky nahodny uhel z rozmezi (angleMedX, angleMedY)
-        pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
-
-        // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
-        // vzdalenosti za 1 sekundu
-        pNew->trajVector.unitMultiply(m_speedMed + frand(-m_speedTol, m_speedTol));
-
-        if (m_template->m_type == DL_TYPE_BILLBOARD)
         {
-            BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
-            pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
-                                                     temp->billboard_x, temp->billboard_y, true);
+            if (m_Particles.size() == 0)
+                return false;
         }
-        else if (m_template->m_type == DL_TYPE_MODEL)
+    }
+
+    if (m_emitting)
+    {
+        if (m_nextParticleTime <= tnow)
         {
-            ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
-            pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate);
+            Particle* pNew = new Particle;
+            pNew->m_timeStart = tnow;
+
+            // Castice bude zit timeMed casu a nahodne + nebo - z celkove tolerance
+            // pokud timeTol == 0, tak samozrejme je cas konstantni
+            if (m_timeTol == 0)
+                pNew->m_timeMax = tnow + m_timeMed;
+            else
+                pNew->m_timeMax = tnow + m_timeMed + (rand()%(m_timeTol*2) - m_timeTol);
+
+            // Vypocitame nasobky uhlopricnych vektoru
+            /* Nasobky jednotlivych vektoru se nejdrive sectou, abychom dostali bod na obdelniku, ze ktereho
+            * budou castice vychazet, a nasledne se vektorove vynasobi, abychom dostali vektor kolmy na oba
+            * uhlopricne, cimz ziskame vektor trajektorie
+            * Delky nasobku vektoru se mohou rovnat dohromady pouze polovine delky jedne uhlopricky (pripadne minus polovine)
+            * protoze jedine tak dostaneme bod uvnitr obdelnika. Kdyby byly vetsi, dostali bychom se "ven"
+            */
+            float mult = frand(-1.0f,1.0f);
+            float othermult = frand(fabs(mult)-1.0f,1.0f-fabs(mult));
+
+            pNew->m_startX = m_centerX + mult*startVector[0].x + othermult*startVector[1].x;
+            pNew->m_startY = m_centerY + mult*startVector[0].y + othermult*startVector[1].y;
+            pNew->m_startZ = m_centerZ + mult*startVector[0].z + othermult*startVector[1].z;
+
+            // vzdycky je v pocatku kolmy na obdelnik emittovani
+            // pote se zapocita i nejaky nahodny uhel z rozmezi (angleMedX, angleMedY)
+            pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
+
+            // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
+            // vzdalenosti za 1 sekundu
+            pNew->trajVector.unitMultiply(m_speedMed + frand(-m_speedTol, m_speedTol));
+
+            if (m_template->m_type == DL_TYPE_BILLBOARD)
+            {
+                BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
+                pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
+                                                         temp->billboard_x, temp->billboard_y, true);
+            }
+            else if (m_template->m_type == DL_TYPE_MODEL)
+            {
+                ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
+                pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate);
+            }
+            // hypoteticky jina moznost nastat nemuze
+
+            m_Particles.push_front(pNew);
+
+            m_nextParticleTime = tnow + m_particleTimeMed + (rand()%(m_particleTimeTol*2) - m_particleTimeTol);
         }
-        // hypoteticky jina moznost nastat nemuze
-
-        m_Particles.push_front(pNew);
-
-        m_nextParticleTime = tnow + m_particleTimeMed + (rand()%(m_particleTimeTol*2) - m_particleTimeTol);
     }
 
     Particle* p = NULL;
