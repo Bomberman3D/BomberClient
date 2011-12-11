@@ -20,6 +20,10 @@ bool MapManager::LoadMap(uint32 id)
 
     assert(pMap != NULL);
 
+    // Nejdriv precteme zahlavi mapy
+    // 0..3     - delka jmena
+    // 4..x     - jmeno
+    // x+1..x+4 - ID skyboxu
     uint32 namesize = 0;
     fread(&namesize,4,1,map);
     char* mapname = new char[namesize+1];
@@ -30,11 +34,14 @@ bool MapManager::LoadMap(uint32 id)
 
     Chunk* pChunk = new Chunk;
 
+    // Inicializace mapy na rozmer 1x1
     pMap->field.resize(1);
     pMap->field[0].resize(1);
 
+    // A cteme bunky tak dlouho, dokud nam to dovoli
     while(fread(pChunk,sizeof(Chunk),1,map) > 0)
     {
+        // V pripade potreby rozsirime po nektere z os
         if (pChunk->x > pMap->field.size()-1)
         {
             pMap->field.resize(pChunk->x+1);
@@ -49,6 +56,7 @@ bool MapManager::LoadMap(uint32 id)
         pMap->field[pChunk->x][pChunk->y].texture = pChunk->texture;
     }
 
+    // A inicializujeme dynamickou mapu na stejny rozmer
     pMap->dynfield.resize(pMap->field.size());
     for (uint32 it = 0; it < pMap->field.size(); it++)
         pMap->dynfield[it].resize(pMap->field[0].size());
@@ -130,9 +138,9 @@ void Map::AddDynamicCell(uint32 x, uint32 y, uint32 type, uint32 state, uint32 m
     if (pos <= 65535)
     {
         dynfield[x][y].resize(pos+1);
-        dynfield[x][y][pos].type = type;
-        dynfield[x][y][pos].state = state;
-        dynfield[x][y][pos].misc = misc;
+        dynfield[x][y][pos].type    = type;
+        dynfield[x][y][pos].state   = state;
+        dynfield[x][y][pos].misc    = misc;
         dynfield[x][y][pos].special = special;
         return;
     }

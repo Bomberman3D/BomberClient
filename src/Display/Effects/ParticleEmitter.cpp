@@ -11,15 +11,21 @@ ParticleEmitterMgr::ParticleEmitterMgr()
 
 void ParticleEmitterMgr::Update()
 {
+    // Pokud nemame zadny emitter, nemusime updatovat
     if (Emitters.empty())
         return;
 
+    // Prochazi vsechny emittery
     for (EmitterList::iterator itr = Emitters.begin(); itr != Emitters.end();)
     {
+        // A pokud update vrati false, vymazeme ho. Pokud ne, pokracujeme
         if ((*itr)->Update())
             ++itr;
         else
+        {
+            delete (*itr);
             itr = Emitters.erase(itr);
+        }
     }
 }
 
@@ -33,25 +39,25 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
 
     Emitter* pTemp = new Emitter;
 
-    pTemp->m_template = templ;
-    pTemp->m_centerX = centerX;
-    pTemp->m_centerY = centerY;
-    pTemp->m_centerZ = centerZ;
-    pTemp->m_width = width;
-    pTemp->m_height = height;
+    pTemp->m_template  = templ;
+    pTemp->m_centerX   = centerX;
+    pTemp->m_centerY   = centerY;
+    pTemp->m_centerZ   = centerZ;
+    pTemp->m_width     = width;
+    pTemp->m_height    = height;
     pTemp->m_angleMedX = angleMedX;
     pTemp->m_angleMedY = angleMedY;
     pTemp->m_angleTolX = angleTolX;
     pTemp->m_angleTolY = angleTolY;
-    pTemp->m_timeMed = timeMed;
-    pTemp->m_timeTol = timeTol;
-    pTemp->m_particleTimeMed = particleTimeMed;
-    pTemp->m_particleTimeTol = particleTimeTol;
-    pTemp->m_speedMed = speedMed;
-    pTemp->m_speedTol = speedTol;
-    pTemp->m_endTime = clock()+duration;
-    pTemp->m_emitting = true;
-    pTemp->m_emitAnim = anim;
+    pTemp->m_timeMed   = timeMed;
+    pTemp->m_timeTol   = timeTol;
+    pTemp->m_particleTimeMed   = particleTimeMed;
+    pTemp->m_particleTimeTol   = particleTimeTol;
+    pTemp->m_speedMed  = speedMed;
+    pTemp->m_speedTol  = speedTol;
+    pTemp->m_endTime   = clock()+duration;
+    pTemp->m_emitting  = true;
+    pTemp->m_emitAnim  = anim;
     pTemp->m_emitAnimFrameSkip = animFrameSkip;
 
     // Uhly angleX a angleY (angleMed+angleTol) budou prohozene, kvuli lepsi predstavivosti
@@ -66,6 +72,7 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->startVector[1].y = pTemp->m_height / 2;
     pTemp->startVector[1].z = 0;
 
+    // Transformace jednotlivych uhlopricnych vektoru je porad stejna, rozdilny je jen vstup na zacatku
     for (uint8 i = 0; i < 2; i++)
     {
         pTemp->startVector[i].y = pTemp->startVector[i].y * cos(angleMedY);
@@ -99,6 +106,13 @@ bool Emitter::Update()
         else
             pNew->m_timeMax = tnow + m_timeMed + (rand()%(m_timeTol*2) - m_timeTol);
 
+        // Vypocitame nasobky uhlopricnych vektoru
+        /* Nasobky jednotlivych vektoru se nejdrive sectou, abychom dostali bod na obdelniku, ze ktereho
+         * budou castice vychazet, a nasledne se vektorove vynasobi, abychom dostali vektor kolmy na oba
+         * uhlopricne, cimz ziskame vektor trajektorie
+         * Delky nasobku vektoru se mohou rovnat dohromady pouze polovine delky jedne uhlopricky (pripadne minus polovine)
+         * protoze jedine tak dostaneme bod uvnitr obdelnika. Kdyby byly vetsi, dostali bychom se "ven"
+         */
         float mult = frand(-1.0f,1.0f);
         float othermult = frand(fabs(mult)-1.0f,1.0f-fabs(mult));
 
@@ -106,9 +120,8 @@ bool Emitter::Update()
         pNew->m_startY = m_centerY + mult*startVector[0].y + othermult*startVector[1].y;
         pNew->m_startZ = m_centerZ + mult*startVector[0].z + othermult*startVector[1].z;
 
-        // TODO: prepocitat pro uhly!
         // vzdycky je v pocatku kolmy na obdelnik emittovani
-        // pote se zapocita i nejaky nahodny uhel z rozmezi
+        // pote se zapocita i nejaky nahodny uhel z rozmezi (angleMedX, angleMedY)
         pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
 
         // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
@@ -146,13 +159,18 @@ bool Emitter::Update()
             continue;
         }
 
+        // Pokud uz castice dosahla maximalniho mozneho casu "na scene", vymazeme ji
         if (p->m_timeMax <= tnow)
         {
             p->m_record->remove = true;
+            if (p)
+                delete p;
             itr = m_Particles.erase(itr);
             continue;
         }
 
+        // Posun castice po vektoru trajektorie
+        // Pokud v budoucnu pribude i gravitace, bude se odecitat od celkove hodnoty Y
         p->m_record->x = p->m_startX + p->trajVector.x * ((tnow - p->m_timeStart)/1000.0f);
         p->m_record->y = p->m_startY + p->trajVector.y * ((tnow - p->m_timeStart)/1000.0f);
         p->m_record->z = p->m_startZ + p->trajVector.z * ((tnow - p->m_timeStart)/1000.0f);

@@ -9,10 +9,6 @@
 
 void GameStage::OnEnter()
 {
-    sDisplay->SetTargetX(-0.5f);
-    sDisplay->SetTargetZ(-0.5f);
-    sDisplay->SetTargetY(0);
-
     pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.18f, 90.0f);
     sDisplay->SetTargetModel(pPlayerRec);
 
@@ -40,12 +36,15 @@ void GameStage::OnDraw(uint32 diff)
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
 {
+    // Jelikoz nam mys drzi pozici veprostred pohledu, nemuzeme zmacknout krizek
+    // Tak si pomuzeme escapem
     if (key == VK_ESCAPE)
         exit(1);
 
     if (!pPlayerRec)
         return;
 
+    // Zmena animace chuze hrace
     if (key == 'W')
     {
         if (press)
@@ -61,35 +60,39 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
 
 void GameStage::OnUpdate(uint32 diff)
 {
+    // Otoceni hrace (hracskeho modelu) o uhel prepocitany podle pohybu mysi
+    // Pri FPS rezimu musime nastavit i vertikalni uhel, ale to ve funkci Display::AdjustViewToTarget
     POINT mousePos;
     int middleX = sConfig->WindowWidth >> 1;
     int middleY = sConfig->WindowHeight >> 1;
     GetCursorPos(&mousePos);
-    SetCursorPos(middleX, middleY);
-    if (!( (mousePos.x == middleX) && (mousePos.y == middleY) ))
-    {
+    SetCursorPos(middleX, middleY);  // Posuneme mys zase na stred
+    if (!((mousePos.x == middleX) && (mousePos.y == middleY)))
         pPlayerRec->rotate -= 0.05f*(mousePos.x-middleX);
-        //Pouze v FPS !
-        //SetVAngle( 0.05f*( mousePos.y-middleY),true);
-    }
 
     // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
     float dist = (float(diff)+1.0f)*0.002f;
     float angle_rad = PI*(-pPlayerRec->rotate+90.0f)/180.0f;
 
+    // Pohyby postavy pomoci klavesnice
+    // Bude zdokumentovan jen jeden blok, ostatni jsou stejne
     if (sApplication->IsKeyPressed('W'))
     {
+        // Nejdrive se zkontroluje kolize na ose X
         float newx = pPlayerRec->x + dist*cos(angle_rad);
         float newz = pPlayerRec->z;
         uint16 collision = sDisplay->CheckCollision(newx, 0.0f, newz);
 
+        // Pokud na tehle ose nekolidujeme, muzeme se posunout
         if (!(collision & AXIS_X))
             pPlayerRec->x = newx;
 
+        // Nasleduje posun po ose Z
         newx = pPlayerRec->x;
         newz = pPlayerRec->z + dist*sin(angle_rad);
         collision = sDisplay->CheckCollision(newx, 0.0f, newz);
 
+        // A opet pokud nekolidujeme na dane ose, posuneme hrace
         if (!(collision & AXIS_Z))
             pPlayerRec->z = newz;
     }
@@ -142,5 +145,7 @@ void GameStage::OnUpdate(uint32 diff)
             pPlayerRec->z = newz;
     }
 
+    // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci
+    // Nutne pro spravne zobrazeni
     sDisplay->AdjustViewToTarget();
 }

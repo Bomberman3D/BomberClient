@@ -53,7 +53,8 @@ void Display::InitFont(uint8 font)
     if (font == SMALL_FONT)
         charsize = 12;
 
-    uint32 charsperline = 16; // charsperline = charspercolumn
+    // V tomto pripade charsperline = charspercolumn
+    uint32 charsperline = 16;
     float charoffset = 1.0f/charsperline;
     float spacing = 10.0f;
 
@@ -70,13 +71,13 @@ void Display::InitFont(uint8 font)
         cy = float(loop/charsperline)/float(charsperline)+charoffset;
 
         glNewList(m_fontBase[font]+loop,GL_COMPILE);
-          glBegin(GL_QUADS);
-            glTexCoord2f(cx,           cy-charoffset); glVertex2i(0,       0);
-            glTexCoord2f(cx+charoffset,cy-charoffset); glVertex2i(charsize,0);
-            glTexCoord2f(cx+charoffset,cy);            glVertex2i(charsize,charsize);
-            glTexCoord2f(cx,           cy);            glVertex2i(0,       charsize);
-          glEnd();
-          glTranslated(spacing,0,0);
+            glBegin(GL_QUADS);
+                glTexCoord2f(cx,           cy-charoffset); glVertex2i(0,       0);
+                glTexCoord2f(cx+charoffset,cy-charoffset); glVertex2i(charsize,0);
+                glTexCoord2f(cx+charoffset,cy);            glVertex2i(charsize,charsize);
+                glTexCoord2f(cx,           cy);            glVertex2i(0,       charsize);
+            glEnd();
+            glTranslated(spacing,0,0);
         glEndList();
     }
 
@@ -199,10 +200,6 @@ void Display::DrawModels()
     float x,y,z;
     ModelDisplayListRecord* temp = NULL;
 
-    /*while(!gDisplayStore.HasDLToken(DL_TOKEN_MAINTHREAD))
-    {
-    }*/
-
     for(std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
     {
         if (!itr._Has_container())
@@ -219,9 +216,9 @@ void Display::DrawModels()
                 break;
         }
 
-        x = temp->x;//*MAP_SCALE_X;
-        y = temp->y;//*MAP_SCALE_Y;
-        z = temp->z;//*MAP_SCALE_Z;
+        x = temp->x;
+        y = temp->y;
+        z = temp->z;
 
         //if (pythagoras_c(fabs(fabs(x)-fabs(view_x)),fabs(fabs(z)-fabs(view_z))) > 2.0f)
         //    continue;
@@ -299,8 +296,6 @@ void Display::DrawModels()
         }
     }
 
-    //gDisplayStore.NextDLToken();
-
     glEnable(GL_TEXTURE_2D);
     glColor3ub(255, 255, 255);
 }
@@ -372,6 +367,7 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     return pNew;
 }
 
+// Vytvoreni billboard display list zaznamu bez jeho zapsani do display listu
 BillboardDisplayListRecord* BillboardDisplayListRecord::Create(uint32 textureId, float x, float y, float z,
                                                                float scale_x, float scale_y,
                                                                bool billboard_x, bool billboard_y)
@@ -433,8 +429,8 @@ void Display::DrawBillboards()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Nechat depth test pro ted zapnuty, dokud nenajdu lepsi zpusob korektniho vykresleni
-        // Zpusobuje nepruhlednost vykreslenych spritu vuci jinym spritum
+        // Nechat depth test pro ted zapnuty, zpusobuje nepruhlednost
+        // vykreslenych spritu vuci jinym spritum
         //glDisable(GL_DEPTH_TEST);
 
         // TODO: blending zvlast kanalu
@@ -464,7 +460,7 @@ void Display::DrawBillboards()
         // Nezapomeneme vypnout blending, jen jako slusnacci
         glDisable(GL_BLEND);
 
-        // Zatim netreba, viz. komentar vyse
+        // Netreba, viz. komentar vyse
         //glEnable(GL_DEPTH_TEST);
     }
     glLoadIdentity();
@@ -600,48 +596,6 @@ void Display::DrawMap()
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z-1);
                     glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
                 glEnd();
-            }
-
-            // Dynamicke prvky
-            if (pMap->dynfield[w][h].size() > 0)
-            {
-                for (uint32 pos = 0; pos < pMap->dynfield[w][h].size(); pos++)
-                {
-                    if (pMap->dynfield[w][h][pos].type == DYNAMIC_TYPE_BOX)
-                    {
-                        // TODO: predelat!
-                        // nutno predelat na zobrazovani modelu
-                        BindTexture(29);
-                        glBegin(GL_QUADS);
-                            glNormal3f(0.0f,-1.0f, 0.0f);
-                            // horni
-                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.9f);
-                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.9f);
-                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            // levobok
-                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.9f);
-                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-0.9f, y                 , z-0.9f);
-                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-0.9f, y                 , z-0.1f  );
-                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            // pravobok
-                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-0.1f  , y                 , z-0.1f  );
-                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-0.1f  , y                 , z-0.9f);
-                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.9f);
-                            // predni
-                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-0.9f, y                 , z-0.1f  );
-                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-0.1f  , y                 , z-0.1f  );
-                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.1f  );
-                            // zadni
-                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-0.9f, y+SOLID_BOX_HEIGHT, z-0.9f);
-                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-0.9f, y                 , z-0.9f);
-                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-0.1f  , y                 , z-0.9f);
-                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-0.1f  , y+SOLID_BOX_HEIGHT, z-0.9f);
-                        glEnd();
-                    }
-                }
             }
         }
     }
