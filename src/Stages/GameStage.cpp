@@ -13,13 +13,13 @@ void GameStage::OnEnter()
     sDisplay->SetTargetModel(pPlayerRec);
 
     // TEST !!!
-    Map* pMap = (Map*)sMapManager->GetMap();
+    /*Map* pMap = (Map*)sMapManager->GetMap();
     pMap->AddDynamicCell(3,3,DYNAMIC_TYPE_BOX, 0, 0, NULL);
     pMap->AddDynamicCell(3,2,DYNAMIC_TYPE_BOMB, 0, 0, NULL);
 
     DisplayListRecord* pbill = BillboardDisplayListRecord::Create(21,0.5f,0,0.5f, 0.5f, 0.5f, true, true);
 
-    sParticleEmitterMgr->AddEmitter(pbill, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 45.0f, 30.0f, 0.0f, 0.0f, 10000, 1000, 4.0f, 1.0f, 50, 10, 1, 1, 10000);
+    sParticleEmitterMgr->AddEmitter(pbill, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 45.0f, 30.0f, 0.0f, 0.0f, 10000, 1000, 4.0f, 1.0f, 50, 10, 1, 1, 10000);*/
     // END OF TEST !!!
 
     sMapManager->FillDynamicRecords();

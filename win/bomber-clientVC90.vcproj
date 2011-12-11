@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Interface;../include/System;../dep/SQLite/;../dep/SOIL/"
+				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Interface;../include/Gameplay;../include/System;../dep/SQLite/;../dep/SOIL/"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -284,6 +284,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Gameplay"
+				>
+				<File
+					RelativePath="..\src\Gameplay\Gameplay.cpp"
+					>
+				</File>
+				<Filter
+					Name="GameTypes"
+					>
+					<File
+						RelativePath="..\src\Gameplay\GameTypes\ClassicMultiType.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Gameplay\GameTypes\ClassicSingleType.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Includes"
@@ -399,6 +419,18 @@
 				</File>
 				<File
 					RelativePath="..\include\Interface\InterfaceElements.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Gameplay"
+				>
+				<File
+					RelativePath="..\include\Gameplay\Gameplay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Gameplay\GameTypes.h"
 					>
 				</File>
 			</Filter>

@@ -277,12 +277,21 @@ void Display::DrawModels()
     float x,y,z;
     ModelDisplayListRecord* temp = NULL;
 
-    for(std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+    for(std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end();)
     {
         if (!itr._Has_container())
+        {
+            ++itr;
             continue;
+        }
 
         temp = *itr;
+
+        if (!temp)
+        {
+            itr = ModelDisplayList.erase(itr);
+            continue;
+        }
 
         if (temp->remove)
         {
@@ -293,8 +302,7 @@ void Display::DrawModels()
             if (temp)
                 delete temp;
             itr = ModelDisplayList.erase(itr);
-            if (itr == ModelDisplayList.end())
-                break;
+            continue;
         }
 
         x = temp->x;
@@ -302,7 +310,10 @@ void Display::DrawModels()
         z = temp->z;
 
         //if (pythagoras_c(fabs(fabs(x)-fabs(view_x)),fabs(fabs(z)-fabs(view_z))) > 2.0f)
+        //{
+        //    ++itr;
         //    continue;
+        //}
 
         glLoadIdentity();
 
@@ -321,6 +332,7 @@ void Display::DrawModels()
             // Vykreslime to pomoci display listu
             glCallList(temp->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
             // A nemusime se dale o nic starat
+            ++itr;
             continue;
         }
 
@@ -384,6 +396,7 @@ void Display::DrawModels()
 
             glPopMatrix();
         }
+        ++itr;
     }
 
     glEnable(GL_TEXTURE_2D);
@@ -504,9 +517,15 @@ void Display::DrawBillboards()
 {
     BillboardDisplayListRecord* temp = NULL;
 
-    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end();)
     {
         temp = (*itr);
+
+        if (!temp)
+        {
+            itr = BillboardDisplayList.erase(itr);
+            continue;
+        }
 
         if (temp->remove)
         {
@@ -517,14 +536,16 @@ void Display::DrawBillboards()
             if (temp)
                 delete temp;
             itr = BillboardDisplayList.erase(itr);
-            if (itr == BillboardDisplayList.end())
-                break;
+            continue;
         }
 
         // Zabezpeceni proti vykreslovani billboardu, ktere jsou od nas vzdalene vice jak 14 jednotek
         // - Zvysuje vykon
         if (pythagoras_c(fabs(temp->x-fabs(m_targetX)), fabs(temp->z-fabs(m_targetZ))) > 14.0f)
+        {
+            ++itr;
             continue;
+        }
 
         glLoadIdentity();
         glColor3ub(255, 255, 255);
@@ -574,6 +595,8 @@ void Display::DrawBillboards()
 
         // Netreba, viz. komentar vyse
         //glEnable(GL_DEPTH_TEST);
+
+        ++itr;
     }
     glLoadIdentity();
 

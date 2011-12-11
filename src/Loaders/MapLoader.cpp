@@ -180,3 +180,25 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
         }
     }
 }
+
+void Map::DestroyAllDynamicRecords()
+{
+    if (dynfield.size() == 0)
+        return;
+
+    if (dynfield[0].size() == 0)
+        return;
+
+    for (uint32 i = 0; i < dynfield.size(); i++)
+    {
+        for (uint32 j = 0; j < dynfield[i].size(); j++)
+        {
+            for (uint32 k = 0; k < dynfield[i][j].size(); k++)
+            {
+                if (dynfield[i][j][k].special)
+                    delete dynfield[i][j][k].special;
+            }
+            dynfield[i][j].clear();
+        }
+    }
+}
