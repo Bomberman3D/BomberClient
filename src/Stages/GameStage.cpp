@@ -9,7 +9,7 @@
 
 void GameStage::OnEnter()
 {
-    pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.18f, 90.0f);
+    pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.18f, 90.0f, true);
     sDisplay->SetTargetModel(pPlayerRec);
 
     // TEST !!!

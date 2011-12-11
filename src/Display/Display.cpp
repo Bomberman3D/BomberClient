@@ -152,7 +152,7 @@ void Display::Update(const uint32 diff)
     DrawBillboards();
 }
 
-ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate)
+ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
@@ -172,6 +172,83 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->remove = false;
     pNew->scale = scale;
     pNew->rotate = rotate;
+
+    if (genGLDisplayList)
+    {
+        uint32 maxFrame = 0;
+        for (uint32 an = 0; an < MAX_ANIM; an++)
+            if (maxFrame < sStorage->ModelAnimation[modelId].Anim[an].frameLast)
+                maxFrame = sStorage->ModelAnimation[modelId].Anim[an].frameLast;
+
+        pNew->displayList = glGenLists(maxFrame+1);
+        pNew->displayListSize = maxFrame + 1;
+
+        t3DModel* pModel = sStorage->Models[modelId];
+
+        for (uint32 a = 0; a <= maxFrame; a++)
+        {
+            glNewList(pNew->displayList + a,GL_COMPILE);
+            for(int i = 0; i < pModel->numOfObjects; i++)
+            {
+                if (pModel->pObject.size() <= 0) break;
+                t3DObject *pObject = &pModel->pObject[i];
+
+                glPushMatrix();
+                AnimateModelObjectByFrame(pObject, pNew, a);
+
+                if (pObject->bHasTexture)
+                {
+                    glEnable(GL_TEXTURE_2D);
+                    glColor3ub(255, 255, 255);
+                    glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                }
+                else
+                {
+                    glDisable(GL_TEXTURE_2D);
+                    if (pModel->pMaterials.size() && pObject->materialID >= 0)
+                    {
+                        BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
+                        glColor3ub(pColor[0], pColor[1], pColor[2]);
+                    }
+                }
+
+                glBegin(GL_TRIANGLES);
+
+                for(int j = 0; j < pObject->numOfFaces; j++)
+                {
+                    for(int whichVertex = 0; whichVertex < 3; whichVertex++)
+                    {
+                        int index = pObject->pFaces[j].vertIndex[whichVertex];
+
+                        if (pObject->pNormals)
+                        {
+                            CVector3* pNormal = &pObject->pNormals[index];
+                            glNormal3f(pNormal->x, pNormal->y, pNormal->z);
+                        }
+
+                        if (pObject->bHasTexture && pObject->pTexVerts != NULL)
+                        {
+                            CVector2* pTexVert = &pObject->pTexVerts[index];
+                            glTexCoord2f(pTexVert->x, pTexVert->y);
+                        }
+
+                        if (pObject->pVerts)
+                        {
+                            CVector3* pVert = &pObject->pVerts[index];
+                            glVertex3f(pVert->x, pVert->y, pVert->z);
+                        }
+                    }
+                }
+
+                glEnd();
+
+                glPopMatrix();
+            }
+            glEndList();
+        }
+    }
 
     ModelDisplayList.push_back(pNew);
 
@@ -209,6 +286,10 @@ void Display::DrawModels()
 
         if (temp->remove)
         {
+            if (temp->displayList)
+                glDeleteLists(temp->displayList, temp->displayListSize);
+            if (temp->AnimTicket)
+                sAnimator->DestroyAnimTicket(temp->AnimTicket);
             if (temp)
                 delete temp;
             itr = ModelDisplayList.erase(itr);
@@ -233,6 +314,15 @@ void Display::DrawModels()
         glTranslatef(x,y,z);
 
         glRotatef(temp->rotate,0.0f,1.0f,0.0f);
+
+        // Pokud mame vygenerovany GL display list pro dany model
+        if (temp->displayList != 0)
+        {
+            // Vykreslime to pomoci display listu
+            glCallList(temp->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
+            // A nemusime se dale o nic starat
+            continue;
+        }
 
         t3DModel* pModel = sStorage->Models[temp->modelId];
 
@@ -324,6 +414,23 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
     }
 }
 
+void Display::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* pData, uint32 frame)
+{
+    CVector3 vPosition = pObject->vPosition[frame];
+    glTranslatef(vPosition.x*pData->scale, vPosition.y*pData->scale, vPosition.z*pData->scale);
+    CVector3 vScale = pObject->vScale[frame];
+    glScalef(vScale.x*pData->scale, vScale.y*pData->scale, vScale.z*pData->scale);
+
+    for (uint32 i = 1; i <= frame; i++)
+    {
+        CVector3 vRotation = pObject->vRotation[i];
+        float rotDegree = pObject->vRotDegree[i];
+
+        if(rotDegree)
+            glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);
+    }
+}
+
 BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
@@ -351,6 +458,7 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     if (genGLDisplayList)
     {
         pNew->displayList = glGenLists(1);
+        pNew->displayListSize = 1;
 
         glNewList(pNew->displayList,GL_COMPILE);
             glBegin(GL_TRIANGLE_STRIP);
@@ -402,6 +510,10 @@ void Display::DrawBillboards()
 
         if (temp->remove)
         {
+            if (temp->displayList)
+                glDeleteLists(temp->displayList, temp->displayListSize);
+            if (temp->AnimTicket)
+                sAnimator->DestroyAnimTicket(temp->AnimTicket);
             if (temp)
                 delete temp;
             itr = BillboardDisplayList.erase(itr);

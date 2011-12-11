@@ -92,7 +92,7 @@ uint32 Animator::GetActualFrame(uint32 id)
     return itr->second.actualFrame;
 }
 
-void Animator::DestroyTextureAnimTicket(uint32 id)
+void Animator::DestroyAnimTicket(uint32 id)
 {
     AnimMap::const_iterator itr = Anims.find(id);
     if (itr == Anims.end())

@@ -51,12 +51,14 @@ struct DisplayListRecord
     {
         m_type = type;
         displayList = 0;
+        displayListSize = 0;
     }
 
     float  x, y, z;
     uint32 m_type;
     bool   remove;
     GLDisplayList displayList;
+    uint32 displayListSize;
 };
 
 struct ModelDisplayListRecord: public DisplayListRecord
@@ -107,10 +109,12 @@ class Display
         // Vse co se tyce vykreslovani modelu
         ModelDisplayListRecord* DrawModel(uint32 modelId, float x, float y, float z,
                                           ModelAnimType Animation = ANIM_IDLE,
-                                          float scale = 1.0f, float rotate = 0.0f);
+                                          float scale = 1.0f, float rotate = 0.0f,
+                                          bool genGLDisplayList = false);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
         void AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData);
+        void AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* pData, uint32 frame);
         void FlushModelDisplayList();
 
         // Vse co se tyce vykreslovani billboardu

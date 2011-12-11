@@ -33,9 +33,8 @@ class Animator
 
         // System vyzvedavani, vyhledavani a znaceni ticketu
         uint32 GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed = 1);
-        void DestroyTextureAnimTicket(uint32 id);
+        void DestroyAnimTicket(uint32 id);
         uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1);
-        void DestroyModelAnimTicket(uint32 id);
         void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0);
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);

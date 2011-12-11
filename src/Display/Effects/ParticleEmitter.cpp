@@ -141,7 +141,7 @@ bool Emitter::Update()
         }
         // hypoteticky jina moznost nastat nemuze
 
-        m_Particles.push_back(pNew);
+        m_Particles.push_front(pNew);
 
         m_nextParticleTime = tnow + m_particleTimeMed + (rand()%(m_particleTimeTol*2) - m_particleTimeTol);
     }
@@ -163,8 +163,6 @@ bool Emitter::Update()
         if (p->m_timeMax <= tnow)
         {
             p->m_record->remove = true;
-            if (p)
-                delete p;
             itr = m_Particles.erase(itr);
             continue;
         }
