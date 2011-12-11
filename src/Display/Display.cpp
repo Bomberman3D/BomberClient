@@ -14,6 +14,8 @@ Display::Display()
 
     for (uint8 i = 0; i < MAX_FONTS; i++)
         m_fontLoaded[i] = false;
+
+    m_ignoreTargetCollision = 0;
 }
 
 Display::~Display()
@@ -815,6 +817,8 @@ uint16 Display::CheckCollision(float newx, float newy, float newz)
     float sizex = 1;
     float sizez = 1;
 
+    bool ignored = false;
+
     for (int32 i = lh_x; i <= pd_x; i++)
     {
         for (int32 j = lh_z; j <= pd_z; j++)
@@ -866,18 +870,35 @@ uint16 Display::CheckCollision(float newx, float newy, float newz)
                                 {
                                     if (ocz >= conz+sizez+COLLISION_RANGE || ocz <= conz-COLLISION_RANGE)
                                         if (ocx < conx+sizex+COLLISION_RANGE || ocx > conx-COLLISION_RANGE)
+                                        {
+                                            if (m_ignoreTargetCollision == pMap->dynfield[i][j][k].type)
+                                            {
+                                                ignored = true;
+                                                break;
+                                            }
                                             collision |= AXIS_Z;
+                                        }
                                 }
                                 if (ncx != ocx)
                                 {
                                     if (ocx >= conx+sizex+COLLISION_RANGE || ocx <= conx-COLLISION_RANGE)
                                         if (ocz < conz+sizez+COLLISION_RANGE || ocz > conz-COLLISION_RANGE)
+                                        {
+                                            if (m_ignoreTargetCollision == pMap->dynfield[i][j][k].type)
+                                            {
+                                                ignored = true;
+                                                break;
+                                            }
                                             collision |= AXIS_X;
+                                        }
                                 }
                             }
                         }
                         break;
                     }
+
+                    if (!ignored && m_ignoreTargetCollision > 0)
+                        m_ignoreTargetCollision = 0;
                 }
             }
         }

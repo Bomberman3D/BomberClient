@@ -6,11 +6,18 @@
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
 #include <Map.h>
+#include <Gameplay.h>
 
 void GameStage::OnEnter()
 {
     pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.18f, 90.0f, true);
     sDisplay->SetTargetModel(pPlayerRec);
+
+    // TODO: vytvorit "nastaveni" hry a tam tohle presunout !!
+    sGameplayMgr->SetGameType(GAME_TYPE_SP_CLASSIC);
+
+
+    sGameplayMgr->OnGameInit();
 
     // TEST !!!
     /*Map* pMap = (Map*)sMapManager->GetMap();
@@ -21,8 +28,6 @@ void GameStage::OnEnter()
 
     sParticleEmitterMgr->AddEmitter(pbill, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 45.0f, 30.0f, 0.0f, 0.0f, 10000, 1000, 4.0f, 1.0f, 50, 10, 1, 1, 10000);*/
     // END OF TEST !!!
-
-    sMapManager->FillDynamicRecords();
 }
 
 void GameStage::OnBeforeDraw(uint32 diff)
@@ -56,6 +61,16 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
 
 void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
 {
+    if (left)
+    {
+        Map* pMap = (Map*)sMapManager->GetMap();
+        if (!pMap)
+            return;
+
+        pMap->AddDynamicCell(floor(pPlayerRec->x)+1,floor(pPlayerRec->z)+1,DYNAMIC_TYPE_BOMB, 0, 0, NULL);
+        sMapManager->FillDynamicRecords();
+        sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+    }
 }
 
 void GameStage::OnUpdate(uint32 diff)

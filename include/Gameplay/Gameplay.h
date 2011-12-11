@@ -15,6 +15,8 @@ class GameplayMgr
         void SetGameType(GameType type);
         GameType GetGameType();
 
+        void OnGameInit();
+
     private:
         GameTypeTemplate* m_game;
 };

@@ -18,6 +18,12 @@ void GameplayMgr::Update()
         m_game->OnUpdate();
 }
 
+void GameplayMgr::OnGameInit()
+{
+    if (m_game)
+        m_game->OnGameInit();
+}
+
 void GameplayMgr::SetGameType(GameType type)
 {
     if (type == GAME_TYPE_MAX)

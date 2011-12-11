@@ -174,6 +174,9 @@ class Display
         float GetTargetAngleY() { return m_tarangleY; };
         float GetTargetAngleZ() { return m_tarangleZ; };
 
+        // Vyjimky pro sledovany model - z vnejsku pristupne primo
+        uint32 m_ignoreTargetCollision;
+
         void BindTexture(uint32 textureId);
     private:
         // Display list modelu
