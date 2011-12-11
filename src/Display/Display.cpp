@@ -92,6 +92,8 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, const char *fmt, ..
     if (!m_fontLoaded[font])
         InitFont(font);
 
+    glEnable(GL_BLEND);
+
     // Nabindujeme texturu s fontem
     BindTexture(fontTextures[font]);
 
@@ -105,12 +107,23 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, const char *fmt, ..
       vsprintf(text, fmt, ap);
     va_end(ap);
 
+    // Pokud jsme ve 3D rezimu
+    bool in3D = !IsIn2DMode();
+
+    // Prepneme do 2D
+    if (in3D)
+        Setup2DMode();
+
     glLoadIdentity();
     glTranslated(left,top,0);
     glListBase(m_fontBase[font]-32);
     glCallLists(strlen(text),GL_UNSIGNED_BYTE,text);
 
     glLoadIdentity();
+
+    // A po vykresleni se vratime zpet do puvodniho modu pokud je to nutne
+    if (in3D)
+        Setup3DMode();
 }
 
 void Display::BindTexture(uint32 textureId)
@@ -199,6 +212,8 @@ void Display::DrawModels()
 
         if (temp->remove)
         {
+            if (temp)
+                delete temp;
             itr = ModelDisplayList.erase(itr);
             if (itr == ModelDisplayList.end())
                 break;
@@ -391,6 +406,8 @@ void Display::DrawBillboards()
 
         if (temp->remove)
         {
+            if (temp)
+                delete temp;
             itr = BillboardDisplayList.erase(itr);
             if (itr == BillboardDisplayList.end())
                 break;
