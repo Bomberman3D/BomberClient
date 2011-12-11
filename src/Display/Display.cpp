@@ -357,6 +357,30 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     return pNew;
 }
 
+BillboardDisplayListRecord* BillboardDisplayListRecord::Create(uint32 textureId, float x, float y, float z,
+                                                               float scale_x, float scale_y,
+                                                               bool billboard_x, bool billboard_y)
+{
+    BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
+    assert(pNew != NULL);
+
+    pNew->textureId = textureId;
+    pNew->x = x;
+    pNew->y = y;
+    pNew->z = z;
+
+    pNew->AnimTicket = 0;
+
+    pNew->remove = false;
+    pNew->scale_x = scale_x;
+    pNew->scale_y = scale_y;
+
+    pNew->billboard_x = billboard_x;
+    pNew->billboard_y = billboard_y;
+
+    return pNew;
+}
+
 void Display::DrawBillboards()
 {
     BillboardDisplayListRecord* temp = NULL;

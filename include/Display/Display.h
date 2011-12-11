@@ -81,6 +81,10 @@ struct BillboardDisplayListRecord: public DisplayListRecord
         AnimTicket = 0;
     }
 
+    static BillboardDisplayListRecord* Create(uint32 textureId, float x, float y, float z,
+                                              float scale_x = 1.0f, float scale_y = 1.0f,
+                                              bool billboard_x = true, bool billboard_y = true);
+
     uint32 textureId;
     uint32 AnimTicket;
     float  scale_x, scale_y;
