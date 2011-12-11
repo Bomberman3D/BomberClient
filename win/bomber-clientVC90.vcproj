@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Interface;../include/Gameplay;../include/System;../dep/SQLite/;../dep/SOIL/"
+				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Gameplay;../include/System;../dep/SQLite/;../dep/SOIL/"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -245,18 +245,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Interface"
-				>
-				<File
-					RelativePath="..\src\Interface\Interface.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Interface\InterfaceElements.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="Stages"
 				>
 				<File
@@ -407,18 +395,6 @@
 				</File>
 				<File
 					RelativePath="..\include\System\Timer.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Interface"
-				>
-				<File
-					RelativePath="..\include\Interface\Interface.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\Interface\InterfaceElements.h"
 					>
 				</File>
 			</Filter>
