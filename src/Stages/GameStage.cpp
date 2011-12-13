@@ -11,7 +11,7 @@
 
 void GameStage::OnEnter()
 {
-    pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.18f, 90.0f, true);
+    pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.45f, 90.0f, true);
     sDisplay->SetTargetModel(pPlayerRec);
 
     // TODO: vytvorit "nastaveni" hry a tam tohle presunout !!

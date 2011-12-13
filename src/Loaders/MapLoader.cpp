@@ -87,14 +87,14 @@ void MapManager::FillDynamicRecords()
                         case DYNAMIC_TYPE_BOMB:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.45f, 0.0f, true));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.6f, 0.0f, true));
                                 sAnimator->ChangeModelAnim(((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special)->AnimTicket, ANIM_IDLE, 0, 8);
                             }
                             break;
                         case DYNAMIC_TYPE_BOX:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.6f, 0.0f, true));
                             }
                             break;
                     }

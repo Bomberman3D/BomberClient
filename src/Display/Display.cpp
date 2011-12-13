@@ -177,21 +177,21 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->scale = scale;
     pNew->rotate = rotate;
 
-    if (genGLDisplayList)
+    if (genGLDisplayList && sStorage->Models[modelId]->displayListSize == 0)
     {
         uint32 maxFrame = 0;
         for (uint32 an = 0; an < MAX_ANIM; an++)
             if (maxFrame < sStorage->ModelAnimation[modelId].Anim[an].frameLast)
                 maxFrame = sStorage->ModelAnimation[modelId].Anim[an].frameLast;
 
-        pNew->displayList = glGenLists(maxFrame+1);
-        pNew->displayListSize = maxFrame + 1;
+        sStorage->Models[modelId]->displayList = glGenLists(maxFrame+1);
+        sStorage->Models[modelId]->displayListSize = maxFrame + 1;
 
         t3DModel* pModel = sStorage->Models[modelId];
 
         for (uint32 a = 0; a <= maxFrame; a++)
         {
-            glNewList(pNew->displayList + a,GL_COMPILE);
+            glNewList(sStorage->Models[modelId]->displayList + a,GL_COMPILE);
             for(int i = 0; i < pModel->numOfObjects; i++)
             {
                 if (pModel->pObject.size() <= 0) break;
@@ -299,8 +299,6 @@ void Display::DrawModels()
 
         if (temp->remove)
         {
-            if (temp->displayList)
-                glDeleteLists(temp->displayList, temp->displayListSize);
             if (temp->AnimTicket)
                 sAnimator->DestroyAnimTicket(temp->AnimTicket);
             if (temp)
@@ -331,10 +329,11 @@ void Display::DrawModels()
         glRotatef(temp->rotate,0.0f,1.0f,0.0f);
 
         // Pokud mame vygenerovany GL display list pro dany model
-        if (temp->displayList != 0)
+        if (sStorage->Models[temp->modelId]->displayListSize != 0)
         {
+            glScalef(temp->scale, temp->scale, temp->scale);
             // Vykreslime to pomoci display listu
-            glCallList(temp->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
+            glCallList(sStorage->Models[temp->modelId]->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
             // A nemusime se dale o nic starat
             ++itr;
             continue;

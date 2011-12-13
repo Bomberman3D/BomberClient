@@ -86,6 +86,8 @@ struct t3DModel
 {
     t3DModel()
     {
+        displayList = 0;
+        displayListSize = 0;
         numOfObjects = 0;
         numOfMaterials = 0;
         numberOfFrames = 1;
@@ -109,6 +111,9 @@ struct t3DModel
     CVector3 Minimum;
 
     float currentScale;
+
+    GLuint displayList;
+    uint32 displayListSize;
 };
 
 namespace Loaders
