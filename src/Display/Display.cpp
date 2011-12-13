@@ -41,6 +41,8 @@ void Display::Initialize()
     m_tarangleX = 0.0f;
     m_tarangleY = 0.0f;
     m_tarangleZ = 0.0f;
+
+    m_targetmodel = NULL;
 }
 
 void Display::InitFont(uint8 font)
@@ -515,9 +517,26 @@ BillboardDisplayListRecord* BillboardDisplayListRecord::Create(uint32 textureId,
     return pNew;
 }
 
+// Funkce pro serazeni zaznamu od nejvzdalenejsiho po nejblizsi kvuli vykreslovani
+bool BubbleSortDistance(BillboardDisplayListRecord* first, BillboardDisplayListRecord* second)
+{
+    // Pokud je vzdalenost daneho zaznamu od bodu pohledu vetsi nez u druheho, nechame ho vykreslit driv
+    // true = "ano, posunout navrch"
+    if (sqrt(pow(first->x-sDisplay->GetViewX(),2)+pow(first->y-sDisplay->GetViewY(),2)+pow(first->z-sDisplay->GetViewZ(),2))
+        > sqrt(pow(second->x-sDisplay->GetViewX(),2)+pow(second->y-sDisplay->GetViewY(),2)+pow(second->z-sDisplay->GetViewZ(),2)))
+        return true;
+
+    return false;
+}
+
 void Display::DrawBillboards()
 {
     BillboardDisplayListRecord* temp = NULL;
+
+    glDepthMask(GL_FALSE);
+
+    if (!BillboardDisplayList.empty())
+        BillboardDisplayList.sort(BubbleSortDistance);
 
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end();)
     {
@@ -600,6 +619,7 @@ void Display::DrawBillboards()
 
         ++itr;
     }
+    glDepthMask(GL_TRUE);
     glLoadIdentity();
 
     glRotatef(m_angleX, 1.0f,  0.0f, 0.0f);

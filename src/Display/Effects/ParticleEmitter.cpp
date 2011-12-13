@@ -47,10 +47,10 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_centerZ   = centerZ;
     pTemp->m_width     = width;
     pTemp->m_height    = height;
-    pTemp->m_angleMedX = angleMedX;
-    pTemp->m_angleMedY = angleMedY;
-    pTemp->m_angleTolX = angleTolX;
-    pTemp->m_angleTolY = angleTolY;
+    pTemp->m_angleMedX = angleMedX * PI / 180.0f;
+    pTemp->m_angleMedY = angleMedY * PI / 180.0f;
+    pTemp->m_angleTolX = angleTolX * PI / 180.0f;
+    pTemp->m_angleTolY = angleTolY * PI / 180.0f;
     pTemp->m_timeMed   = timeMed;
     pTemp->m_timeTol   = timeTol;
     pTemp->m_particleTimeMed   = particleTimeMed;
@@ -77,11 +77,11 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     // Transformace jednotlivych uhlopricnych vektoru je porad stejna, rozdilny je jen vstup na zacatku
     for (uint8 i = 0; i < 2; i++)
     {
-        pTemp->startVector[i].y = pTemp->startVector[i].y * cos(angleMedY);
-        pTemp->startVector[i].z = pTemp->startVector[i].y * sin(angleMedY);
+        pTemp->startVector[i].y = pTemp->startVector[i].y * cos(pTemp->m_angleMedY);
+        pTemp->startVector[i].z = pTemp->startVector[i].y * sin(pTemp->m_angleMedY);
 
-        pTemp->startVector[i].z = pTemp->startVector[i].z + pTemp->startVector[i].x * sin(angleMedX);
-        pTemp->startVector[i].x = pTemp->startVector[i].x + pTemp->startVector[i].x * cos(angleMedX);
+        pTemp->startVector[i].z = pTemp->startVector[i].z + pTemp->startVector[i].x * sin(pTemp->m_angleMedX);
+        pTemp->startVector[i].x = pTemp->startVector[i].x * cos(pTemp->m_angleMedX);
     }
 
     pTemp->m_nextParticleTime = 0;

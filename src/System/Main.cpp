@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+#include <GL/glut.h>
+
 HDC hDC=NULL;
 HGLRC hRC=NULL;
 HWND hWnd=NULL;
@@ -54,6 +56,8 @@ bool InitGL(GLvoid)
     glShadeModel(GL_SMOOTH);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0f);
+    glutInitDisplayMode(GLUT_DEPTH);
+    glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
