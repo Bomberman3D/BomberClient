@@ -12,6 +12,8 @@ enum GameType
     GAME_TYPE_MAX
 };
 
+struct BombRecord;
+
 class GameTypeTemplate
 {
     public:
@@ -20,6 +22,7 @@ class GameTypeTemplate
         }
         virtual void OnGameInit() {};
         virtual void OnUpdate() {};
+        virtual void OnBombBoom(BombRecord* bomb) {};
 
         // Multiplayer funkce, prepsany jen v multiplayerovych potomkach
         //virtual void OnPlayerJoin( ... ) {};
@@ -43,6 +46,7 @@ class ClassicSingleGameType: public GameTypeTemplate
         }
         void OnGameInit();
         void OnUpdate();
+        void OnBombBoom(BombRecord* bomb);
 };
 
 class ClassicMultiGameType: public GameTypeTemplate

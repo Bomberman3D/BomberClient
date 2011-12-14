@@ -527,7 +527,8 @@ void Application::MouseButtonStateChange(bool left, bool press)
     {
         mouse[pos] = press;
 
-        m_currStage->OnMouseButtonPress(mouseXY[0], mouseXY[1], left);
+        if (press)
+            m_currStage->OnMouseButtonPress(mouseXY[0], mouseXY[1], left);
     }
 }
 

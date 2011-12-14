@@ -186,6 +186,28 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
     }
 }
 
+bool Map::IsDynamicRecordPresent(uint32 x, uint32 y, int32 type)
+{
+    if (x > dynfield.size()-1 || y > dynfield[0].size()-1)
+        return false;
+
+    for (Map::DynamicCellSet::iterator itr = dynfield[x][y].begin(); itr != dynfield[x][y].end(); ++itr)
+    {
+        if ((*itr).type == type || type == -1)
+            return true;
+    }
+
+    return false;
+}
+
+uint32 Map::GetStaticRecord(uint32 x, uint32 y)
+{
+    if (x > field.size()-1 || y > field[0].size()-1)
+        return 0;
+
+    return field[x][y].type;
+}
+
 void Map::DestroyAllDynamicRecords()
 {
     if (dynfield.size() == 0)

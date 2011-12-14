@@ -76,6 +76,9 @@ class Map
         Map::DynamicCellSet* GetDynamicCellSet(uint32 x, uint32 y);
         void DestroyDynamicRecords(uint32 x, uint32 y, int32 type = -1);
         void DestroyAllDynamicRecords();
+        bool IsDynamicRecordPresent(uint32 x, uint32 y, int32 type = -1);
+
+        uint32 GetStaticRecord(uint32 x, uint32 y);
 
         uint32 mapId;
         uint32 m_skybox;

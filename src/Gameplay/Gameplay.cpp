@@ -2,7 +2,6 @@
 #include <Gameplay.h>
 #include <Timer.h>
 #include <Map.h>
-#include <Effects/ParticleEmitter.h>
 
 GameplayMgr::GameplayMgr()
 {
@@ -32,27 +31,9 @@ void GameplayMgr::Update()
 
             if ((*itr)->state == 1)
             {
-                Map* pMap = (Map*)sMapManager->GetMap();
-                if (pMap)
-                {
-                    pMap->DestroyDynamicRecords((*itr)->x, (*itr)->y, DYNAMIC_TYPE_BOMB);
-
-                    // Exploze - particle emittery
-                    BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-                    sParticleEmitterMgr->AddEmitter(templ, (*itr)->x-0.5f, 0.1f, (*itr)->y-0.5f, 0.1f, 0.3f, 0, 0, 0, 0, 140, 10, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
-
-                    templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-                    sParticleEmitterMgr->AddEmitter(templ, (*itr)->x-0.5f, 0.1f, (*itr)->y-0.5f, 0.1f, 0.3f, 90.0f, 0, 0, 0, 140, 10, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
-
-                    templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-                    sParticleEmitterMgr->AddEmitter(templ, (*itr)->x-0.5f, 0.1f, (*itr)->y-0.5f, 0.1f, 0.3f, 180.0f, 0, 0, 0, 140, 10, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
-
-                    templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-                    sParticleEmitterMgr->AddEmitter(templ, (*itr)->x-0.5f, 0.1f, (*itr)->y-0.5f, 0.1f, 0.3f, 270.0f, 0, 0, 0, 140, 10, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
-
-                    itr = BombMap.erase(itr);
-                    continue;
-                }
+                m_game->OnBombBoom(*itr);
+                itr = BombMap.erase(itr);
+                continue;
             }
 
             ++itr;
