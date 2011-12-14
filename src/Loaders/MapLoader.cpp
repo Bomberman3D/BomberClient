@@ -156,7 +156,7 @@ Map::DynamicCellSet* Map::GetDynamicCellSet(uint32 x, uint32 y)
 
 void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
 {
-    if (dynfield[x][y].empty())
+    if (x >= dynfield.size() || y >= dynfield[x].size() || dynfield[x][y].empty())
         return;
 
     for (Map::DynamicCellSet::iterator itr = dynfield[x][y].begin(); itr != dynfield[x][y].end();)
