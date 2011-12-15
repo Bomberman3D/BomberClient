@@ -91,6 +91,7 @@ class GameSettingsStage: public StageControl
             m_type = STAGE_GAMESETTINGS;
         }
         void OnEnter();
+        void OnLeave();
         void OnDraw(uint32 diff);
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);

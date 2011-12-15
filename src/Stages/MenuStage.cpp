@@ -9,6 +9,9 @@ void MenuStage::OnEnter()
 {
     // Menu scene
     sDisplay->DrawModel(4, -0.5f, -5.0f, -8.0f, ANIM_NONE, 2.0f);
+    sDisplay->DrawModel(2, -4.0f, -5.0f, -13.0f, ANIM_IDLE, 1.0f);
+    sDisplay->DrawModel(2, -4.0f, -5.0f, -10.0f, ANIM_IDLE, 1.0f);
+    sDisplay->DrawModel(2, -4.0f, -5.0f,  -7.5f, ANIM_IDLE, 1.0f);
     sDisplay->SetAngleX(20.0f);
 
     // Svetlo
