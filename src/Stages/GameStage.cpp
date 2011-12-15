@@ -30,6 +30,16 @@ void GameStage::OnEnter()
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
     glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
     glEnable(GL_LIGHT1);
+
+    // Mlha
+    /*glFogi(GL_FOG_MODE, GL_LINEAR);
+    GLfloat fogColor[]= {0.5f, 0.5f, 0.5f, 1.0f};
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogf(GL_FOG_DENSITY, 0.1f);
+    glHint(GL_FOG_HINT, GL_DONT_CARE);
+    glFogf(GL_FOG_START, 3.0f);
+    glFogf(GL_FOG_END, 10.0f);
+    glEnable(GL_FOG);*/
 }
 
 void GameStage::OnBeforeDraw(uint32 diff)
