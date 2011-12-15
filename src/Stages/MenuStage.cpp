@@ -38,6 +38,9 @@ void MenuStage::OnDraw(uint32 diff)
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
 
+    // Logo skoly
+    sDisplay->Draw2D(32,WIDTH-144-20, HEIGHT-42-20, 144, 42);
+
     // Nova hra
     sDisplay->Draw2D(4 ,WIDTH-350,50 ,350,80);
     // Multiplayer
