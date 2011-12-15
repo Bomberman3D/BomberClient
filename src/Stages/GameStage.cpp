@@ -30,16 +30,6 @@ void GameStage::OnEnter()
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
     glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
     glEnable(GL_LIGHT1);
-
-    // TEST !!!
-    /*Map* pMap = (Map*)sMapManager->GetMap();
-    pMap->AddDynamicCell(3,3,DYNAMIC_TYPE_BOX, 0, 0, NULL);
-    pMap->AddDynamicCell(3,2,DYNAMIC_TYPE_BOMB, 0, 0, NULL);
-
-    DisplayListRecord* pbill = BillboardDisplayListRecord::Create(21,0.5f,0,0.5f, 0.5f, 0.5f, true, true);
-
-    sParticleEmitterMgr->AddEmitter(pbill, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 45.0f, 30.0f, 0.0f, 0.0f, 10000, 1000, 4.0f, 1.0f, 50, 10, 1, 1, 10000);*/
-    // END OF TEST !!!
 }
 
 void GameStage::OnBeforeDraw(uint32 diff)
@@ -49,10 +39,16 @@ void GameStage::OnBeforeDraw(uint32 diff)
 
 void GameStage::OnDraw(uint32 diff)
 {
-    glLoadIdentity();
-    glRotatef(pPlayerRec->rotate, 0, -1.0f, 0);
-    static GLfloat lPosition[]= {pPlayerRec->x-5.0f, 5.0f, pPlayerRec->z-5.0f, 1.5f};
-    glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
+    // Pokud existuje zaznam hrace, posuneme svetlo
+    if (pPlayerRec)
+    {
+        glLoadIdentity();
+        // Natoceni je dulezite, jinak se bude svetlo pohybovat stale s hracem
+        glRotatef(pPlayerRec->rotate, 0, -1.0f, 0);
+        // Souradnice se odecitaji kvuli "presunuti" nuly zpet do pocatku
+        static GLfloat lPosition[] = {pPlayerRec->x-5.0f, 5.0f, pPlayerRec->z-5.0f, 1.5f};
+        glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
+    }
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
