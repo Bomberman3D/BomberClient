@@ -701,6 +701,78 @@ void Display::DrawMap()
     glRotatef(m_angleZ,0.0f,0.0f,1.0f);
     glTranslatef(m_viewX, m_viewY, m_viewZ);
 
+    // Vykresleni skyboxu
+
+    /*
+    Skybox data struktura:
+        id
+        box_textures[6]
+            0 = dolni
+            1 = horni
+            2 = zadni
+            3 = predni
+            4 = vlevo
+            5 = vpravo
+    */
+    uint32 m_skybox = pMap->m_skybox;
+    GLfloat skyboxSize = 50.0f;
+
+    // Predni cast
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[3]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1, 1); glVertex3f(  skyboxSize, -skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 1); glVertex3f( -skyboxSize, -skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize, -skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f(  skyboxSize,  skyboxSize, -skyboxSize );
+    glEnd();
+
+    // Cast vlevo
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[4]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1, 1); glVertex3f(  skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(0, 1); glVertex3f(  skyboxSize, -skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 0); glVertex3f(  skyboxSize,  skyboxSize, -skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f(  skyboxSize,  skyboxSize,  skyboxSize );
+    glEnd();
+
+    // Zadni cast
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[2]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1, 1); glVertex3f( -skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(0, 1); glVertex3f(  skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(0, 0); glVertex3f(  skyboxSize,  skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f( -skyboxSize,  skyboxSize,  skyboxSize );
+    glEnd();
+
+    // Cast vpravo
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[5]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1, 1); glVertex3f( -skyboxSize, -skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 1); glVertex3f( -skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f( -skyboxSize,  skyboxSize, -skyboxSize );
+    glEnd();
+
+    // Strop
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[1]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 1); glVertex3f( -skyboxSize,  skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f(  skyboxSize,  skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 1); glVertex3f(  skyboxSize,  skyboxSize, -skyboxSize );
+    glEnd();
+
+    // Spodni cast
+    sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[0]);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -skyboxSize, -skyboxSize, -skyboxSize );
+        glTexCoord2f(0, 1); glVertex3f( -skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 1); glVertex3f(  skyboxSize, -skyboxSize,  skyboxSize );
+        glTexCoord2f(1, 0); glVertex3f(  skyboxSize, -skyboxSize, -skyboxSize );
+    glEnd();
+
+    // Konec vykresleni skyboxu
+
     for (uint32 w = 0; w < pMap->field.size(); w++)
     {
         for (uint32 h = 0; h < pMap->field[0].size(); h++)
