@@ -10,6 +10,17 @@ void MenuStage::OnEnter()
     // Menu scene
     sDisplay->DrawModel(4, -0.5f, -5.0f, -8.0f, ANIM_NONE, 2.0f);
     sDisplay->SetAngleX(20.0f);
+
+    // Svetlo
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    GLfloat lAmbient[] = {0.4f, 0.4f, 0.4f, 1.0f};
+    GLfloat lDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat lPosition[]= {0.0f, 5.0f, 0.0f, 1.0f};
+    glLightfv(GL_LIGHT1, GL_AMBIENT,  lAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
+    glEnable(GL_LIGHT1);
 }
 
 void MenuStage::OnDraw(uint32 diff)

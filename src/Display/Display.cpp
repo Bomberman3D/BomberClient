@@ -43,6 +43,8 @@ void Display::Initialize()
     m_tarangleZ = 0.0f;
 
     m_targetmodel = NULL;
+
+    m_is2D = false;
 }
 
 void Display::InitFont(uint8 font)
@@ -534,6 +536,9 @@ void Display::DrawBillboards()
 
     glDepthMask(GL_FALSE);
 
+    bool lightingEnable = (glIsEnabled(GL_LIGHTING) == GL_TRUE);
+    glDisable(GL_LIGHTING);
+
     if (!BillboardDisplayList.empty())
         BillboardDisplayList.sort(BubbleSortDistance);
 
@@ -619,6 +624,10 @@ void Display::DrawBillboards()
         ++itr;
     }
     glDepthMask(GL_TRUE);
+
+    if (lightingEnable)
+        glEnable(GL_LIGHTING);
+
     glLoadIdentity();
 
     glRotatef(m_angleX, 1.0f,  0.0f, 0.0f);
@@ -636,6 +645,10 @@ void Display::Setup2DMode()
     // Priprava a prechod do 2D projekce
     int vPort[4];
     glGetIntegerv(GL_VIEWPORT, vPort);
+
+    // Bez svetel ve 2D modu
+    m_cachedLighting = (glIsEnabled(GL_LIGHTING) == GL_TRUE);
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -665,6 +678,9 @@ void Display::Setup3DMode()
     glPopMatrix();
 
     glEnable(GL_DEPTH_TEST);
+
+    if (m_cachedLighting)
+        glEnable(GL_LIGHTING);
 
     m_is2D = false;
 }

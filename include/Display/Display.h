@@ -186,6 +186,8 @@ class Display
 
         // Jsme ve 2D rezimu? Defaultne false
         bool m_is2D;
+        // Promenna ktera uchovava stav zapnuti svetel pro pozdejsi obnoveni
+        bool m_cachedLighting;
 
         // Promenne specifikujici pozici a natoceni kamery
         float m_viewX;
