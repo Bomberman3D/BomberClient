@@ -14,13 +14,19 @@ void MenuStage::OnEnter()
     // Svetlo
     glEnable(GL_LIGHTING);
     glEnable(GL_NORMALIZE);
-    GLfloat lAmbient[] = {0.4f, 0.4f, 0.4f, 1.0f};
+    GLfloat lAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f};
     GLfloat lDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat lPosition[]= {0.0f, 5.0f, 0.0f, 1.0f};
+    GLfloat lPosition[]= {0.0f, 2.0f, 0.0f, 1.0f};
     glLightfv(GL_LIGHT1, GL_AMBIENT,  lAmbient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
     glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
     glEnable(GL_LIGHT1);
+}
+
+void MenuStage::OnLeave()
+{
+    glDisable(GL_LIGHTING);
+    glDisable(GL_NORMALIZE);
 }
 
 void MenuStage::OnDraw(uint32 diff)

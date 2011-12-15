@@ -19,6 +19,7 @@ class StageControl
 {
     public:
         virtual void OnEnter() {};
+        virtual void OnLeave() {};
         virtual void OnDraw(uint32 diff) {};
         virtual void OnBeforeDraw(uint32 diff) {};
         virtual void OnKeyStateChange(uint16 key, bool press) {};
@@ -45,6 +46,7 @@ class MenuStage: public StageControl
             m_type = STAGE_MENU;
         }
         void OnEnter();
+        void OnLeave();
         void OnDraw(uint32 diff);
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
@@ -122,6 +124,7 @@ class GameStage: public StageControl
             m_type = STAGE_GAME;
         }
         void OnEnter();
+        void OnLeave();
         void OnDraw(uint32 diff);
         void OnBeforeDraw(uint32 diff);
         void OnKeyStateChange(uint16 key, bool press);

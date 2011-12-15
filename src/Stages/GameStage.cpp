@@ -42,6 +42,12 @@ void GameStage::OnEnter()
     glEnable(GL_FOG);*/
 }
 
+void GameStage::OnLeave()
+{
+    glDisable(GL_LIGHTING);
+    glDisable(GL_NORMALIZE);
+}
+
 void GameStage::OnBeforeDraw(uint32 diff)
 {
     sDisplay->DrawMap();

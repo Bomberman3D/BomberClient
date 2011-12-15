@@ -476,7 +476,10 @@ void Application::PMessageBox(const char* caption, const char* format, ...)
 void Application::SetStage(uint32 newstage, uint32 newphase)
 {
     if (m_currStage)
+    {
+        m_currStage->OnLeave();
         delete m_currStage;
+    }
 
     switch (newstage)
     {
