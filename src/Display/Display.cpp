@@ -799,26 +799,31 @@ void Display::DrawMap()
                 glBegin(GL_QUADS);
                     glNormal3f(0.0f,-1.0f, 0.0f);
                     // horni
+                    glNormal3f( 0.0f, 1.0f, 0.0f);
                     glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
                     glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
                     // levobok
+                    glNormal3f(-1.0f, 0.0f, 0.0f);
                     glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z-1);
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x-1, y                 , z  );
                     glTexCoord2f(0.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
                     // pravobok
+                    glNormal3f( 1.0f, 0.0f, 0.0f);
                     glTexCoord2f(1.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x  , y                 , z  );
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z-1);
                     glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
                     // predni
+                    glNormal3f( 0.0f, 0.0f, 1.0f);
                     glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z  );
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z  );
                     glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
                     // zadni
+                    glNormal3f( 0.0f, 0.0f,-1.0f);
                     glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z-1);
                     glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z-1);

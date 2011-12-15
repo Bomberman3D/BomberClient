@@ -20,6 +20,17 @@ void GameStage::OnEnter()
 
     sGameplayMgr->OnGameInit();
 
+    // Svetla
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    GLfloat lAmbient[] = {0.4f, 0.4f, 0.4f, 1.0f};
+    GLfloat lDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat lPosition[]= {0.0f, 5.0f, 0.0f, 1.0f};
+    glLightfv(GL_LIGHT1, GL_AMBIENT,  lAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
+    glEnable(GL_LIGHT1);
+
     // TEST !!!
     /*Map* pMap = (Map*)sMapManager->GetMap();
     pMap->AddDynamicCell(3,3,DYNAMIC_TYPE_BOX, 0, 0, NULL);
@@ -38,6 +49,10 @@ void GameStage::OnBeforeDraw(uint32 diff)
 
 void GameStage::OnDraw(uint32 diff)
 {
+    glLoadIdentity();
+    glRotatef(pPlayerRec->rotate, 0, -1.0f, 0);
+    static GLfloat lPosition[]= {pPlayerRec->x-5.0f, 5.0f, pPlayerRec->z-5.0f, 1.5f};
+    glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
