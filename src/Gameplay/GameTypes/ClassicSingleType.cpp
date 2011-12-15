@@ -79,17 +79,17 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         --reach_y2;
 
         // Exploze - particle emittery
-        BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.1f, 0.3f, 0, 0, 0, 0, reach_y1*100, 20, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
+        BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 0, 0, 0, reach_y1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
-        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.1f, 0.3f, 90.0f, 0, 0, 0, reach_x2*100, 20, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
+        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 90.0f, 0, 0, 0, reach_x2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
-        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.1f, 0.3f, 180.0f, 0, 0, 0, reach_y2*100, 20, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
+        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 180.0f, 0, 0, 0, reach_y2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
-        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 1.0f, 1.0f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.1f, 0.3f, 270.0f, 0, 0, 0, reach_x1*100, 20, 10.0f, 0.1f, 100, 10, 0, 0, 1500);
+        templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 270.0f, 0, 0, 0, reach_x1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         // A nakonec znicime vsechny bedny v dosahu bomby (+1 / -1 proto, ze reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
         pMap->DestroyDynamicRecords(bomb->x + reach_x1 + 1, bomb->y, DYNAMIC_TYPE_BOX);
