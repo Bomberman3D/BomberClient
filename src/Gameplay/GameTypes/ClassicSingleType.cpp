@@ -32,6 +32,28 @@ void ClassicSingleGameType::OnGameInit()
 
 void ClassicSingleGameType::OnUpdate()
 {
+    if (!m_enemies.empty())
+    {
+        clock_t tnow = clock();
+
+        for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end(); )
+        {
+            // Pokud neexistuje cil, vymazeme zaznam z vektoru
+            if (!(*itr))
+            {
+                itr = m_enemies.erase(itr);
+                continue;
+            }
+            // Pokud jeste neni cas na update, posuneme se dal
+            if ((*itr)->m_nextUpdate > tnow)
+            {
+                ++itr;
+                continue;
+            }
+
+            // Samotny update
+        }
+    }
 }
 
 void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)

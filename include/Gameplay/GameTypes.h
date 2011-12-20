@@ -13,6 +13,7 @@ enum GameType
 };
 
 struct BombRecord;
+class EnemyTemplate;
 
 class GameTypeTemplate
 {
@@ -47,6 +48,9 @@ class ClassicSingleGameType: public GameTypeTemplate
         void OnGameInit();
         void OnUpdate();
         void OnBombBoom(BombRecord* bomb);
+
+    private:
+        std::list<EnemyTemplate*> m_enemies;
 };
 
 class ClassicMultiGameType: public GameTypeTemplate
