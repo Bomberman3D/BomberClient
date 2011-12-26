@@ -480,10 +480,10 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
 
         glNewList(pNew->displayList,GL_COMPILE);
             glBegin(GL_TRIANGLE_STRIP);
-                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, pNew->scale_y , ( pNew->scale_x/2));
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, 0             , (-pNew->scale_x/2));
                 glTexCoord2f(0.0f, 1.0f); glVertex3f(0, 0             , ( pNew->scale_x/2));
                 glTexCoord2f(1.0f, 0.0f); glVertex3f(0, pNew->scale_y , (-pNew->scale_x/2));
-                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0             , (-pNew->scale_x/2));
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, pNew->scale_y , ( pNew->scale_x/2));
             glEnd();
         glEndList();
     }
@@ -608,10 +608,10 @@ void Display::DrawBillboards()
         else
         {
             glBegin(GL_TRIANGLE_STRIP);
-                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, temp->scale_y , ( temp->scale_x/2));
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0, 0             , (-temp->scale_x/2));
                 glTexCoord2f(0.0f, 1.0f); glVertex3f(0, 0             , ( temp->scale_x/2));
                 glTexCoord2f(1.0f, 0.0f); glVertex3f(0, temp->scale_y , (-temp->scale_x/2));
-                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0             , (-temp->scale_x/2));
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0, temp->scale_y , ( temp->scale_x/2));
             glEnd();
         }
 
