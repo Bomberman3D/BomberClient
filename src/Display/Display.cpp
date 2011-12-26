@@ -538,10 +538,13 @@ BillboardDisplayListRecord* BillboardDisplayListRecord::Create(uint32 textureId,
 // Funkce pro serazeni zaznamu od nejvzdalenejsiho po nejblizsi kvuli vykreslovani
 bool BubbleSortDistance(BillboardDisplayListRecord* first, BillboardDisplayListRecord* second)
 {
+    // Ve vypoctu musime zminusovat hracovo souradnice - vzdycky se pohybujeme s vykreslovanim v zaporne poloose, kdezto souradnice
+    // realnych zaznamu se pohybuji v opacne poloose od tech hracskych
+
     // Pokud je vzdalenost daneho zaznamu od bodu pohledu vetsi nez u druheho, nechame ho vykreslit driv
     // true = "ano, posunout navrch"
-    if (sqrt(pow(first->x-sDisplay->GetViewX(),2)+pow(first->y-sDisplay->GetViewY(),2)+pow(first->z-sDisplay->GetViewZ(),2))
-        > sqrt(pow(second->x-sDisplay->GetViewX(),2)+pow(second->y-sDisplay->GetViewY(),2)+pow(second->z-sDisplay->GetViewZ(),2)))
+    if (sqrt(pow(first->x-(-sDisplay->GetViewX()),2)+pow(first->y-(-sDisplay->GetViewY()),2)+pow(first->z-(-sDisplay->GetViewZ()),2))
+        > sqrt(pow(second->x-(-sDisplay->GetViewX()),2)+pow(second->y-(-sDisplay->GetViewY()),2)+pow(second->z-(-sDisplay->GetViewZ()),2)))
         return true;
 
     return false;
