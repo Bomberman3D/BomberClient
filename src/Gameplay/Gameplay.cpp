@@ -32,6 +32,7 @@ void GameplayMgr::Update()
             if ((*itr)->state == 1)
             {
                 m_game->OnBombBoom(*itr);
+                m_plActiveBombs--;
                 itr = BombMap.erase(itr);
                 continue;
             }
@@ -43,6 +44,13 @@ void GameplayMgr::Update()
 
 void GameplayMgr::OnGameInit()
 {
+    // Vychozi hodnoty
+    m_plSpeedCoef  = 1.0f;
+    m_plFlameReach = 1;
+    m_plMaxBombs   = 1;
+
+    m_plActiveBombs = 0;
+
     if (m_game)
         m_game->OnGameInit();
 }
@@ -81,8 +89,11 @@ GameType GameplayMgr::GetGameType()
     return m_game->GetType();
 }
 
-void GameplayMgr::AddBomb(uint32 x, uint32 y)
+bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 {
+    if (m_plActiveBombs >= m_plMaxBombs)
+        return false;
+
     BombRecord* temp = new BombRecord;
     temp->x = x;
     temp->y = y;
@@ -90,4 +101,41 @@ void GameplayMgr::AddBomb(uint32 x, uint32 y)
     BombMap.push_back(temp);
 
     sTimer->AddTimedSetEvent(2500, &temp->state, 1);
+    m_plActiveBombs++;
+    return true;
+}
+
+void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
+{
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    Map::DynamicCellSet* pSet = pMap->GetDynamicCellSet(newX, newY);
+    if (!pSet || pSet->empty())
+        return;
+
+    for (Map::DynamicCellSet::iterator itr = pSet->begin(); itr != pSet->end(); ++itr)
+    {
+        if (itr->type == DYNAMIC_TYPE_BONUS)
+        {
+            switch (itr->misc)
+            {
+                case BONUS_FLAME:
+                    if (m_plFlameReach < 5)
+                        m_plFlameReach++;
+                    break;
+                case BONUS_SPEED:
+                    if (m_plSpeedCoef < 2.0f)
+                    m_plSpeedCoef += 0.2f;
+                    break;
+                case BONUS_BOMB:
+                    if (m_plMaxBombs < 6)
+                        m_plMaxBombs++;
+                    break;
+            }
+        }
+    }
+
+    pMap->DestroyDynamicRecords(newX, newY, DYNAMIC_TYPE_BONUS);
 }

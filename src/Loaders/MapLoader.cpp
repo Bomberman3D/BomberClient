@@ -2,6 +2,7 @@
 #include <Map.h>
 #include <Storage.h>
 #include <Effects/Animations.h>
+#include <Gameplay.h>
 
 #include <algorithm>
 
@@ -97,6 +98,20 @@ void MapManager::FillDynamicRecords()
                                 pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.6f, 0.0f, true));
                             }
                             break;
+                        case DYNAMIC_TYPE_BONUS:
+                            if (pMap->dynfield[i][j][k].special == NULL)
+                            {
+                                uint32 texture = 33;
+                                switch (pMap->dynfield[i][j][k].misc)
+                                {
+                                    case 0:   texture = 33;   break;
+                                    case 1:   texture = 34;   break;
+                                    case 2:   texture = 35;   break;
+                                    default:  texture = 33;   break;
+                                }
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawBillboard(texture, i-0.5f, 0.0f, j-0.5f, 0, 0, 0.8f, 0.8f, false, true));
+                            }
+                            break;
                     }
                 }
             }
@@ -159,6 +174,8 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
     if (x >= dynfield.size() || y >= dynfield[x].size() || dynfield[x][y].empty())
         return;
 
+    uint32 destroyedCount = 0;
+
     for (Map::DynamicCellSet::iterator itr = dynfield[x][y].begin(); itr != dynfield[x][y].end();)
     {
         // Odstranujeme jen specifikovany typ nebo pri type == -1 vsechny
@@ -181,9 +198,19 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
             if ((*itr).special != NULL)
                 sDisplay->RemoveRecordFromDisplayList((ModelDisplayListRecord*)(*itr).special);
         }
+        else if ((*itr).type == DYNAMIC_TYPE_BONUS)
+        {
+            if ((*itr).special != NULL)
+                sDisplay->RemoveRecordFromDisplayList((BillboardDisplayListRecord*)(*itr).special);
+        }
 
+        destroyedCount++;
         itr = dynfield[x][y].erase(itr);
     }
+
+    if (type == DYNAMIC_TYPE_BOX)
+        for (uint32 i = 0; i < destroyedCount; ++i)
+            sGameplayMgr->OnBoxDestroy(x, y, true);
 }
 
 bool Map::IsDynamicRecordPresent(uint32 x, uint32 y, int32 type)

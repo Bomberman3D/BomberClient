@@ -45,12 +45,24 @@ class GameplayMgr
         GameType GetGameType();
 
         void OnGameInit();
+        void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
+        void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
-        void AddBomb(uint32 x, uint32 y);
+        bool AddBomb(uint32 x, uint32 y);
+
+        float GetPlayerSpeedCoef() { return m_plSpeedCoef; };
+        uint32 GetFlameReach() { return m_plFlameReach; };
+        uint32 GetMaxBombs() { return m_plMaxBombs; };
 
     private:
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;
+
+        float  m_plSpeedCoef;
+        uint32 m_plFlameReach;
+        uint32 m_plMaxBombs;
+
+        uint32 m_plActiveBombs;
 };
 
 #define sGameplayMgr Singleton<GameplayMgr>::instance()

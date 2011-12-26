@@ -68,7 +68,7 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         pMap->DestroyDynamicRecords(bomb->x, bomb->y, DYNAMIC_TYPE_BOMB);
 
         // Tohle bude v budoucnu promenliva hodnota, podle bonusu apod.
-        uint32 bombreach = 1;
+        uint32 bombreach = sGameplayMgr->GetFlameReach();
 
         // Projdeme vsechny mozne zaznamy na mape az na maximalni definovany dosah
         // pokud tam neco je, zamezime dalsimu prepsani a zapiseme
@@ -134,5 +134,24 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         pMap->DestroyDynamicRecords(bomb->x - reach_x2 - (rx2_box?1:0), bomb->y, DYNAMIC_TYPE_BOX);
         pMap->DestroyDynamicRecords(bomb->x, bomb->y + reach_y1 + (ry1_box?1:0), DYNAMIC_TYPE_BOX);
         pMap->DestroyDynamicRecords(bomb->x, bomb->y - reach_y2 - (rx1_box?1:0), DYNAMIC_TYPE_BOX);
+    }
+}
+
+void ClassicSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
+{
+    if (by_bomb)
+    {
+        // vytvorit bonus na dynamic mape
+        Map* pMap = (Map*)sMapManager->GetMap();
+        if (!pMap)
+            return;
+
+        // sance 1:1, pozdeji asi doladit
+        if (rand()%2 > 0)
+        {
+            uint32 which = rand()%3;
+            pMap->AddDynamicCell(x,y,DYNAMIC_TYPE_BONUS,0,which);
+            sMapManager->FillDynamicRecords();
+        }
     }
 }

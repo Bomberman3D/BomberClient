@@ -12,6 +12,14 @@ enum GameType
     GAME_TYPE_MAX
 };
 
+enum BonusType
+{
+    BONUS_FLAME = 0,
+    BONUS_SPEED = 1,
+    BONUS_BOMB  = 2,
+    BONUS_MAX
+};
+
 struct BombRecord;
 class EnemyTemplate;
 
@@ -24,6 +32,7 @@ class GameTypeTemplate
         virtual void OnGameInit() {};
         virtual void OnUpdate() {};
         virtual void OnBombBoom(BombRecord* bomb) {};
+        virtual void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) {};
 
         // Multiplayer funkce, prepsany jen v multiplayerovych potomkach
         //virtual void OnPlayerJoin( ... ) {};
@@ -48,6 +57,7 @@ class ClassicSingleGameType: public GameTypeTemplate
         void OnGameInit();
         void OnUpdate();
         void OnBombBoom(BombRecord* bomb);
+        void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true);
 
     private:
         std::list<EnemyTemplate*> m_enemies;

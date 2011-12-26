@@ -98,10 +98,12 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         uint32 bx = floor(pPlayerRec->x)+1;
         uint32 by = floor(pPlayerRec->z)+1;
 
-        pMap->AddDynamicCell(bx, by, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
-        sMapManager->FillDynamicRecords();
-        sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
-        sGameplayMgr->AddBomb(bx, by);
+        if (sGameplayMgr->AddBomb(bx, by))
+        {
+            pMap->AddDynamicCell(bx, by, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
+            sMapManager->FillDynamicRecords();
+            sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+        }
     }
 }
 
@@ -118,7 +120,7 @@ void GameStage::OnUpdate(uint32 diff)
         pPlayerRec->rotate -= 0.05f*(mousePos.x-middleX);
 
     // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
-    float dist = (float(diff)+1.0f)*0.002f;
+    float dist = (float(diff)+1.0f)*0.002f*sGameplayMgr->GetPlayerSpeedCoef();
     float angle_rad = PI*(-pPlayerRec->rotate+90.0f)/180.0f;
 
     // Pohyby postavy pomoci klavesnice
@@ -190,6 +192,16 @@ void GameStage::OnUpdate(uint32 diff)
 
         if (!(collision & AXIS_Z))
             pPlayerRec->z = newz;
+    }
+
+    // Pripadne obslouzeni vstupu na jine pole - univerzalni check pro treba vstup do plamenu, na bonus, ...
+    uint32 nX = ceil(pPlayerRec->x);
+    uint32 nY = ceil(pPlayerRec->z);
+    if (nX != plX || nY != plY)
+    {
+        sGameplayMgr->OnPlayerFieldChange(plX, plY, nX, nY);
+        plX = nX;
+        plY = nY;
     }
 
     // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci

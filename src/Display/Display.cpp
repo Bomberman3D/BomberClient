@@ -278,6 +278,23 @@ bool Display::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
     return false;
 }
 
+bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
+{
+    for(std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+    {
+        if (!itr._Has_container())
+            continue;
+
+        if ((*itr) == target)
+        {
+            (*itr)->remove = true;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Display::DrawModels()
 {
     float x,y,z;

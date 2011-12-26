@@ -22,6 +22,7 @@ enum DynamicFieldType
     DYNAMIC_TYPE_BOX   = 1,
     DYNAMIC_TYPE_ENEMY = 2,
     DYNAMIC_TYPE_BOMB  = 3,
+    DYNAMIC_TYPE_BONUS = 4,
 };
 
 // Vychozi chunk z mapy

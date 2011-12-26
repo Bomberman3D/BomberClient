@@ -123,6 +123,8 @@ class GameStage: public StageControl
         GameStage()
         {
             m_type = STAGE_GAME;
+            plX = 0;
+            plY = 0;
         }
         void OnEnter();
         void OnLeave();
@@ -134,6 +136,8 @@ class GameStage: public StageControl
 
     protected:
         ModelDisplayListRecord* pPlayerRec;
+
+        uint32 plX, plY;
 };
 
 #endif
