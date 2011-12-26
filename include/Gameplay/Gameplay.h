@@ -54,6 +54,10 @@ class GameplayMgr
         uint32 GetFlameReach() { return m_plFlameReach; };
         uint32 GetMaxBombs() { return m_plMaxBombs; };
 
+        void SetPlayerSpeedCoef(float value, bool relative = false) { m_plSpeedCoef = (relative)?(m_plSpeedCoef+value):(value); };
+        void SetFlameReach(uint32 value, bool relative = false) { m_plFlameReach = (relative)?(m_plFlameReach+value):(value); };
+        void SetMaxBombs(float value, bool relative = false) { m_plMaxBombs = (relative)?(m_plMaxBombs+value):(value); };
+
     private:
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;

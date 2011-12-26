@@ -107,35 +107,6 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 
 void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
 {
-    Map* pMap = (Map*)sMapManager->GetMap();
-    if (!pMap)
-        return;
-
-    Map::DynamicCellSet* pSet = pMap->GetDynamicCellSet(newX, newY);
-    if (!pSet || pSet->empty())
-        return;
-
-    for (Map::DynamicCellSet::iterator itr = pSet->begin(); itr != pSet->end(); ++itr)
-    {
-        if (itr->type == DYNAMIC_TYPE_BONUS)
-        {
-            switch (itr->misc)
-            {
-                case BONUS_FLAME:
-                    if (m_plFlameReach < 5)
-                        m_plFlameReach++;
-                    break;
-                case BONUS_SPEED:
-                    if (m_plSpeedCoef < 2.0f)
-                    m_plSpeedCoef += 0.2f;
-                    break;
-                case BONUS_BOMB:
-                    if (m_plMaxBombs < 6)
-                        m_plMaxBombs++;
-                    break;
-            }
-        }
-    }
-
-    pMap->DestroyDynamicRecords(newX, newY, DYNAMIC_TYPE_BONUS);
+    if (m_game)
+        m_game->OnPlayerFieldChange(oldX, oldY, newX, newY);
 }

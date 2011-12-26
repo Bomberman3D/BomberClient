@@ -155,3 +155,38 @@ void ClassicSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
         }
     }
 }
+
+void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
+{
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    Map::DynamicCellSet* pSet = pMap->GetDynamicCellSet(newX, newY);
+    if (!pSet || pSet->empty())
+        return;
+
+    for (Map::DynamicCellSet::iterator itr = pSet->begin(); itr != pSet->end(); ++itr)
+    {
+        if (itr->type == DYNAMIC_TYPE_BONUS)
+        {
+            switch (itr->misc)
+            {
+                case BONUS_FLAME:
+                    if (sGameplayMgr->GetFlameReach() < 5)
+                        sGameplayMgr->SetFlameReach(1, true);
+                    break;
+                case BONUS_SPEED:
+                    if (sGameplayMgr->GetPlayerSpeedCoef() < 2.0f)
+                        sGameplayMgr->SetPlayerSpeedCoef(0.2f, true);
+                    break;
+                case BONUS_BOMB:
+                    if (sGameplayMgr->GetMaxBombs() < 6)
+                        sGameplayMgr->SetMaxBombs(1, true);
+                    break;
+            }
+        }
+    }
+
+    pMap->DestroyDynamicRecords(newX, newY, DYNAMIC_TYPE_BONUS);
+}

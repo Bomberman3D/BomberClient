@@ -33,6 +33,7 @@ class GameTypeTemplate
         virtual void OnUpdate() {};
         virtual void OnBombBoom(BombRecord* bomb) {};
         virtual void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) {};
+        virtual void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY) {};
 
         // Multiplayer funkce, prepsany jen v multiplayerovych potomkach
         //virtual void OnPlayerJoin( ... ) {};
@@ -58,6 +59,7 @@ class ClassicSingleGameType: public GameTypeTemplate
         void OnUpdate();
         void OnBombBoom(BombRecord* bomb);
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true);
+        void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
     private:
         std::list<EnemyTemplate*> m_enemies;
