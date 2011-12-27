@@ -38,6 +38,7 @@ class Animator
         void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0);
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);
+        uint32 GetAnimId(uint32 id);
 
         void Update();
 

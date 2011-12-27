@@ -2,6 +2,7 @@
 #include <AI.h>
 #include <Map.h>
 #include <Display.h>
+#include <Effects/Animations.h>
 
 #include <algorithm>
 
@@ -448,12 +449,18 @@ void MovementHolder::MutateToTargetGen()
 
     m_moveType = MOVEMENT_TARGETTED;
     Generator();
+
+    if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 }
 
 void MovementHolder::MutateToRandomGen()
 {
     m_moveType = MOVEMENT_RANDOM;
     Generator();
+
+    if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 }
 
 void MovementHolder::Update()
@@ -462,6 +469,9 @@ void MovementHolder::Update()
 
     if (m_path.size() < 2)
     {
+        if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_IDLE)
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_IDLE, 0, 5);
+
         if (tnow < m_nextUpdate)
             return;
 
@@ -471,6 +481,19 @@ void MovementHolder::Update()
         return;
     }
 
+    // natoceni modelu podle smeru kterym jdeme
+    if (m_nodeVector.x > 0.0f)
+        m_src->pRecord->rotate = 90.0f;
+    else if (m_nodeVector.x < 0.0f)
+        m_src->pRecord->rotate = 270.0f;
+    else if (m_nodeVector.y > 0.0f)
+        m_src->pRecord->rotate = 0.0f;
+    else if (m_nodeVector.y < 0.0f)
+        m_src->pRecord->rotate = 180.0f;
+
+    if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+
     m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/500 ));
     m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/500 ));
 
@@ -479,7 +502,6 @@ void MovementHolder::Update()
         m_currentPathNode++;
         if (m_currentPathNode >= m_path.size()-1)
         {
-            m_nextUpdate = tnow;
             m_currentPathNode--;
             Generator();
         }
@@ -488,8 +510,8 @@ void MovementHolder::Update()
             // existence node+1 zabezpecena v checku vyse
             m_nodeVector.x = int32(m_path[m_currentPathNode+1].x) - int32(m_path[m_currentPathNode].x);
             m_nodeVector.y = int32(m_path[m_currentPathNode+1].y) - int32(m_path[m_currentPathNode].y);
+
             m_nodeStartTime = tnow;
-            m_nextUpdate = tnow;
             if (m_moveType == MOVEMENT_TARGETTED)
                 Generator();
         }

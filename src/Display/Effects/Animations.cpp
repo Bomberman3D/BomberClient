@@ -66,6 +66,18 @@ void Animator::Update()
     }
 }
 
+uint32 Animator::GetAnimId(uint32 id)
+{
+    // Hleda ticket v mape
+    AnimMap::const_iterator itr = Anims.find(id);
+    // Pokud nenajde, vrati nulu
+    if (itr == Anims.end())
+        return 0;
+
+    // Jinak vrati platnou hodnotu
+    return itr->second.animId;
+}
+
 uint32 Animator::GetActualTexture(uint32 id)
 {
     /* Tahle metoda je bezpecnejsi nez vraceni celeho zaznamu, protoze potrebujeme, aby
