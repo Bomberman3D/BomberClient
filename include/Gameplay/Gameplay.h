@@ -4,6 +4,7 @@
 #include <Global.h>
 #include <Singleton.h>
 #include <GameTypes.h>
+#include <AI.h>
 
 struct BombRecord
 {
@@ -11,12 +12,6 @@ struct BombRecord
     uint32 y;
     uint32 state;
     //pozdeji i data o vlastnikovi?
-};
-
-struct PathNode
-{
-    float x, y, z;
-    uint8 flags; // jeste nepouzito - napr. polozit bombu, prepocitat cestu, atd...
 };
 
 class EnemyTemplate
@@ -30,7 +25,7 @@ class EnemyTemplate
         ModelDisplayListRecord* pRecord;
 
         // Pathfinding veci - vektor "bodu", aktualni bod
-        std::vector<PathNode> m_path;
+        Path m_path;
         uint32 m_actualNodePos;
 };
 

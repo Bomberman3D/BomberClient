@@ -61,6 +61,8 @@
 				AdditionalDependencies="opengl32.lib glu32.lib glut32.lib glaux.lib ws2_32.lib SOIL.lib"
 				AdditionalLibraryDirectories="&quot;$(InputDir)\$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
+				StackReserveSize="0"
+				StackCommitSize="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -276,6 +278,10 @@
 				Name="Gameplay"
 				>
 				<File
+					RelativePath="..\src\Gameplay\AI.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Gameplay\Gameplay.cpp"
 					>
 				</File>
@@ -401,6 +407,10 @@
 			<Filter
 				Name="Gameplay"
 				>
+				<File
+					RelativePath="..\include\Gameplay\AI.h"
+					>
+				</File>
 				<File
 					RelativePath="..\include\Gameplay\Gameplay.h"
 					>
