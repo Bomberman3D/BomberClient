@@ -117,16 +117,16 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
 
         // Exploze - particle emittery
         BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 0, 0, 0, reach_y1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,   0.0f, 0, 0, reach_y1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 90.0f, 0, 0, 0, reach_x2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,  90.0f, 0, 0, reach_x2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 180.0f, 0, 0, 0, reach_y2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 180.0f, 0, 0, reach_y2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 270.0f, 0, 0, 0, reach_x1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         // A nakonec znicime vsechny bedny v dosahu bomby (v pripade true hodnoty bool promenne +1 / -1 proto, ze
         // reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
@@ -139,6 +139,9 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
 
 void ClassicSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
 {
+    BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
+    sParticleEmitterMgr->AddEmitter(templ, x-0.5f, 0.0f, y-0.5f, 0.6f, 0.6f, 90.0f, 0.0f, 0, 0, 150, 30, 5.0f, 0.1f, 10, 5, 0, 0, 1500);
+
     if (by_bomb)
     {
         // vytvorit bonus na dynamic mape

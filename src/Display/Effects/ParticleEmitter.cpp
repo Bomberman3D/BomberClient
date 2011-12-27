@@ -77,11 +77,11 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     // Transformace jednotlivych uhlopricnych vektoru je porad stejna, rozdilny je jen vstup na zacatku
     for (uint8 i = 0; i < 2; i++)
     {
-        pTemp->startVector[i].y = pTemp->startVector[i].y * cos(pTemp->m_angleMedY);
-        pTemp->startVector[i].z = pTemp->startVector[i].y * sin(pTemp->m_angleMedY);
+        pTemp->startVector[i].z = - pTemp->startVector[i].y * sin(pTemp->m_angleMedX);
+        pTemp->startVector[i].y = pTemp->startVector[i].y * cos(pTemp->m_angleMedX);
 
-        pTemp->startVector[i].z = pTemp->startVector[i].z + pTemp->startVector[i].x * sin(pTemp->m_angleMedX);
-        pTemp->startVector[i].x = pTemp->startVector[i].x * cos(pTemp->m_angleMedX);
+        pTemp->startVector[i].z = pTemp->startVector[i].z + pTemp->startVector[i].x * sin(pTemp->m_angleMedY);
+        pTemp->startVector[i].x = pTemp->startVector[i].x * cos(pTemp->m_angleMedY);
     }
 
     pTemp->m_nextParticleTime = 0;
