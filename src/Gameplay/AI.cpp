@@ -20,6 +20,7 @@ Pathfinder::~Pathfinder()
 
 void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32 destY)
 {
+    // Inicializace vstupnich dat
     m_sourceX = sourceX;
     m_sourceY = sourceY;
     m_destX = destX;
@@ -31,12 +32,15 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
     if (!pMap)
         return;
 
+    // Naplneni pomocnych promennych
     m_mapSizeX = pMap->field.size();
     m_mapSizeY = pMap->field[0].size();
 
-    accessMatrixOrigin.clear();
     accessMatrixDyn.clear();
     CoordPair tmp;
+
+    // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
+    // a nulami tam, kam nemuze
     for (uint32 i = 0; i < m_mapSizeX; i++)
     {
         for (uint32 j = 0; j < m_mapSizeY; j++)
@@ -48,38 +52,20 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
             {
-                // Vynulujeme ho v hledacich mapach
-                accessMatrixOrigin[tmp] = 0;
+                // Vynulujeme ho v hledaci mape
                 accessMatrixDyn[tmp] = 0;
                 continue;
             }
 
             // Pokud je pristupne, jednicku
-            accessMatrixOrigin[tmp] = 1;
             accessMatrixDyn[tmp] = 1;
         }
     }
-
-    // Vynulovat startovni pozici - tam ted jsme
-    //tmp = std::make_pair(sourceX, sourceY);
-    //accessMatrixOrigin[tmp] = 0;
-    //accessMatrixDyn[tmp] = 0;
 }
 
-void Pathfinder::PrintAndWait()
-{
-    fprintf(stdout, "------------\n");
-    for (uint32 i = 0; i < m_mapSizeX; i++)
-    {
-        for (uint32 j = 0; j < m_mapSizeY; j++)
-        {
-            fprintf(stdout, "%i", accessMatrixDyn[std::make_pair(i,j)]);
-        }
-        fprintf(stdout, "\n");
-    }
-    system("pause");
-}
-
+// Makra pro rekurzivni postup po poli
+// ve zkratce jen volaji dalsi zanoreni funkce Recursor a pri uspechu (true) zapisou bod do cesty
+// Nastaveni na 9 je zde jen kvuli pripadnemu debugu a vystupu
 #define RECURSE_RIGHT   if ((x+1) < m_mapSizeX && accessMatrixDyn[std::make_pair(x+1,y)] == 1) \
                         {                         \
                             if (Recursor(x+1, y)) \
@@ -138,11 +124,14 @@ bool Pathfinder::Recursor(uint32 x, uint32 y)
     if (accessMatrixDyn[std::make_pair(x,y)] != 1)
         return false;
 
+    // Automaticky nastavime pole jako "navstivene"
     accessMatrixDyn[std::make_pair(x,y)] = 2;
 
+    // Overeni, zdali se jedna o cilove pole. Pokud ano, vratime true a cela rekurze se pote vrati a cesta se zapise
     if (x == m_destX && y == m_destY)
         return true;
 
+    // Minimalizujeme pocet lokalnich promennych kvuli velikosti zasobniku
     PathNode* p = new PathNode;
 
     // Uprednostni se smer, ktery je potreba "uspokojit". Pokud je cil o deset poli nalevo

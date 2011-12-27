@@ -28,8 +28,7 @@ class Pathfinder
         Path m_path;
 
         // Mapa, kde jsou same jednotky, vynuluji se pouze nepristupna mista (bomby, krabice,..)
-        std::map<CoordPair, int8> accessMatrixOrigin;
-        // Pracovni mapa - nuluji se jeste k tomu jiz navstivena mista pathfinderem
+        // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
         std::map<CoordPair, int8> accessMatrixDyn;
 
     private:
