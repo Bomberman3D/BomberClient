@@ -2,6 +2,8 @@
 #include <AI.h>
 #include <Map.h>
 
+#include <algorithm>
+
 Pathfinder::Pathfinder()
 {
     m_sourceX = 0;
@@ -226,5 +228,8 @@ void Pathfinder::GeneratePath()
     else
     {
         // Cesta se nasla, muzeme se pohybovat po ceste
+
+        // Ovsem.. vygenerovala se v opacnem poradi. Prevratime ji tedy
+        std::reverse(m_path.begin(), m_path.end());
     }
 }
