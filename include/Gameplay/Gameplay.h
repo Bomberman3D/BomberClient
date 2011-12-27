@@ -14,21 +14,6 @@ struct BombRecord
     //pozdeji i data o vlastnikovi?
 };
 
-class EnemyTemplate
-{
-    public:
-        EnemyTemplate() { pRecord = NULL; m_nextUpdate = 0; };
-        void Init(uint32 modelId, uint32 x, uint32 y);
-
-        clock_t m_nextUpdate;
-
-        ModelDisplayListRecord* pRecord;
-
-        // Pathfinding veci - vektor "bodu", aktualni bod
-        Path m_path;
-        uint32 m_actualNodePos;
-};
-
 class GameplayMgr
 {
     public:

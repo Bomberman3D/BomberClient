@@ -1,17 +1,26 @@
 #include <Global.h>
 #include <AI.h>
 #include <Map.h>
+#include <Display.h>
 
 #include <algorithm>
 
-Pathfinder::Pathfinder()
+/********************************************************************/
+/*                                                                  */
+/*               Targetted pathfinder                               */
+/*                                                                  */
+/********************************************************************/
+
+Pathfinder::Pathfinder(Path* path)
 {
     m_sourceX = 0;
     m_sourceY = 0;
     m_destX = 0;
     m_destY = 0;
 
-    m_path.clear();
+    m_path = path;
+
+    m_path->clear();
 }
 
 Pathfinder::~Pathfinder()
@@ -26,7 +35,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
     m_destX = destX;
     m_destY = destY;
 
-    m_path.clear();
+    m_path->clear();
 
     Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap)
@@ -74,7 +83,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                                 p->y = y;         \
                                 p->flags = 0;     \
                                 accessMatrixDyn[std::make_pair(x+1,y)] = 9; \
-                                m_path.push_back(*p); \
+                                m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
@@ -87,7 +96,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                                 p->y = y+1;       \
                                 p->flags = 0;     \
                                 accessMatrixDyn[std::make_pair(x,y+1)] = 9; \
-                                m_path.push_back(*p); \
+                                m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
@@ -100,7 +109,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                                 p->y = y;         \
                                 p->flags = 0;     \
                                 accessMatrixDyn[std::make_pair(x-1,y)] = 9; \
-                                m_path.push_back(*p); \
+                                m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
@@ -113,7 +122,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                                 p->y = y-1;       \
                                 p->flags = 0;     \
                                 accessMatrixDyn[std::make_pair(x,y-1)] = 9; \
-                                m_path.push_back(*p); \
+                                m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
@@ -218,7 +227,282 @@ void Pathfinder::GeneratePath()
     {
         // Cesta se nasla, muzeme se pohybovat po ceste
 
+        // Vlozime i zdrojovou node
+        PathNode node;
+        node.x = m_sourceX;
+        node.y = m_sourceY;
+        node.flags = 0;
+        m_path->push_back(node);
+
         // Ovsem.. vygenerovala se v opacnem poradi. Prevratime ji tedy
-        std::reverse(m_path.begin(), m_path.end());
+        std::reverse(m_path->begin(), m_path->end());
     }
+}
+
+/********************************************************************/
+/*                                                                  */
+/*               Random pathfinder                                  */
+/*                                                                  */
+/********************************************************************/
+
+RandomPathfinder::RandomPathfinder(Path *path)
+{
+    m_sourceX = 0;
+    m_sourceY = 0;
+    m_length = 0;
+
+    m_path = path;
+
+    m_path->clear();
+}
+
+RandomPathfinder::~RandomPathfinder()
+{
+}
+
+void RandomPathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 length)
+{
+    // Vstupni parametr length defaultne nastaven na 5
+
+    m_sourceX = sourceX;
+    m_sourceY = sourceY;
+    m_length = length;
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    // Naplneni pomocnych promennych
+    m_mapSizeX = pMap->field.size();
+    m_mapSizeY = pMap->field[0].size();
+
+    accessMatrixDyn.clear();
+    CoordPair tmp;
+
+    // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
+    // a nulami tam, kam nemuze
+    for (uint32 i = 0; i < m_mapSizeX; i++)
+    {
+        for (uint32 j = 0; j < m_mapSizeY; j++)
+        {
+            tmp = std::make_pair(i,j);
+
+            // Pokud je nepristupne pole na souradnicich [x,y]
+            if (pMap->field[i][j].type == TYPE_SOLID_BOX
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX)
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
+            {
+                // Vynulujeme ho v hledaci mape
+                accessMatrixDyn[tmp] = 0;
+                continue;
+            }
+
+            // Pokud je pristupne, jednicku
+            accessMatrixDyn[tmp] = 1;
+        }
+    }
+}
+
+bool RandomPathfinder::Recursor(uint32 x, uint32 y)
+{
+    if (m_curLength >= m_length)
+        return true;
+
+    m_curLength++;
+
+    PathNode* p = new PathNode;
+
+    switch (rand()%4)
+    {
+        case 0:
+            RECURSE_UP;
+            RECURSE_LEFT;
+            RECURSE_RIGHT;
+            RECURSE_DOWN;
+            break;
+        case 1:
+            RECURSE_LEFT;
+            RECURSE_RIGHT;
+            RECURSE_DOWN;
+            RECURSE_UP;
+            break;
+        case 2:
+            RECURSE_RIGHT;
+            RECURSE_DOWN;
+            RECURSE_UP;
+            RECURSE_LEFT;
+            break;
+        case 3:
+        default:
+            RECURSE_LEFT;
+            RECURSE_UP;
+            RECURSE_DOWN;
+            RECURSE_RIGHT;
+            break;
+    }
+
+    return false;
+}
+
+void RandomPathfinder::GeneratePath()
+{
+    m_curLength = 0;
+
+    if (!Recursor(m_sourceX, m_sourceY))
+    {
+        // Cesta nenalezena
+    }
+    else
+    {
+        // Cesta nalezena
+
+        PathNode node;
+        node.x = m_sourceX;
+        node.y = m_sourceY;
+        node.flags = 0;
+        m_path->push_back(node);
+
+        // Opet prevratime
+        std::reverse(m_path->begin(), m_path->end());
+    }
+}
+
+/********************************************************************/
+/*                                                                  */
+/*               Movement holder class                              */
+/*                                                                  */
+/********************************************************************/
+
+MovementHolder::MovementHolder(EnemyTemplate* src)
+{
+    m_path.clear();
+    m_src = src;
+    m_moveType = MOVEMENT_NONE;
+    m_lastMoveUpdate = clock();
+    m_nodeStartTime = 0;
+}
+
+MovementHolder::~MovementHolder()
+{
+}
+
+void MovementHolder::Generator()
+{
+    switch (m_moveType)
+    {
+        case MOVEMENT_TARGETTED:
+        {
+            ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
+            if (!pTarget)
+            {
+                m_moveType = MOVEMENT_NONE;
+                break;
+            }
+
+            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
+            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 tx = ceil(pTarget->x);
+            uint32 ty = ceil(pTarget->z);
+            Pathfinder p(&m_path);
+            p.Initialize(mx, my, tx, ty);
+            p.GeneratePath();
+
+            // Musi byt vetsi nez 1, aby melo smysl se pohybovat
+            if (m_path.size() > 1)
+            {
+                m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
+                m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
+                m_currentPathNode = 0;
+                m_nodeStartTime = clock();
+            }
+            break;
+        }
+        case MOVEMENT_RANDOM:
+        {
+            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
+            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            RandomPathfinder p(&m_path);
+            p.Initialize(mx, my);
+            p.GeneratePath();
+
+            if (m_path.size() > 1)
+            {
+                m_nodeVector.x = int32(m_path[1].x) - int32(m_path[0].x);
+                m_nodeVector.y = int32(m_path[1].y) - int32(m_path[0].y);
+                m_currentPathNode = 0;
+                m_nodeStartTime = clock();
+            }
+            break;
+        }
+    }
+}
+
+void MovementHolder::MutateToTargetGen()
+{
+    ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
+    if (!pTarget)
+    {
+        m_path.clear();
+        return;
+    }
+
+    m_moveType = MOVEMENT_TARGETTED;
+    Generator();
+}
+
+void MovementHolder::MutateToRandomGen()
+{
+    m_moveType = MOVEMENT_RANDOM;
+    Generator();
+}
+
+void MovementHolder::Update()
+{
+    clock_t tnow = clock();
+
+    if (m_path.size() < 2)
+    {
+        if (tnow < m_nextUpdate)
+            return;
+
+        Generator();
+
+        m_nextUpdate = tnow + HOLDER_UPDATE_DELAY;
+        return;
+    }
+
+    m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/500 ));
+    m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/500 ));
+
+    if (tnow-m_nodeStartTime >= 500)
+    {
+        m_currentPathNode++;
+        if (m_currentPathNode >= m_path.size()-1)
+        {
+            m_nextUpdate = tnow;
+            m_currentPathNode--;
+            Generator();
+        }
+        else
+        {
+            // existence node+1 zabezpecena v checku vyse
+            m_nodeVector.x = int32(m_path[m_currentPathNode+1].x) - int32(m_path[m_currentPathNode].x);
+            m_nodeVector.y = int32(m_path[m_currentPathNode+1].y) - int32(m_path[m_currentPathNode].y);
+            m_nodeStartTime = tnow;
+            m_nextUpdate = tnow;
+            if (m_moveType == MOVEMENT_TARGETTED)
+                Generator();
+        }
+    }
+}
+
+void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
+{
+    pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.45f, 0.0f, true);
+}
+
+void EnemyTemplate::Update()
+{
+    if (m_movement)
+        m_movement->Update();
 }

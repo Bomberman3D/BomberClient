@@ -173,6 +173,7 @@ class Display
         float GetTargetAngleX() { return m_tarangleX; };
         float GetTargetAngleY() { return m_tarangleY; };
         float GetTargetAngleZ() { return m_tarangleZ; };
+        ModelDisplayListRecord* GetTargetModel() { return m_targetmodel; };
 
         // Vyjimky pro sledovany model - z vnejsku pristupne primo
         uint32 m_ignoreTargetCollision;

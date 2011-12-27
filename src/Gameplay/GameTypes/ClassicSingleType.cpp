@@ -10,6 +10,8 @@ void ClassicSingleGameType::OnGameInit()
     if (!pMap)
         return;
 
+    m_enemies.clear();
+
     pMap->DestroyAllDynamicRecords();
 
     for (uint32 i = 0; i < pMap->field.size(); i++)
@@ -26,6 +28,11 @@ void ClassicSingleGameType::OnGameInit()
             }
         }
     }
+
+    /*EnemyTemplate* pEnemy = new EnemyTemplate;
+    pEnemy->Init(1, 13, 15);
+    pEnemy->m_movement->MutateToTargetGen();
+    m_enemies.push_back(pEnemy);*/
 
     sMapManager->FillDynamicRecords();
 }
@@ -44,14 +51,10 @@ void ClassicSingleGameType::OnUpdate()
                 itr = m_enemies.erase(itr);
                 continue;
             }
-            // Pokud jeste neni cas na update, posuneme se dal
-            if ((*itr)->m_nextUpdate > tnow)
-            {
-                ++itr;
-                continue;
-            }
 
-            // Samotny update
+            (*itr)->Update();
+
+            ++itr;
         }
     }
 }
