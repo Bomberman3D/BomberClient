@@ -84,14 +84,22 @@ class MovementHolder
         void MutateToTargetGen();
         void MutateToRandomGen();
 
+        bool TryMutateToTargetGen();
+        bool TryMutateToRandomGen();
+
+        bool HasTargettedPath();
+        MovementType GetMovementType() { return m_moveType; };
+
         void Update();
 
         void Generator();
+        bool TryGenerator(MovementType moveType);
 
     private:
         MovementType m_moveType;
 
         Path m_path;
+        Path m_tryPath;
         uint32 m_currentPathNode;
         CVector2 m_nodeVector;
         clock_t m_nodeStartTime;
@@ -105,13 +113,16 @@ class MovementHolder
 class EnemyTemplate
 {
     public:
-        EnemyTemplate() { pRecord = NULL; m_movement = new MovementHolder(this); };
+        EnemyTemplate() { pRecord = NULL; m_movement = new MovementHolder(this); m_nextTargettedUpdate = 0; };
         void Init(uint32 modelId, uint32 x, uint32 y);
         void Update();
 
         ModelDisplayListRecord* pRecord;
 
         MovementHolder* m_movement;
+
+    private:
+        clock_t m_nextTargettedUpdate;
 };
 
 #endif

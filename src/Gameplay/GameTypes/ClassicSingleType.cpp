@@ -29,10 +29,10 @@ void ClassicSingleGameType::OnGameInit()
         }
     }
 
-    /*EnemyTemplate* pEnemy = new EnemyTemplate;
+    EnemyTemplate* pEnemy = new EnemyTemplate;
     pEnemy->Init(1, 13, 15);
     pEnemy->m_movement->MutateToTargetGen();
-    m_enemies.push_back(pEnemy);*/
+    m_enemies.push_back(pEnemy);
 
     sMapManager->FillDynamicRecords();
 }

@@ -220,6 +220,10 @@ bool Pathfinder::Recursor(uint32 x, uint32 y)
 
 void Pathfinder::GeneratePath()
 {
+    // Pokud stojime na nepristupnem poli, jsme uvezneni
+    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 0)
+        return;
+
     if (!Recursor(m_sourceX, m_sourceY))
     {
         // Cesta se nevygenerovala, nutno nasadit nahodny pohyb
@@ -349,6 +353,10 @@ void RandomPathfinder::GeneratePath()
 {
     m_curLength = 0;
 
+    // Pokud stojime na nepristupnem poli, jsme uvezneni
+    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 0)
+        return;
+
     if (!Recursor(m_sourceX, m_sourceY))
     {
         // Cesta nenalezena
@@ -377,6 +385,7 @@ void RandomPathfinder::GeneratePath()
 MovementHolder::MovementHolder(EnemyTemplate* src)
 {
     m_path.clear();
+    m_tryPath.clear();
     m_src = src;
     m_moveType = MOVEMENT_NONE;
     m_lastMoveUpdate = clock();
@@ -438,6 +447,50 @@ void MovementHolder::Generator()
     }
 }
 
+bool MovementHolder::TryGenerator(MovementType moveType)
+{
+    switch (moveType)
+    {
+        case MOVEMENT_TARGETTED:
+        {
+            ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
+            if (!pTarget)
+            {
+                m_moveType = MOVEMENT_NONE;
+                break;
+            }
+
+            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
+            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 tx = ceil(pTarget->x);
+            uint32 ty = ceil(pTarget->z);
+            Pathfinder p(&m_tryPath);
+            p.Initialize(mx, my, tx, ty);
+            p.GeneratePath();
+
+            if (m_tryPath.size() > 1)
+                return true;
+
+            break;
+        }
+        case MOVEMENT_RANDOM:
+        {
+            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
+            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            RandomPathfinder p(&m_tryPath);
+            p.Initialize(mx, my);
+            p.GeneratePath();
+
+            if (m_tryPath.size() > 1)
+                return true;
+
+            break;
+        }
+    }
+
+    return false;
+}
+
 void MovementHolder::MutateToTargetGen()
 {
     ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
@@ -461,6 +514,50 @@ void MovementHolder::MutateToRandomGen()
 
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+}
+
+bool MovementHolder::TryMutateToTargetGen()
+{
+    if (TryGenerator(MOVEMENT_TARGETTED))
+    {
+        m_moveType = MOVEMENT_TARGETTED;
+        m_path.clear();
+        m_path.assign(m_tryPath.begin(), m_tryPath.end());
+
+        m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
+        m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
+        m_currentPathNode = 0;
+        m_nodeStartTime = clock();
+
+        if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool MovementHolder::TryMutateToRandomGen()
+{
+    if (TryGenerator(MOVEMENT_RANDOM))
+    {
+        m_moveType = MOVEMENT_RANDOM;
+        m_path.clear();
+        m_path.assign(m_tryPath.begin(), m_tryPath.end());
+
+        m_nodeVector.x = int32(m_path[1].x) - int32(m_path[0].x);
+        m_nodeVector.y = int32(m_path[1].y) - int32(m_path[0].y);
+        m_currentPathNode = 0;
+        m_nodeStartTime = clock();
+
+        if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+
+        return true;
+    }
+
+    return false;
 }
 
 void MovementHolder::Update()
@@ -518,6 +615,11 @@ void MovementHolder::Update()
     }
 }
 
+bool MovementHolder::HasTargettedPath()
+{
+    return ((m_moveType == MOVEMENT_TARGETTED) && m_path.size() > 0);
+}
+
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 {
     pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.45f, 0.0f, true);
@@ -525,6 +627,21 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 
 void EnemyTemplate::Update()
 {
+    clock_t tnow = clock();
+
     if (m_movement)
+    {
+        if (m_nextTargettedUpdate <= tnow)
+        {
+            if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                m_movement->TryMutateToTargetGen();
+
+            m_nextTargettedUpdate = tnow + HOLDER_UPDATE_DELAY;
+        }
+
+        if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasTargettedPath())
+            m_movement->MutateToRandomGen();
+
         m_movement->Update();
+    }
 }
