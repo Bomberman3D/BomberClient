@@ -31,7 +31,7 @@ void ClassicSingleGameType::OnGameInit()
 
     EnemyTemplate* pEnemy = new EnemyTemplate;
     pEnemy->Init(1, 13, 15);
-    pEnemy->m_movement->MutateToTargetGen();
+    pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
     m_enemies.push_back(pEnemy);
 
     sMapManager->FillDynamicRecords();

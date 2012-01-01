@@ -405,6 +405,7 @@ void MovementHolder::Generator()
             ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
             if (!pTarget)
             {
+                m_path.clear();
                 m_moveType = MOVEMENT_NONE;
                 break;
             }
@@ -491,63 +492,28 @@ bool MovementHolder::TryGenerator(MovementType moveType)
     return false;
 }
 
-void MovementHolder::MutateToTargetGen()
+void MovementHolder::Mutate(MovementType moveType)
 {
-    ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
-    if (!pTarget)
-    {
-        m_path.clear();
+    if (moveType >= MOVEMENT_MAX)
         return;
-    }
 
-    m_moveType = MOVEMENT_TARGETTED;
+    m_moveType = moveType;
     Generator();
 
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 }
 
-void MovementHolder::MutateToRandomGen()
+bool MovementHolder::TryMutate(MovementType moveType)
 {
-    m_moveType = MOVEMENT_RANDOM;
-    Generator();
-
-    if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
-}
-
-bool MovementHolder::TryMutateToTargetGen()
-{
-    if (TryGenerator(MOVEMENT_TARGETTED))
+    if (TryGenerator(moveType))
     {
-        m_moveType = MOVEMENT_TARGETTED;
+        m_moveType = moveType;
         m_path.clear();
         m_path.assign(m_tryPath.begin(), m_tryPath.end());
 
         m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
         m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
-        m_currentPathNode = 0;
-        m_nodeStartTime = clock();
-
-        if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
-
-        return true;
-    }
-
-    return false;
-}
-
-bool MovementHolder::TryMutateToRandomGen()
-{
-    if (TryGenerator(MOVEMENT_RANDOM))
-    {
-        m_moveType = MOVEMENT_RANDOM;
-        m_path.clear();
-        m_path.assign(m_tryPath.begin(), m_tryPath.end());
-
-        m_nodeVector.x = int32(m_path[1].x) - int32(m_path[0].x);
-        m_nodeVector.y = int32(m_path[1].y) - int32(m_path[0].y);
         m_currentPathNode = 0;
         m_nodeStartTime = clock();
 
@@ -615,9 +581,9 @@ void MovementHolder::Update()
     }
 }
 
-bool MovementHolder::HasTargettedPath()
+bool MovementHolder::HasPath()
 {
-    return ((m_moveType == MOVEMENT_TARGETTED) && m_path.size() > 0);
+    return (m_path.size() > 1);
 }
 
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
@@ -631,16 +597,16 @@ void EnemyTemplate::Update()
 
     if (m_movement)
     {
-        if (m_nextTargettedUpdate <= tnow)
+        if (m_nextMoveTypeUpdate <= tnow)
         {
             if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
-                m_movement->TryMutateToTargetGen();
+                m_movement->TryMutate(MOVEMENT_TARGETTED);
 
-            m_nextTargettedUpdate = tnow + HOLDER_UPDATE_DELAY;
+        if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
+            m_movement->TryMutate(MOVEMENT_RANDOM);
+
+            m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY;
         }
-
-        if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasTargettedPath())
-            m_movement->MutateToRandomGen();
 
         m_movement->Update();
     }

@@ -81,13 +81,10 @@ class MovementHolder
         MovementHolder(EnemyTemplate* src);
         ~MovementHolder();
 
-        void MutateToTargetGen();
-        void MutateToRandomGen();
+        void Mutate(MovementType moveType);
+        bool TryMutate(MovementType moveType);
 
-        bool TryMutateToTargetGen();
-        bool TryMutateToRandomGen();
-
-        bool HasTargettedPath();
+        bool HasPath();
         MovementType GetMovementType() { return m_moveType; };
 
         void Update();
@@ -113,7 +110,7 @@ class MovementHolder
 class EnemyTemplate
 {
     public:
-        EnemyTemplate() { pRecord = NULL; m_movement = new MovementHolder(this); m_nextTargettedUpdate = 0; };
+        EnemyTemplate() { pRecord = NULL; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; };
         void Init(uint32 modelId, uint32 x, uint32 y);
         void Update();
 
@@ -122,7 +119,7 @@ class EnemyTemplate
         MovementHolder* m_movement;
 
     private:
-        clock_t m_nextTargettedUpdate;
+        clock_t m_nextMoveTypeUpdate;
 };
 
 #endif
