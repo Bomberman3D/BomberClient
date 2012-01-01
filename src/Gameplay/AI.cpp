@@ -226,7 +226,7 @@ void Pathfinder::GeneratePath()
 
     if (!Recursor(m_sourceX, m_sourceY))
     {
-        // Cesta se nevygenerovala, nutno nasadit nahodny pohyb
+        // Cesta se nevygenerovala, nutno nasadit nahodny pohyb (viz. EnemyTemplate::Update)
     }
     else
     {
@@ -317,6 +317,10 @@ bool RandomPathfinder::Recursor(uint32 x, uint32 y)
 
     PathNode* p = new PathNode;
 
+    // U nahodneho generatoru cesty je nam vlastne jedno, jakou cestou se vydame
+    // jde nam jen o to, abychom se nedostali na spatne misto (nastavene na nulu v
+    // pristupove mape)
+    // Proto muzeme zvolit nahodne zanoreni, ktere je omezeno "maximalni delkou"
     switch (rand()%4)
     {
         case 0:
@@ -384,6 +388,8 @@ void RandomPathfinder::GeneratePath()
 
 MovementHolder::MovementHolder(EnemyTemplate* src)
 {
+    // Inicializace tridy starajici se o pohyb
+
     m_path.clear();
     m_tryPath.clear();
     m_src = src;
@@ -398,10 +404,13 @@ MovementHolder::~MovementHolder()
 
 void MovementHolder::Generator()
 {
+    // Generator slouzi k vygenerovani cesty, o ktere jsme si jisti, ze existuje,
+    // nebo k implicitnimu nastaveni
     switch (m_moveType)
     {
         case MOVEMENT_TARGETTED:
         {
+            // Pokud se pohybujeme za cilem, musi cil existovat
             ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
             if (!pTarget)
             {
@@ -450,6 +459,9 @@ void MovementHolder::Generator()
 
 bool MovementHolder::TryGenerator(MovementType moveType)
 {
+    // TryGenerator slouzi k vygenerovani cesty k cili, ale do docasne vedlejsi mapy
+    // pote je overeno funkci TryMutate, zdali doslo k vygenerovani a pripadne se pouzije
+    // vygenerovana cesta
     switch (moveType)
     {
         case MOVEMENT_TARGETTED:
@@ -494,18 +506,25 @@ bool MovementHolder::TryGenerator(MovementType moveType)
 
 void MovementHolder::Mutate(MovementType moveType)
 {
+    // Funkce mutate slouzi k nastaveni generatoru cesty "na jistotu"
+    // nebo k implicitnimu nastaveni
+
     if (moveType >= MOVEMENT_MAX)
         return;
 
     m_moveType = moveType;
     Generator();
 
+    // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 }
 
 bool MovementHolder::TryMutate(MovementType moveType)
 {
+    // TryMutate overi, zdali existuje cesta pomoci generatoru, ktery byl zvolen,
+    // a pokud ano, pouzije se vygenerovana cesta a nastavi se typ pohybu
+
     if (TryGenerator(moveType))
     {
         m_moveType = moveType;
@@ -517,6 +536,7 @@ bool MovementHolder::TryMutate(MovementType moveType)
         m_currentPathNode = 0;
         m_nodeStartTime = clock();
 
+        // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
         if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
             sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 
@@ -528,10 +548,15 @@ bool MovementHolder::TryMutate(MovementType moveType)
 
 void MovementHolder::Update()
 {
+    // Update movement holderu
+
     clock_t tnow = clock();
 
+    // Pokud je cesta mensi nez 2 (tedy posun jen na pole na kterem jsme),
+    // je to zbytecne a pockame tedy
     if (m_path.size() < 2)
     {
+        // Zastaveni animace modelu
         if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_IDLE)
             sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_IDLE, 0, 5);
 
@@ -554,17 +579,22 @@ void MovementHolder::Update()
     else if (m_nodeVector.y < 0.0f)
         m_src->pRecord->rotate = 180.0f;
 
+    // Opet zmena animace modelu na chuzi, tady se mi to taky nelibi, bude treba vymyslet nejake hezci umisteni
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 
+    // Posun modelu po vektoru pohybu
     m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/500 ));
     m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/500 ));
 
+    // No a pokud jsme dosahli maximalniho bodu usecky urcene vektorem a delkou 1,
+    // posuneme se na dalsi bod cesty
     if (tnow-m_nodeStartTime >= 500)
     {
         m_currentPathNode++;
         if (m_currentPathNode >= m_path.size()-1)
         {
+            // Dostali jsme se na konec cesty, nechame si vygenerovat novou cestu
             m_currentPathNode--;
             Generator();
         }
@@ -588,26 +618,34 @@ bool MovementHolder::HasPath()
 
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 {
+    // Inicializace modelu a zaznamu modelu pro nepritele
     pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.45f, 0.0f, true);
 }
 
 void EnemyTemplate::Update()
 {
+    // Samotny update
+
     clock_t tnow = clock();
 
     if (m_movement)
     {
+        // Pokud uz je cas na update typu pohybu
         if (m_nextMoveTypeUpdate <= tnow)
         {
+            // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
             if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
                 m_movement->TryMutate(MOVEMENT_TARGETTED);
 
-        if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
-            m_movement->TryMutate(MOVEMENT_RANDOM);
+            // Pokud ne (cesta neexistuje), presedlame na nahodny pohyb
+            if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
+                m_movement->TryMutate(MOVEMENT_RANDOM);
 
             m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY;
         }
 
+        // A samotny update pohybu
+        // Musi byt spusten pokazde - tam se posunuje model po vektoru
         m_movement->Update();
     }
 }
