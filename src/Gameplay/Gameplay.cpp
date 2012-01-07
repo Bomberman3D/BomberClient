@@ -49,7 +49,7 @@ void GameplayMgr::Update()
     }
 }
 
-void GameplayMgr::OnGameInit()
+void GameplayMgr::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
     // Vychozi hodnoty
     m_plSpeedCoef  = 1.0f;
@@ -59,7 +59,7 @@ void GameplayMgr::OnGameInit()
     m_plActiveBombs = 0;
 
     if (m_game)
-        m_game->OnGameInit();
+        m_game->OnGameInit(pPlayerRec);
 }
 
 void GameplayMgr::SetGameType(GameType type)

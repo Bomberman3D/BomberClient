@@ -4,7 +4,7 @@
 #include <Map.h>
 #include <Effects/ParticleEmitter.h>
 
-void ClassicSingleGameType::OnGameInit()
+void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap)
@@ -29,7 +29,16 @@ void ClassicSingleGameType::OnGameInit()
                     pMap->AddDynamicCell(i,j,DYNAMIC_TYPE_BOX);
                 }
             }
-            else if (pMap->field[i][j].type == TYPE_STARTLOC)
+        }
+    }
+
+    sMapManager->FillDynamicRecords();
+
+    for (uint32 i = 0; i < pMap->field.size(); i++)
+    {
+        for (uint32 j = 0; j < pMap->field[i].size(); j++)
+        {
+            if (pMap->field[i][j].type == TYPE_STARTLOC)
             {
                 // Pokud je vetsi nez 0, muzeme tam dat nepritele, jinak se jedna o hracovu pozici
                 if (startlocpos > 0 && startlocpos <= sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT))
@@ -44,12 +53,14 @@ void ClassicSingleGameType::OnGameInit()
                     startlocpos++;
                 }
                 else
+                {
+                    pPlayerRec->x = i-0.5f;
+                    pPlayerRec->z = j-0.5f;
                     startlocpos++;
+                }
             }
         }
     }
-
-    sMapManager->FillDynamicRecords();
 }
 
 void ClassicSingleGameType::OnUpdate()

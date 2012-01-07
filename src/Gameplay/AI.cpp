@@ -396,6 +396,8 @@ MovementHolder::MovementHolder(EnemyTemplate* src)
     m_moveType = MOVEMENT_NONE;
     m_lastMoveUpdate = clock();
     m_nodeStartTime = 0;
+
+    m_speedMod = 1.0f;
 }
 
 MovementHolder::~MovementHolder()
@@ -419,8 +421,8 @@ void MovementHolder::Generator()
                 break;
             }
 
-            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
-            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
             uint32 tx = ceil(pTarget->x);
             uint32 ty = ceil(pTarget->z);
             Pathfinder p(&m_path);
@@ -439,8 +441,8 @@ void MovementHolder::Generator()
         }
         case MOVEMENT_RANDOM:
         {
-            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
-            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
             RandomPathfinder p(&m_path);
             p.Initialize(mx, my);
             p.GeneratePath();
@@ -473,8 +475,8 @@ bool MovementHolder::TryGenerator(MovementType moveType)
                 break;
             }
 
-            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
-            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
             uint32 tx = ceil(pTarget->x);
             uint32 ty = ceil(pTarget->z);
             Pathfinder p(&m_tryPath);
@@ -488,8 +490,8 @@ bool MovementHolder::TryGenerator(MovementType moveType)
         }
         case MOVEMENT_RANDOM:
         {
-            uint32 mx = ceil(m_src->pRecord->x + 0.5f);
-            uint32 my = ceil(m_src->pRecord->z + 0.5f);
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
             RandomPathfinder p(&m_tryPath);
             p.Initialize(mx, my);
             p.GeneratePath();

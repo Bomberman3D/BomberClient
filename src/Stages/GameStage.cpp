@@ -14,7 +14,7 @@ void GameStage::OnEnter()
     pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.45f, 90.0f, true);
     sDisplay->SetTargetModel(pPlayerRec);
 
-    sGameplayMgr->OnGameInit();
+    sGameplayMgr->OnGameInit(pPlayerRec);
 
     // Svetla
     glEnable(GL_LIGHTING);

@@ -34,7 +34,7 @@ class GameplayMgr
         void SetGameType(GameType type);
         GameType GetGameType();
 
-        void OnGameInit();
+        void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 

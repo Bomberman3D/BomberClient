@@ -35,7 +35,7 @@ class GameTypeTemplate
         GameTypeTemplate()
         {
         }
-        virtual void OnGameInit() {};
+        virtual void OnGameInit(ModelDisplayListRecord* pPlayerRec) {};
         virtual void OnUpdate() {};
         virtual void OnBombBoom(BombRecord* bomb) {};
         virtual void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) {};
@@ -61,7 +61,7 @@ class ClassicSingleGameType: public GameTypeTemplate
         {
             m_type = GAME_TYPE_SP_CLASSIC;
         }
-        void OnGameInit();
+        void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnUpdate();
         void OnBombBoom(BombRecord* bomb);
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true);
@@ -78,7 +78,7 @@ class ClassicMultiGameType: public GameTypeTemplate
         {
             m_type = GAME_TYPE_MP_CLASSIC;
         }
-        void OnGameInit();
+        void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnUpdate();
 };
 

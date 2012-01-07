@@ -26,6 +26,22 @@ void Timer::AddTimedSetEvent(uint32 time, uint32 *target, uint32 value)
     TimedSetEvents.push_back(temp);
 }
 
+void Timer::RemoveTimerSetEventByTarget(uint32* target)
+{
+    // THREAD UNSAFE !
+
+    if (TimedSetEvents.empty())
+        return;
+
+    for (std::list<TimerSetRecord>::iterator itr = TimedSetEvents.begin(); itr != TimedSetEvents.end();)
+    {
+        if (itr->target == target)
+            itr = TimedSetEvents.erase(itr);
+        else
+            ++itr;
+    }
+}
+
 void Timer::Update()
 {
     clock_t tnow = clock();
