@@ -159,7 +159,7 @@ void Display::Update(const uint32 diff)
     DrawBillboards();
 }
 
-ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList)
+ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
@@ -172,7 +172,10 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->y = y;
     pNew->z = z;
     if (Animation != ANIM_NONE)
+    {
         pNew->AnimTicket = sAnimator->GetModelAnimTicket(modelId, Animation);
+        sAnimator->ChangeModelAnim(pNew->AnimTicket, Animation, startFrame, frameSkipSpeed, animReverse);
+    }
     else
         pNew->AnimTicket = 0;
 
@@ -422,6 +425,7 @@ void Display::DrawModels()
         ++itr;
     }
 
+    glLoadIdentity();
     glEnable(GL_TEXTURE_2D);
     glColor3ub(255, 255, 255);
 }

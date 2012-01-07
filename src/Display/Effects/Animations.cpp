@@ -41,10 +41,31 @@ void Animator::Update()
             if (temp->passedInterval >= sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval)
             {
                 temp->passedInterval = 0;                    // Resetovat casovac
-                temp->actualFrame   += temp->frameSkipSpeed; // posunout frame
+
+                if (temp->reversed)
+                {
+                    if (temp->actualFrame >= temp->frameSkipSpeed)
+                        temp->actualFrame -= temp->frameSkipSpeed; // posunout frame zpet
+                    else
+                        temp->actualFrame = 0;
+                }
+                else
+                    temp->actualFrame += temp->frameSkipSpeed; // posunout frame dopredu
+
                 // Pokud jsme se dostali na konec, opakovat animaci
-                if (sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
-                    temp->actualFrame = 0;
+                if (!temp->reversed && sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
+                {
+                    if (temp->bothWay)
+                    {
+                        temp->actualFrame -= temp->frameSkipSpeed*2; // *2 pro netrhanou animaci
+                        temp->reversed = true;
+                    }
+                    else
+                        temp->actualFrame = 0;
+                }
+
+                if (temp->reversed && temp->actualFrame == 0)
+                    temp->reversed = false;
 
                 // A nakonec ulozit texturu
                 temp->actualTextureId = sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].textureId;
@@ -56,11 +77,31 @@ void Animator::Update()
             if (temp->passedInterval >= sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval)
             {
                 temp->passedInterval = 0;                    // Resetovat casovac
-                temp->actualFrame   += temp->frameSkipSpeed; // posunout frame
+
+                if (temp->reversed)
+                {
+                    if (temp->actualFrame >= temp->frameSkipSpeed)
+                        temp->actualFrame -= temp->frameSkipSpeed; // posunout frame zpet
+                    else
+                        temp->actualFrame = 0;
+                }
+                else
+                    temp->actualFrame += temp->frameSkipSpeed; // posunout frame
 
                 // Pokud jsme na poslednim framu animace, opakujeme
-                if (sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
-                    temp->actualFrame = 0;
+                if (!temp->reversed && sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
+                {
+                    if (temp->bothWay)
+                    {
+                        temp->actualFrame -= temp->frameSkipSpeed*2; // *2 pro netrhanou animaci
+                        temp->reversed = true;
+                    }
+                    else
+                        temp->actualFrame = 0;
+                }
+
+                if (temp->reversed && temp->actualFrame == 0)
+                    temp->reversed = false;
             }
         }
     }
@@ -126,7 +167,7 @@ uint32 Animator::GetLowestAnimTicketId()
     return (uint32)-1;
 }
 
-uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed)
+uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed, bool bothWay)
 {
     // Ziska nejnizsi mozne ID ticketu
     uint32 pos = GetLowestAnimTicketId();
@@ -144,11 +185,12 @@ uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 fr
     temp->actualFrame     = 0;
     temp->passedInterval  = 0;
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
+    temp->bothWay         = bothWay;
 
     return pos;
 }
 
-uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed)
+uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed, bool bothWay)
 {
     // Pokud vubec muzeme animovat
     if (animId > MAX_ANIM)
@@ -170,11 +212,12 @@ uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameS
     temp->actualFrame     = sStorage->ModelAnimation[modelId].Anim[animId].frameFirst;
     temp->passedInterval  = 0;
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
+    temp->bothWay         = bothWay;
 
     return pos;
 }
 
-void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame, uint32 frameSkipSpeed)
+void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame, uint32 frameSkipSpeed, bool bothWay)
 {
     if (animId > MAX_ANIM || ticketId == 0)
         return;
@@ -186,6 +229,7 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
     itr->second.animId         = animId;
     itr->second.actualFrame    = sStorage->ModelAnimation[itr->second.sourceId].Anim[animId].frameFirst + startFrame;
     itr->second.passedInterval = 0;
+    itr->second.bothWay        = bothWay;
     if (frameSkipSpeed > 0)
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }

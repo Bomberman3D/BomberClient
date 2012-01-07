@@ -19,11 +19,13 @@ struct AnimationRecord
     uint32 animId;
     uint8  animType;
     uint32 frameSkipSpeed;
+    bool   bothWay; // dovoluje animovat nejdriv k nejvyssimu a pak k nejnizsimu framu
 
     // Dynamicka data
     uint32 passedInterval;
     uint32 actualTextureId; // Kvuli rychlosti se bude uchovavat oboji
     uint32 actualFrame;
+    bool   reversed;
 };
 
 class Animator
@@ -32,10 +34,10 @@ class Animator
         Animator();
 
         // System vyzvedavani, vyhledavani a znaceni ticketu
-        uint32 GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed = 1);
+        uint32 GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed = 1, bool bothWay = false);
         void DestroyAnimTicket(uint32 id);
-        uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1);
-        void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0);
+        uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1, bool bothWay = false);
+        void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0, bool bothWay = false);
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);
         uint32 GetAnimId(uint32 id);
