@@ -14,10 +14,6 @@ void GameStage::OnEnter()
     pPlayerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.45f, 90.0f, true);
     sDisplay->SetTargetModel(pPlayerRec);
 
-    // TODO: vytvorit "nastaveni" hry a tam tohle presunout !!
-    sGameplayMgr->SetGameType(GAME_TYPE_SP_CLASSIC);
-
-
     sGameplayMgr->OnGameInit();
 
     // Svetla

@@ -7,8 +7,14 @@
 enum GameType
 {
     GAME_TYPE_NONE = 0,
-    GAME_TYPE_SP_CLASSIC,
-    GAME_TYPE_MP_CLASSIC,
+    GAME_TYPE_SP_MIN = 1, // zachytny bod pro vyber typu hry
+    GAME_TYPE_SP_CLASSIC  = 1,
+    GAME_TYPE_SP_MEME     = 2, // NYI
+    GAME_TYPE_SP_MAX = 2, // zachytny bod pro vyber typu hry
+    GAME_TYPE_MP_MIN = 3, // zachytny bod pro vyber typu hry
+    GAME_TYPE_MP_CLASSIC  = 3, // NYI
+    GAME_TYPE_MP_MEME     = 4, // NYI
+    GAME_TYPE_MP_MAX = 4, // zachytny bod pro vyber typu hry
     GAME_TYPE_MAX
 };
 

@@ -162,6 +162,7 @@ bool Storage::LoadMapData()
     {
         id = qry.getval();
         MapData[id].filename = qry.getstr();
+        MapData[id].mapname = qry.getstr();
         count++;
     }
     fprintf(stdout,"Nacteno %u dat pro mapy\n",count);

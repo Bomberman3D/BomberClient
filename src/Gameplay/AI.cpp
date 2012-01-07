@@ -565,7 +565,7 @@ void MovementHolder::Update()
 
         Generator();
 
-        m_nextUpdate = tnow + HOLDER_UPDATE_DELAY;
+        m_nextUpdate = tnow + HOLDER_UPDATE_DELAY * m_speedMod;
         return;
     }
 
@@ -583,13 +583,15 @@ void MovementHolder::Update()
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
 
+    float timePass = 500 * m_speedMod;
+
     // Posun modelu po vektoru pohybu
-    m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/500 ));
-    m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/500 ));
+    m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/timePass ));
+    m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/timePass ));
 
     // No a pokud jsme dosahli maximalniho bodu usecky urcene vektorem a delkou 1,
     // posuneme se na dalsi bod cesty
-    if (tnow-m_nodeStartTime >= 500)
+    if (tnow-m_nodeStartTime >= timePass)
     {
         m_currentPathNode++;
         if (m_currentPathNode >= m_path.size()-1)
@@ -641,7 +643,7 @@ void EnemyTemplate::Update()
             if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
                 m_movement->TryMutate(MOVEMENT_RANDOM);
 
-            m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY;
+            m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
         }
 
         // A samotny update pohybu

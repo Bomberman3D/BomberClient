@@ -16,11 +16,18 @@
 enum Fonts
 {
     MAIN_FONT  = 0,
-    SMALL_FONT = 1,
+    FONT_ONE   = 1,
     MAX_FONTS
 };
 
-static const uint32 fontTextures[MAX_FONTS] = {17, 18};
+static const uint32 fontTextures[MAX_FONTS] = {17, 44};
+
+#define FONT_SIZE_N 1.0f
+#define FONT_SIZE_1 0.8f
+#define FONT_SIZE_2 0.6f
+#define FONT_SIZE_3 0.4f
+#define FONT_SIZE_4 0.3f
+#define FONT_SIZE_5 0.2f
 
 //kolize s osami
 enum AxisColission
@@ -134,7 +141,7 @@ class Display
         bool IsIn2DMode() { return m_is2D; };
 
         // Text
-        void PrintText(uint8 font, uint32 left, uint32 top, const char* fmt, ...);
+        void PrintText(uint8 font, uint32 left, uint32 top, float scale, const char* fmt, ...);
 
         // 2D funkce
         void Draw2D(uint32 textureId, float left, float top, float width, float height);

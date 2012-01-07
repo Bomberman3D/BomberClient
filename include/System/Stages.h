@@ -2,6 +2,7 @@
 #define BOMB_STAGES_H
 
 #include <Display.h>
+#include <GameTypes.h>
 
 enum Stages
 {
@@ -97,9 +98,14 @@ class GameSettingsStage: public StageControl
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
     protected:
+        // Multiplayer
         uint32 m_selected;
         std::string m_nickfield;
         bool m_nickselected;
+
+        // Singleplayer
+        uint32 m_selectedMapId;
+        GameType m_selectedMode;
 };
 
 class OptionsStage: public StageControl

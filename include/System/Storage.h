@@ -49,6 +49,7 @@ struct TextureAnim
 struct MapData
 {
     std::string filename;
+    std::string mapname;
 };
 
 class Storage

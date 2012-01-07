@@ -14,6 +14,8 @@ void ClassicSingleGameType::OnGameInit()
 
     pMap->DestroyAllDynamicRecords();
 
+    uint32 startlocpos = 0; // vzdy je jedna vyhrazena pro hrace + se inkrementuje s poctem nepratel
+
     for (uint32 i = 0; i < pMap->field.size(); i++)
     {
         for (uint32 j = 0; j < pMap->field[i].size(); j++)
@@ -21,18 +23,31 @@ void ClassicSingleGameType::OnGameInit()
             // Muzeme dat bednu jen na misto kde nebude stat hrac, ani pevny objekt mapy
             if ((i > 2 || j > 2) && pMap->field[i][j].type == TYPE_GROUND)
             {
-                if (rand()%2)
+                // pri 10ti se deli dvema, pri 1 se deli 11ti, asi nejjednodussi
+                if ((rand()%(12-sGameplayMgr->GetSetting(SETTING_BOX_DENSITY))) == 0)
                 {
                     pMap->AddDynamicCell(i,j,DYNAMIC_TYPE_BOX);
                 }
             }
+            else if (pMap->field[i][j].type == TYPE_STARTLOC)
+            {
+                // Pokud je vetsi nez 0, muzeme tam dat nepritele, jinak se jedna o hracovu pozici
+                if (startlocpos > 0 && startlocpos <= sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT))
+                {
+                    // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
+                    // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
+                    EnemyTemplate* pEnemy = new EnemyTemplate;
+                    pEnemy->Init(1, i, j);
+                    pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
+                    pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
+                    m_enemies.push_back(pEnemy);
+                    startlocpos++;
+                }
+                else
+                    startlocpos++;
+            }
         }
     }
-
-    EnemyTemplate* pEnemy = new EnemyTemplate;
-    pEnemy->Init(1, 13, 15);
-    pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
-    m_enemies.push_back(pEnemy);
 
     sMapManager->FillDynamicRecords();
 }

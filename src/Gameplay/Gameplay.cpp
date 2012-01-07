@@ -6,6 +6,13 @@
 GameplayMgr::GameplayMgr()
 {
     m_game = NULL;
+
+    m_settings.resize(SETTING_MAX);
+    m_settings[SETTING_ENEMY_COUNT] = 4;
+    m_settings[SETTING_ENEMY_AI_LEVEL] = 1;
+    m_settings[SETTING_ENEMY_SPEED] = 1;
+    m_settings[SETTING_BOX_DENSITY] = 10;
+    m_settings[SETTING_MAP_ID] = 1;
 }
 
 GameplayMgr::~GameplayMgr()

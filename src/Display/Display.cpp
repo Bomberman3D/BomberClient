@@ -56,16 +56,16 @@ void Display::InitFont(uint8 font)
     float cy;
 
     GLint charsize = 16;
-    if (font == SMALL_FONT)
-        charsize = 12;
+    if (font == FONT_ONE)
+        charsize = 64;
 
     // V tomto pripade charsperline = charspercolumn
     uint32 charsperline = 16;
     float charoffset = 1.0f/charsperline;
     float spacing = 10.0f;
 
-    if (font == SMALL_FONT)
-        spacing = 7.5f;
+    if (font == FONT_ONE)
+        spacing = 36.0f;
 
     m_fontBase[font] = glGenLists(256);
 
@@ -91,7 +91,7 @@ void Display::InitFont(uint8 font)
 }
 
 //Vykresleni textu
-void Display::PrintText(uint8 font, uint32 left, uint32 top, const char *fmt, ...)
+void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, const char *fmt, ...)
 {
     if (font >= MAX_FONTS)
         return;
@@ -123,6 +123,7 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, const char *fmt, ..
 
     glLoadIdentity();
     glTranslated(left,top,0);
+    glScalef(scale, scale, scale);
     glListBase(m_fontBase[font]-32);
     glCallLists(strlen(text),GL_UNSIGNED_BYTE,text);
 

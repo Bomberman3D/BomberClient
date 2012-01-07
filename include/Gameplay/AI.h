@@ -87,6 +87,9 @@ class MovementHolder
         bool HasPath();
         MovementType GetMovementType() { return m_moveType; };
 
+        void SetSpeedMod(float speedMod) { m_speedMod = speedMod; };
+        float GetSpeedMod() { return m_speedMod; };
+
         void Update();
 
         void Generator();
@@ -100,6 +103,7 @@ class MovementHolder
         uint32 m_currentPathNode;
         CVector2 m_nodeVector;
         clock_t m_nodeStartTime;
+        float m_speedMod;
 
         clock_t m_nextUpdate;
         clock_t m_lastMoveUpdate;
