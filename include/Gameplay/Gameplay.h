@@ -25,6 +25,15 @@ struct BombRecord
     //pozdeji i data o vlastnikovi?
 };
 
+// Struktura pro "nebezpecne pole" :-)
+// jde v podstate jen o cas aktivace a deaktivace pro vymazani
+struct DangerousField
+{
+    clock_t activeSince; // aktivni od [ms] - kvuli postupnemu dosahu plamene
+    uint32  activeTime;  // [ms]
+    bool    registered;  // byly uz provedeny veci "po aktivaci" ?
+};
+
 class GameplayMgr
 {
     public:
@@ -53,10 +62,14 @@ class GameplayMgr
         void SetSetting(SettingsEnum pos, uint32 val) { if (pos < SETTING_MAX) m_settings[pos] = val; };
         std::vector<uint32>* SettingsPointer() { return &m_settings; };
 
+        bool IsDangerousField(uint32 x, uint32 y);
+        void SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong);
+
     private:
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;
+        std::map<std::pair<uint32, uint32>, DangerousField*> DangerousMap;
 
         float  m_plSpeedCoef;
         uint32 m_plFlameReach;

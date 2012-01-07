@@ -26,6 +26,8 @@ void GameplayMgr::Update()
     if (m_game)
         m_game->OnUpdate();
 
+    clock_t tnow = clock();
+
     if (!BombMap.empty())
     {
         for (std::list<BombRecord*>::iterator itr = BombMap.begin(); itr != BombMap.end();)
@@ -42,6 +44,39 @@ void GameplayMgr::Update()
                 m_plActiveBombs--;
                 itr = BombMap.erase(itr);
                 continue;
+            }
+
+            ++itr;
+        }
+    }
+
+    if (!DangerousMap.empty())
+    {
+        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end();)
+        {
+            if (!itr->second)
+            {
+                ++itr;
+                continue;
+            }
+
+            if (itr->second->activeSince + itr->second->activeTime < tnow)
+            {
+                itr = DangerousMap.erase(itr);
+                continue;
+            }
+
+            if (itr->second->registered)
+            {
+                ++itr;
+                continue;
+            }
+
+            if (itr->second->activeSince <= tnow)
+            {
+                itr->second->registered = true;
+                if (m_game)
+                    m_game->OnDangerousFieldActivate(itr->first.first, itr->first.second);
             }
 
             ++itr;
@@ -117,4 +152,27 @@ void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uin
 {
     if (m_game)
         m_game->OnPlayerFieldChange(oldX, oldY, newX, newY);
+}
+
+bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
+{
+    std::map<std::pair<uint32, uint32>, DangerousField*>::const_iterator itr = DangerousMap.find(std::make_pair(x,y));
+    if (itr == DangerousMap.end())
+        return false;
+
+    if (itr->second->activeSince <= clock() && itr->second->activeSince+itr->second->activeTime >= clock())
+        return true;
+
+    return false;
+}
+
+void GameplayMgr::SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong)
+{
+    DangerousField* field = new DangerousField;
+
+    field->activeSince = since;
+    field->activeTime = howLong;
+    field->registered = false;
+
+    DangerousMap[std::make_pair(x,y)] = field;
 }
