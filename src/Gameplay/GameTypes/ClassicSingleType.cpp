@@ -96,8 +96,10 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         // Nejdrive znicime bombu na mape
         pMap->DestroyDynamicRecords(bomb->x, bomb->y, DYNAMIC_TYPE_BOMB);
 
-        // Tohle bude v budoucnu promenliva hodnota, podle bonusu apod.
-        uint32 bombreach = sGameplayMgr->GetFlameReach();
+        // Nyni promenliva hodnota podle bonusu
+        // Bonus se ale zapocita jen pokud je bomba polozena az po vzeti bonusu, ne na vsechny
+        // Jednak je to realistictejsi a jednak to usnadni trochu pathfinding pro AI
+        uint32 bombreach = bomb->reach;
 
         // Projdeme vsechny mozne zaznamy na mape az na maximalni definovany dosah
         // pokud tam neco je, zamezime dalsimu prepsani a zapiseme
@@ -110,7 +112,7 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
             // Pokud jeste nebylo zapsano
             if (reach_x1 == bombreach+1)
                 // Overime, zdali na dane pozici neco neprostupneho je
-                if (pMap->IsDynamicRecordPresent(bomb->x + i + 1, bomb->y, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x+i+1,bomb->y) == TYPE_SOLID_BOX)
+                if (pMap->IsDynamicRecordPresent(bomb->x + i + 1, bomb->y, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x + i + 1,bomb->y) == TYPE_SOLID_BOX)
                 {
                     // Pokud ano, zamezime zapsanim maximalni pozice dalsimu prepsani
                     reach_x1 = i+1;
@@ -125,14 +127,14 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
                 }
 
             if (reach_y1 == bombreach+1)
-                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y + i + 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y+i+1) == TYPE_SOLID_BOX)
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y + i + 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y + i + 1) == TYPE_SOLID_BOX)
                 {
                     reach_y1 = i+1;
                     ry1_box = true;
                 }
 
             if (reach_y2 == bombreach+1)
-                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y - i - 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y-i-1) == TYPE_SOLID_BOX)
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y - i - 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y - i - 1) == TYPE_SOLID_BOX)
                 {
                     reach_y2 = i+1;
                     ry2_box = true;
@@ -162,7 +164,7 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         pMap->DestroyDynamicRecords(bomb->x + reach_x1 + (rx1_box?1:0), bomb->y, DYNAMIC_TYPE_BOX);
         pMap->DestroyDynamicRecords(bomb->x - reach_x2 - (rx2_box?1:0), bomb->y, DYNAMIC_TYPE_BOX);
         pMap->DestroyDynamicRecords(bomb->x, bomb->y + reach_y1 + (ry1_box?1:0), DYNAMIC_TYPE_BOX);
-        pMap->DestroyDynamicRecords(bomb->x, bomb->y - reach_y2 - (rx1_box?1:0), DYNAMIC_TYPE_BOX);
+        pMap->DestroyDynamicRecords(bomb->x, bomb->y - reach_y2 - (ry2_box?1:0), DYNAMIC_TYPE_BOX);
     }
 }
 

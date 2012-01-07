@@ -105,6 +105,7 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     temp->x = x;
     temp->y = y;
     temp->state = 0;
+    temp->reach = GetFlameReach();
     BombMap.push_back(temp);
 
     sTimer->AddTimedSetEvent(2500, &temp->state, 1);

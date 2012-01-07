@@ -21,6 +21,7 @@ struct BombRecord
     uint32 x;
     uint32 y;
     uint32 state;
+    uint32 reach;
     //pozdeji i data o vlastnikovi?
 };
 
