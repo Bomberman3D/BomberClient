@@ -111,34 +111,50 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         {
             // Pokud jeste nebylo zapsano
             if (reach_x1 == bombreach+1)
+            {
                 // Overime, zdali na dane pozici neco neprostupneho je
-                if (pMap->IsDynamicRecordPresent(bomb->x + i + 1, bomb->y, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x + i + 1,bomb->y) == TYPE_SOLID_BOX)
+                if (pMap->IsDynamicRecordPresent(bomb->x + i + 1, bomb->y, DYNAMIC_TYPE_BOX))
                 {
                     // Pokud ano, zamezime zapsanim maximalni pozice dalsimu prepsani
                     reach_x1 = i+1;
                     rx1_box = true;
                 }
+                else if (pMap->GetStaticRecord(bomb->x + i + 1,bomb->y) == TYPE_SOLID_BOX)
+                    reach_x1 = i+1;
+            }
 
             if (reach_x2 == bombreach+1)
-                if (pMap->IsDynamicRecordPresent(bomb->x - i - 1, bomb->y, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x - i - 1,bomb->y) == TYPE_SOLID_BOX)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x - i - 1, bomb->y, DYNAMIC_TYPE_BOX))
                 {
                     reach_x2 = i+1;
                     rx2_box = true;
                 }
+                else if (pMap->GetStaticRecord(bomb->x - i - 1,bomb->y) == TYPE_SOLID_BOX)
+                    reach_x2 = i+1;
+            }
 
             if (reach_y1 == bombreach+1)
-                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y + i + 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y + i + 1) == TYPE_SOLID_BOX)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y + i + 1, DYNAMIC_TYPE_BOX))
                 {
                     reach_y1 = i+1;
                     ry1_box = true;
                 }
+                else if (pMap->GetStaticRecord(bomb->x,bomb->y + i + 1) == TYPE_SOLID_BOX)
+                    reach_y1 = i+1;
+            }
 
             if (reach_y2 == bombreach+1)
-                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y - i - 1, DYNAMIC_TYPE_BOX) || pMap->GetStaticRecord(bomb->x,bomb->y - i - 1) == TYPE_SOLID_BOX)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y - i - 1, DYNAMIC_TYPE_BOX))
                 {
                     reach_y2 = i+1;
                     ry2_box = true;
                 }
+                else if (pMap->GetStaticRecord(bomb->x,bomb->y - i - 1) == TYPE_SOLID_BOX)
+                    reach_y2 = i+1;
+            }
         }
         // Pak vsechno dekrementujeme - zapise se vzdy pozice uz nepristupneho pole
         --reach_x1;
@@ -148,16 +164,16 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
 
         // Exploze - particle emittery
         BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,   0.0f, 0, 0, reach_y1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,   0.0f, 0, 0, reach_y1*100 + (ry1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,  90.0f, 0, 0, reach_x2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,  90.0f, 0, 0, reach_x2*100 + (rx2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 180.0f, 0, 0, reach_y2*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 180.0f, 0, 0, reach_y2*100 + (ry2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100, 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100 + (rx1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
         // A nakonec znicime vsechny bedny v dosahu bomby (v pripade true hodnoty bool promenne +1 / -1 proto, ze
         // reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
