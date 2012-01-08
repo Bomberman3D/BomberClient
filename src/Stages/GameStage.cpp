@@ -12,6 +12,7 @@
 void GameStage::OnEnter()
 {
     sGameplayMgr->OnGameInit();
+    m_subStage = 0;
 
     // Svetla
     glEnable(GL_LIGHTING);
@@ -58,14 +59,41 @@ void GameStage::OnDraw(uint32 diff)
         static GLfloat lPosition[] = {sGameplayMgr->GetPlayerRec()->x-5.0f, 5.0f, sGameplayMgr->GetPlayerRec()->z-5.0f, 1.5f};
         glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
     }
+
+    // Hra zapauzovana
+    if (m_subStage == 2)
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        sDisplay->Draw2D(15, 150, 80, WIDTH-150-150, HEIGHT-80-80);
+        sDisplay->PrintText(FONT_ONE, WIDTH/2-33*2.5f, 130, FONT_SIZE_1, NOCOLOR, "PAUZA");
+
+        sDisplay->Setup3DMode();
+    }
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
 {
-    // Jelikoz nam mys drzi pozici veprostred pohledu, nemuzeme zmacknout krizek
-    // Tak si pomuzeme escapem
-    if (key == VK_ESCAPE)
-        exit(1);
+    // Menu (pauza)
+    if (key == VK_ESCAPE && press)
+    {
+        // Dovolime prepnuti pouze kdyz jsme zapauzovani nebo hrajeme
+        if (m_subStage == 2)
+        {
+            sGameplayMgr->UnblockMovement();
+            m_subStage = 0;
+        }
+        else if (m_subStage == 0)
+        {
+            sGameplayMgr->BlockMovement();
+            m_subStage = 2;
+        }
+    }
+
+    // Pokud je substage rovna 2 (menu), zadny pohyb !
+    if (m_subStage == 2)
+        return;
 
     // Dame vedet globalnimu kontroleru, ze hrac se chce pohybovat
     if (press)
@@ -115,6 +143,10 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     {
         Map* pMap = (Map*)sMapManager->GetMap();
         if (!pMap)
+            return;
+
+        // Pokladame bomby pouze kdyz hrajeme (ne v menu nebo kdyz jsme mrtvi)
+        if (m_subStage != 0)
             return;
 
         uint32 bx = floor(sGameplayMgr->GetPlayerRec()->x)+1;

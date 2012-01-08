@@ -100,6 +100,16 @@ struct BillboardDisplayListRecord: public DisplayListRecord
     bool   billboard_x, billboard_y;
 };
 
+#define COLOR(r,g,b) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(0)))
+#define COLORA(r,g,b,a) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(a)))
+
+#define NOCOLOR COLOR(255,255,255)
+
+#define CRED(x)   uint8(x >> 24)
+#define CGREEN(x) uint8(x >> 16)
+#define CBLUE(x)  uint8(x >> 8)
+#define CALPHA(x) uint8(x)
+
 class Display
 {
     public:
@@ -142,7 +152,7 @@ class Display
         bool IsIn2DMode() { return m_is2D; };
 
         // Text
-        void PrintText(uint8 font, uint32 left, uint32 top, float scale, const char* fmt, ...);
+        void PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32 color, const char* fmt, ...);
 
         // 2D funkce
         void Draw2D(uint32 textureId, float left, float top, float width, float height);

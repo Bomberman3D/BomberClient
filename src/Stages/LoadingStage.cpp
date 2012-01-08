@@ -32,7 +32,7 @@ void LoadingStage::OnDraw(uint32 diff)
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
 
-    sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+100,FONT_SIZE_N, "Naèítání");
+    sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+100,FONT_SIZE_N, NOCOLOR, "Naèítání");
 
     sDisplay->Draw2D(sAnimator->GetActualTexture(ImgAnimTicket), WIDTHPCT*50-75, HEIGHTPCT*50-75,150,150);
 }

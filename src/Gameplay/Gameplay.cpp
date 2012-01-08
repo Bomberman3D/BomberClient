@@ -198,7 +198,7 @@ void GameplayMgr::PlayerDied(uint32 x, uint32 y)
     if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
         sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
 
-    // TODO: zobrazit nejakou tabulku, zmenit model a tak..
+    sApplication->SetStagePhase(3);
 }
 
 void GameplayMgr::UpdatePlayerMoveAngle()

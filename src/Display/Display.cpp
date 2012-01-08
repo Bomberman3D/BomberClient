@@ -91,7 +91,7 @@ void Display::InitFont(uint8 font)
 }
 
 //Vykresleni textu
-void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, const char *fmt, ...)
+void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32 color, const char *fmt, ...)
 {
     if (font >= MAX_FONTS)
         return;
@@ -123,11 +123,14 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, const 
 
     glLoadIdentity();
     glTranslated(left,top,0);
+    glColor4ub(CRED(color), CGREEN(color), CBLUE(color), 255-CALPHA(color));
     glScalef(scale, scale, scale);
     glListBase(m_fontBase[font]-32);
     glCallLists(strlen(text),GL_UNSIGNED_BYTE,text);
 
     glLoadIdentity();
+
+    glColor4ub(255, 255, 255, 255);
 
     // A po vykresleni se vratime zpet do puvodniho modu pokud je to nutne
     if (in3D)
