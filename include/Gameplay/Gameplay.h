@@ -75,11 +75,12 @@ class GameplayMgr
         void SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong);
 
         void PlayerDied(uint32 x, uint32 y);
-        void SetPlayerMoveAngle(float angle) { m_moveAngle = angle; };
-        void ChangePlayerMoveAngle(int32 coordDif);
+        void UpdatePlayerMoveAngle();
         void UpdatePlayerMotion(uint32 diff);
         void SetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = true; };
         void UnsetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = false; };
+        void BlockMovement() { m_movementBlocked = true; };
+        void UnblockMovement() { m_movementBlocked = false; };
 
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
 
@@ -90,6 +91,7 @@ class GameplayMgr
         std::map<std::pair<uint32, uint32>, DangerousField*> DangerousMap;
         std::vector<bool> m_moveElements;
         float m_moveAngle;
+        bool m_movementBlocked;
 
         ModelDisplayListRecord* m_playerRec;
         uint32 m_playerX, m_playerY;

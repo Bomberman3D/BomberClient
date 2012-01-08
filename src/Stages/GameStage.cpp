@@ -131,18 +131,10 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
 
 void GameStage::OnUpdate(uint32 diff)
 {
-    // Otoceni hrace (hracskeho modelu) o uhel prepocitany podle pohybu mysi
-    // Pri FPS rezimu musime nastavit i vertikalni uhel, ale to ve funkci Display::AdjustViewToTarget
-    POINT mousePos;
-    int middleX = sConfig->WindowWidth >> 1;
-    int middleY = sConfig->WindowHeight >> 1;
-    GetCursorPos(&mousePos);
-    SetCursorPos(middleX, middleY);  // Posuneme mys zase na stred
-    if (!((mousePos.x == middleX) && (mousePos.y == middleY)))
-        sGameplayMgr->ChangePlayerMoveAngle(mousePos.x-middleX);
-
     // Odsud budeme updatovat i GameplayMgr, proto nesmi byt nikde predtim return
-    // Nedrive pohyb
+    // Nejdrive uhel podle mysi
+    sGameplayMgr->UpdatePlayerMoveAngle();
+    // Pak pohyb
     sGameplayMgr->UpdatePlayerMotion(diff);
     // A pote zbytek
     sGameplayMgr->Update();

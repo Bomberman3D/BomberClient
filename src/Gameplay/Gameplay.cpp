@@ -93,6 +93,7 @@ void GameplayMgr::OnGameInit()
     m_plMaxBombs   = 1;
 
     m_plActiveBombs = 0;
+    m_movementBlocked = false;
 
     m_moveElements.resize(MOVE_MAX);
     for (uint8 i = 0; i < MOVE_MAX; i++)
@@ -192,19 +193,38 @@ void GameplayMgr::SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong
 
 void GameplayMgr::PlayerDied(uint32 x, uint32 y)
 {
-    //
+    BlockMovement();
+
+    if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
+        sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
+
+    // TODO: zobrazit nejakou tabulku, zmenit model a tak..
 }
 
-void GameplayMgr::ChangePlayerMoveAngle(int32 coordDiff)
+void GameplayMgr::UpdatePlayerMoveAngle()
 {
-    m_moveAngle += coordDiff*0.0025f;
+    if (m_movementBlocked)
+        return;
+
+    // Otoceni hrace (hracskeho modelu) o uhel prepocitany podle pohybu mysi
+    // Pri FPS rezimu musime nastavit i vertikalni uhel, ale to ve funkci Display::AdjustViewToTarget
+    POINT mousePos;
+    int middleX = sConfig->WindowWidth >> 1;
+    int middleY = sConfig->WindowHeight >> 1;
+    GetCursorPos(&mousePos);
+    SetCursorPos(middleX, middleY);  // Posuneme mys zase na stred
+    if (!((mousePos.x == middleX) && (mousePos.y == middleY)))
+        m_moveAngle += 0.0025f*(mousePos.x-middleX);
 }
 
 void GameplayMgr::UpdatePlayerMotion(uint32 diff)
 {
+    if (m_movementBlocked)
+        return;
+
     // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
     float dist = (float(diff)+1.0f)*0.002f*GetPlayerSpeedCoef();
-    float angle_rad = m_moveAngle;//PI*(-m_moveAngle+90.0f)/180.0f;
+    float angle_rad = m_moveAngle;
 
     bool move = false;
 

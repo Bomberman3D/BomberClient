@@ -221,6 +221,12 @@ void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32
     m_playerX = newX;
     m_playerY = newY;
 
+    if (sGameplayMgr->IsDangerousField(newX, newY))
+    {
+        // Obsluha smrti - predame to zpet
+        sGameplayMgr->PlayerDied(newX, newY);
+    }
+
     Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap)
         return;
