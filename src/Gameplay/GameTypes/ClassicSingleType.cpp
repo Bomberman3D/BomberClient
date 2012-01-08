@@ -260,8 +260,10 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
     if (pMap)
         pMap->DestroyDynamicRecords(x, y, DYNAMIC_TYPE_BOX);
 
+    // Pokud hrac stoji na nebezpecnem poli
     if (m_playerX == x && m_playerY == y)
     {
-        // hrac stoji v plameni
+        // GameplayMgr se postara o zbytek.. ouch!
+        sGameplayMgr->PlayerDied(x, y);
     }
 }

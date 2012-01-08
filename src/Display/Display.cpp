@@ -890,6 +890,10 @@ void Display::AdjustViewToTarget()
         m_tarangleY = -m_targetmodel->rotate-270.0f;
     }
 
+    // Odchylka horizontalniho uhlu - pouziva se treba pri pohybu hrace do stran
+    if (m_deviateAngleY != 0.0f)
+        m_tarangleY += m_deviateAngleY;
+
     m_viewX = m_targetX + 1.8f*cos(PI*(m_tarangleY)/180.0f);
     m_viewY = -2.0f; // potrebuje upresnit, vyska pohledu, pri FPS minimalni
     m_viewZ = m_targetZ + 1.8f*sin(PI*(m_tarangleY)/180.0f);

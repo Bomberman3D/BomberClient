@@ -16,6 +16,15 @@ enum SettingsEnum
     SETTING_MAX
 };
 
+enum PlayerMoveElements
+{
+    MOVE_FORWARD,
+    MOVE_RIGHT,
+    MOVE_BACKWARD,
+    MOVE_LEFT,
+    MOVE_MAX
+};
+
 struct BombRecord
 {
     uint32 x;
@@ -44,7 +53,7 @@ class GameplayMgr
         void SetGameType(GameType type);
         GameType GetGameType();
 
-        void OnGameInit(ModelDisplayListRecord* pPlayerRec);
+        void OnGameInit();
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
@@ -65,11 +74,25 @@ class GameplayMgr
         bool IsDangerousField(uint32 x, uint32 y);
         void SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong);
 
+        void PlayerDied(uint32 x, uint32 y);
+        void SetPlayerMoveAngle(float angle) { m_moveAngle = angle; };
+        void ChangePlayerMoveAngle(int32 coordDif);
+        void UpdatePlayerMotion(uint32 diff);
+        void SetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = true; };
+        void UnsetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = false; };
+
+        ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
+
     private:
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;
         std::map<std::pair<uint32, uint32>, DangerousField*> DangerousMap;
+        std::vector<bool> m_moveElements;
+        float m_moveAngle;
+
+        ModelDisplayListRecord* m_playerRec;
+        uint32 m_playerX, m_playerY;
 
         float  m_plSpeedCoef;
         uint32 m_plFlameReach;

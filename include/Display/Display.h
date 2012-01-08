@@ -183,6 +183,9 @@ class Display
         float GetTargetAngleZ() { return m_tarangleZ; };
         ModelDisplayListRecord* GetTargetModel() { return m_targetmodel; };
 
+        void DeviateHorizontalAngle(float angle) { m_deviateAngleY = angle; };
+        float GetHorizontalAngleDeviation() { return m_deviateAngleY; };
+
         // Vyjimky pro sledovany model - z vnejsku pristupne primo
         uint32 m_ignoreTargetCollision;
 
@@ -214,6 +217,8 @@ class Display
         float m_tarangleY;
         float m_tarangleZ;
         ModelDisplayListRecord* m_targetmodel;
+
+        float m_deviateAngleY;
 
         // Font
         GLuint m_fontBase[MAX_FONTS];
