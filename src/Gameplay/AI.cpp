@@ -628,6 +628,10 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 
 void EnemyTemplate::Update()
 {
+    // TODO: podminka na singleplayer ?
+    if (sApplication->GetStagePhase() == 2)
+        return;
+
     // Samotny update
 
     clock_t tnow = clock();

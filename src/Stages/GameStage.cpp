@@ -69,6 +69,20 @@ void GameStage::OnDraw(uint32 diff)
         sDisplay->Draw2D(15, 150, 80, WIDTH-150-150, HEIGHT-80-80);
         sDisplay->PrintText(FONT_ONE, WIDTH/2-33*2.5f, 130, FONT_SIZE_1, NOCOLOR, "PAUZA");
 
+        sDisplay->PrintText(FONT_ONE, 250, 200, FONT_SIZE_3, COLOR(200, 0, 0), "Zpìt do hry");
+
+        sDisplay->Setup3DMode();
+    }
+    // Game over!
+    else if (m_subStage == 3)
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        // 38 px na 1 znak
+        sDisplay->Draw2D(14, WIDTH/8, 2*HEIGHT/7, 3*WIDTH/4, 100);
+        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 2*HEIGHT/7+25, FONT_SIZE_N, COLOR(255, 0, 0), "Jsi mrtev!");
+
         sDisplay->Setup3DMode();
     }
 }

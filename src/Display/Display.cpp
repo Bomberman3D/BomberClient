@@ -127,6 +127,7 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32
     glScalef(scale, scale, scale);
     glListBase(m_fontBase[font]-32);
     glCallLists(strlen(text),GL_UNSIGNED_BYTE,text);
+    glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 
     glLoadIdentity();
 
