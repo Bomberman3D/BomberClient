@@ -22,6 +22,11 @@ enum Fonts
 
 static const uint32 fontTextures[MAX_FONTS] = {17, 44};
 
+#define FONT_SIZE_H5 2.0f
+#define FONT_SIZE_H4 1.8f
+#define FONT_SIZE_H3 1.6f
+#define FONT_SIZE_H2 1.4f
+#define FONT_SIZE_H1 1.2f
 #define FONT_SIZE_N 1.0f
 #define FONT_SIZE_1 0.8f
 #define FONT_SIZE_2 0.6f
@@ -144,7 +149,6 @@ class Display
         bool RemoveRecordFromDisplayList(BillboardDisplayListRecord* target);
         void DrawBillboards();
         void FlushBillboardDisplayList();
-        // TODO: DO
 
         // Prechod mezi 2D a 3D mody
         void Setup2DMode();

@@ -70,6 +70,8 @@ class ParticleEmitterMgr
                             uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
                             uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration);
 
+        void FlushEmitters();
+
     private:
         EmitterList Emitters;
 };

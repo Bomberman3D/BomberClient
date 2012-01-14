@@ -43,6 +43,50 @@ struct DangerousField
     bool    registered;  // byly uz provedeny veci "po aktivaci" ?
 };
 
+// Struktura pro statistiky hrace v dane hre
+typedef union
+{
+    struct UniversalStatTemplate
+    {
+        uint32 field1;
+        uint32 field2;
+        uint32 field3;
+    } UniversalStats;
+
+    struct
+    {
+        uint32 bombsPlanted;
+        uint32 bonusesEarned;
+        uint32 enemiesKilled;
+    } ClassicSingleStats;
+
+    struct
+    {
+        uint32 bombsPlanted;
+        uint32 boxesDestroyed;
+        uint32 enemiesTrolled;
+    } MemeSingleStats;
+
+    // TODO: dalsi typy her
+
+    // NOTE: pri zmene poctu sloupcu nezapomenout zmenit konstantu o kousek niz
+} PlayerStats;
+
+#define MAX_PLAYER_STATS 3
+
+// Nazvy sloupcu
+// pouzit nulovy znak pro "neexistujici" pole
+static const char* PlayerStatsNames[GAME_TYPE_MAX][MAX_PLAYER_STATS] = {
+    {'\0','\0','\0'},
+    // SP
+    {"Položeno bomb","Sebráno bonusù","Zabito nepøátel"},
+    {"Položeno bomb","Znièeno beden","Nepøátel trollnuto"},
+    // MP
+    {"Položeno bomb","Sebráno bonusù","Zabito nepøátel"},
+    {"Položeno bomb","Znièeno beden","Nepøátel trollnuto"}
+    //{'\0','\0','\0'}
+};
+
 class GameplayMgr
 {
     public:
@@ -54,6 +98,7 @@ class GameplayMgr
         GameType GetGameType();
 
         void OnGameInit();
+        void OnGameLeave();
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
@@ -83,6 +128,9 @@ class GameplayMgr
         void UnblockMovement() { m_movementBlocked = false; };
 
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
+
+        // verejne pristupne, tady to nebude vadit
+        PlayerStats localPlayerStats;
 
     private:
         std::vector<uint32> m_settings;

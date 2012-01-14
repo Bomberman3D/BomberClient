@@ -63,6 +63,18 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
     }
 }
 
+void ClassicSingleGameType::OnGameLeave()
+{
+    if (!m_enemies.empty())
+    {
+        for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end(); )
+        {
+            delete (*itr);
+            itr = m_enemies.erase(itr);
+        }
+    }
+}
+
 void ClassicSingleGameType::OnUpdate()
 {
     if (!m_enemies.empty())
@@ -254,6 +266,8 @@ void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32
                         sGameplayMgr->SetMaxBombs(1, true);
                     break;
             }
+
+            sGameplayMgr->localPlayerStats.ClassicSingleStats.bonusesEarned += 1;
         }
     }
 

@@ -14,6 +14,8 @@ GameplayMgr::GameplayMgr()
     m_settings[SETTING_ENEMY_SPEED] = 1;
     m_settings[SETTING_BOX_DENSITY] = 10;
     m_settings[SETTING_MAP_ID] = 1;
+
+    memset(&localPlayerStats, 0, sizeof(PlayerStats::UniversalStatTemplate));
 }
 
 GameplayMgr::~GameplayMgr()
@@ -99,7 +101,7 @@ void GameplayMgr::OnGameInit()
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
 
-    m_playerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.45f, 90.0f, true);
+    m_playerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.20f, 90.0f, true);
     m_moveAngle = 0.0f;
     m_playerX = 0;
     m_playerY = 0;
@@ -107,8 +109,38 @@ void GameplayMgr::OnGameInit()
 
     sDisplay->SetTargetModel(m_playerRec);
 
+    memset(&localPlayerStats, 0, sizeof(PlayerStats::UniversalStatTemplate));
+
+    if (!BombMap.empty())
+    {
+        for (std::list<BombRecord*>::iterator itr = BombMap.begin(); itr != BombMap.end();)
+        {
+            delete (*itr);
+            itr = BombMap.erase(itr);
+        }
+
+        BombMap.clear();
+    }
+
+    if (!DangerousMap.empty())
+    {
+        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end();)
+        {
+            delete (*itr).second;
+            itr = DangerousMap.erase(itr);
+        }
+
+        DangerousMap.clear();
+    }
+
     if (m_game)
         m_game->OnGameInit(m_playerRec);
+}
+
+void GameplayMgr::OnGameLeave()
+{
+    if (m_game)
+        m_game->OnGameLeave();
 }
 
 void GameplayMgr::SetGameType(GameType type)
@@ -159,6 +191,10 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 
     sTimer->AddTimedSetEvent(2500, &temp->state, 1);
     m_plActiveBombs++;
+
+    if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
+        localPlayerStats.ClassicSingleStats.bombsPlanted += 1;
+
     return true;
 }
 

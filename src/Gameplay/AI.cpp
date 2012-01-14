@@ -623,7 +623,7 @@ bool MovementHolder::HasPath()
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 {
     // Inicializace modelu a zaznamu modelu pro nepritele
-    pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.45f, 0.0f, true);
+    pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.20f, 0.0f, true);
 }
 
 void EnemyTemplate::Update()

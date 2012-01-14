@@ -92,6 +92,21 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     return pTemp;
 }
 
+void ParticleEmitterMgr::FlushEmitters()
+{
+    if (Emitters.empty())
+        return;
+
+    // Prochazi vsechny emittery
+    for (EmitterList::iterator itr = Emitters.begin(); itr != Emitters.end();)
+    {
+        if ((*itr)->m_template)
+            delete (*itr)->m_template;
+        delete (*itr);
+        itr = Emitters.erase(itr);
+    }
+}
+
 bool Emitter::Update()
 {
     clock_t tnow = clock();

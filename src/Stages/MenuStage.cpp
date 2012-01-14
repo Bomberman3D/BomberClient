@@ -7,6 +7,9 @@
 
 void MenuStage::OnEnter()
 {
+    // Vynulovat vsechny mozne uhly a podobne
+    sDisplay->Initialize();
+
     // Menu scene
     sDisplay->DrawModel(4, -0.5f, -5.0f, -8.0f, ANIM_NONE, 2.0f);
     sDisplay->DrawModel(2, -4.0f, -5.0f, -13.0f, ANIM_IDLE, 1.0f, 0.0f, false, true, 0, 2);

@@ -39,6 +39,8 @@ class Application
             mouseXY[0] = x;
             mouseXY[1] = y;
         }
+        uint32 GetMouseX() { return mouseXY[0]; };
+        uint32 GetMouseY() { return mouseXY[1]; };
 
         bool IsKeyPressed(uint8 key) { return keys[key]; };
 

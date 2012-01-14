@@ -88,13 +88,13 @@ void MapManager::FillDynamicRecords()
                         case DYNAMIC_TYPE_BOMB:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.6f, 0.0f, true, true, 0, 8));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true, true, 0, 8));
                             }
                             break;
                         case DYNAMIC_TYPE_BOX:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.6f, 0.0f, true));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true));
                             }
                             break;
                         case DYNAMIC_TYPE_BONUS:
@@ -248,8 +248,7 @@ void Map::DestroyAllDynamicRecords()
         {
             for (uint32 k = 0; k < dynfield[i][j].size(); k++)
             {
-                if (dynfield[i][j][k].special)
-                    delete dynfield[i][j][k].special;
+                // specialni veci, delete model/billboard zaznamu resi samotny flush
             }
             dynfield[i][j].clear();
         }

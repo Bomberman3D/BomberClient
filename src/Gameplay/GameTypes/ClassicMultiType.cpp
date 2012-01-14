@@ -6,6 +6,10 @@ void ClassicMultiGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
 }
 
+void ClassicMultiGameType::OnGameLeave()
+{
+}
+
 void ClassicMultiGameType::OnUpdate()
 {
 }

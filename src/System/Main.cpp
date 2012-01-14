@@ -9,6 +9,7 @@
 #include <Storage.h>
 #include <Config.h>
 #include <Display.h>
+#include <Effects/ParticleEmitter.h>
 #include <Network.h>
 #include <Timer.h>
 
@@ -508,6 +509,8 @@ void Application::SetStage(uint32 newstage, uint32 newphase)
     assert(m_currStage != NULL);
 
     sDisplay->FlushModelDisplayList();
+    sDisplay->FlushBillboardDisplayList();
+    sParticleEmitterMgr->FlushEmitters();
 
     m_currStage->SetSubStage(newphase);
     m_currStage->OnEnter();

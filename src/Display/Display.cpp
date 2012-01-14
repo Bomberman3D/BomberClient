@@ -189,6 +189,8 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
 
     if (genGLDisplayList && sStorage->Models[modelId]->displayListSize == 0)
     {
+        glLoadIdentity();
+
         uint32 maxFrame = 0;
         for (uint32 an = 0; an < MAX_ANIM; an++)
             if (maxFrame < sStorage->ModelAnimation[modelId].Anim[an].frameLast)
@@ -436,7 +438,8 @@ void Display::DrawModels()
 
 void Display::FlushModelDisplayList()
 {
-    ModelDisplayList.clear();
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+        (*itr)->remove = true;
 }
 
 void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData)
@@ -461,9 +464,9 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
 void Display::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* pData, uint32 frame)
 {
     CVector3 vPosition = pObject->vPosition[frame];
-    glTranslatef(vPosition.x*pData->scale, vPosition.y*pData->scale, vPosition.z*pData->scale);
+    glTranslatef(vPosition.x, vPosition.y, vPosition.z);
     CVector3 vScale = pObject->vScale[frame];
-    glScalef(vScale.x*pData->scale, vScale.y*pData->scale, vScale.z*pData->scale);
+    glScalef(vScale.x, vScale.y, vScale.z);
 
     for (uint32 i = 1; i <= frame; i++)
     {
@@ -666,7 +669,8 @@ void Display::DrawBillboards()
 
 void Display::FlushBillboardDisplayList()
 {
-    BillboardDisplayList.clear();
+    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+        (*itr)->remove = true;
 }
 
 void Display::Setup2DMode()
@@ -898,12 +902,17 @@ void Display::AdjustViewToTarget()
     if (m_deviateAngleY != 0.0f)
         m_tarangleY += m_deviateAngleY;
 
-    m_viewX = m_targetX + 1.8f*cos(PI*(m_tarangleY)/180.0f);
-    m_viewY = -2.0f; // potrebuje upresnit, vyska pohledu, pri FPS minimalni
-    m_viewZ = m_targetZ + 1.8f*sin(PI*(m_tarangleY)/180.0f);
+    if (m_targetmodel)
+        m_angleY = 90.0f + m_tarangleY;
 
-    m_angleX = 30.0f; // 0 pri FPS
-    m_angleY = m_tarangleY+90.0f;
+    if (m_targetmodel)
+    {
+        m_viewX = m_targetX + 1.8f*cos(PI*(m_tarangleY)/180.0f);
+        m_viewY = -2.0f; // potrebuje upresnit, vyska pohledu, pri FPS minimalni
+        m_viewZ = m_targetZ + 1.8f*sin(PI*(m_tarangleY)/180.0f);
+
+        m_angleX = 30.0f; // 0 pri FPS
+    }
 
     glLoadIdentity();
     glRotatef(m_angleX,1.0f,0.0f,0.0f);
