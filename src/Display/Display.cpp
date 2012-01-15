@@ -163,7 +163,7 @@ void Display::Update(const uint32 diff)
     DrawBillboards();
 }
 
-ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed)
+ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
@@ -182,6 +182,8 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     }
     else
         pNew->AnimTicket = 0;
+
+    pNew->animRestriction = animRest;
 
     pNew->remove = false;
     pNew->scale = scale;
@@ -478,7 +480,7 @@ void Display::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListReco
     }
 }
 
-BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList)
+BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
     assert(pNew != NULL);
@@ -494,6 +496,8 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
         pNew->AnimTicket = sAnimator->GetTextureAnimTicket(textureId, Animation, animFrameSpeed);
     else
         pNew->AnimTicket = 0;
+
+    pNew->animRestriction = animRest;
 
     pNew->remove = false;
     pNew->scale_x = scale_x;
@@ -671,6 +675,28 @@ void Display::FlushBillboardDisplayList()
 {
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
         (*itr)->remove = true;
+}
+
+void Display::EnableRestrictedAnimations(AnimRestriction animRes)
+{
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+        if ((*itr)->animRestriction == animRes)
+            sAnimator->EnableAnimation((*itr)->AnimTicket);
+
+    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+        if ((*itr)->animRestriction == animRes)
+            sAnimator->EnableAnimation((*itr)->AnimTicket);
+}
+
+void Display::DisableRestrictedAnimations(AnimRestriction animRes)
+{
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+        if ((*itr)->animRestriction == animRes)
+            sAnimator->DisableAnimation((*itr)->AnimTicket);
+
+    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+        if ((*itr)->animRestriction == animRes)
+            sAnimator->DisableAnimation((*itr)->AnimTicket);
 }
 
 void Display::Setup2DMode()

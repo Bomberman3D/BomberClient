@@ -55,6 +55,14 @@ enum DisplayListType
     DL_TYPE_MAX
 };
 
+// animacni restrikce (napr. pri pauznuti hry, ..)
+enum AnimRestriction
+{
+    ANIM_RESTRICTION_NONE = 0,
+    ANIM_RESTRICTION_NOT_PAUSED = 1,
+    ANIM_RESTRICTION_MAX = 2
+};
+
 // Zakladni struktura pro vsechny
 // vyuzitelne napriklad v particle emitter kodu - hybat muze jak modelem tak billboardem
 struct DisplayListRecord
@@ -71,6 +79,7 @@ struct DisplayListRecord
     bool   remove;
     GLDisplayList displayList;
     uint32 displayListSize;
+    AnimRestriction animRestriction;
 };
 
 struct ModelDisplayListRecord: public DisplayListRecord
@@ -133,7 +142,7 @@ class Display
                                           ModelAnimType Animation = ANIM_IDLE,
                                           float scale = 1.0f, float rotate = 0.0f,
                                           bool genGLDisplayList = false, bool animReverse = false,
-                                          uint32 startFrame = 0, uint32 frameSkipSpeed = 0);
+                                          uint32 startFrame = 0, uint32 frameSkipSpeed = 0, AnimRestriction animRest = ANIM_RESTRICTION_NONE);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
         void AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData);
@@ -145,10 +154,13 @@ class Display
                                                   uint32 Animation = ANIM_NONE, uint32 animFrameSpeed = 1,
                                                   float scale_x = 1.0f, float scale_y = 1.0f,
                                                   bool billboard_x = true, bool billboard_y = true,
-                                                  bool genGLDisplayList = false);
+                                                  bool genGLDisplayList = false, AnimRestriction animRest = ANIM_RESTRICTION_NONE);
         bool RemoveRecordFromDisplayList(BillboardDisplayListRecord* target);
         void DrawBillboards();
         void FlushBillboardDisplayList();
+
+        void DisableRestrictedAnimations(AnimRestriction animRes);
+        void EnableRestrictedAnimations(AnimRestriction animRes);
 
         // Prechod mezi 2D a 3D mody
         void Setup2DMode();

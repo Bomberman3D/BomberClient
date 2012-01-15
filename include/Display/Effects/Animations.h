@@ -26,6 +26,7 @@ struct AnimationRecord
     uint32 actualTextureId; // Kvuli rychlosti se bude uchovavat oboji
     uint32 actualFrame;
     bool   reversed;
+    bool   disabled;
 };
 
 class Animator
@@ -41,6 +42,8 @@ class Animator
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);
         uint32 GetAnimId(uint32 id);
+        void EnableAnimation(uint32 id);
+        void DisableAnimation(uint32 id);
 
         void Update();
 

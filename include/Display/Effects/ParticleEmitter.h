@@ -71,9 +71,12 @@ class ParticleEmitterMgr
                             uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration);
 
         void FlushEmitters();
+        void PauseEmitters();
+        void UnpauseEmitters();
 
     private:
         EmitterList Emitters;
+        clock_t m_pauseTime;
 };
 
 #define sParticleEmitterMgr Singleton<ParticleEmitterMgr>::instance()

@@ -44,6 +44,9 @@ void Timer::RemoveTimerSetEventByTarget(uint32* target)
 
 void Timer::Update()
 {
+    if (m_pauseTime > 0)
+        return;
+
     clock_t tnow = clock();
 
     if (!TimedEvents.empty())
@@ -74,5 +77,29 @@ void Timer::Update()
             else
                 ++itr;
         }
+    }
+}
+
+void Timer::PauseTimers()
+{
+    m_pauseTime = clock();
+}
+
+void Timer::UnpauseTimers()
+{
+    clock_t diff = clock() - m_pauseTime;
+
+    m_pauseTime = 0;
+
+    if (!TimedEvents.empty())
+    {
+        for (std::list<TimerRecord>::iterator itr = TimedEvents.begin(); itr != TimedEvents.end();++itr)
+            itr->expireTime += diff;
+    }
+
+    if (!TimedSetEvents.empty())
+    {
+        for (std::list<TimerSetRecord>::iterator itr = TimedSetEvents.begin(); itr != TimedSetEvents.end();++itr)
+            itr->expireTime += diff;
     }
 }

@@ -11,6 +11,9 @@ ParticleEmitterMgr::ParticleEmitterMgr()
 
 void ParticleEmitterMgr::Update()
 {
+    if (m_pauseTime > 0)
+        return;
+
     // Pokud nemame zadny emitter, nemusime updatovat
     if (Emitters.empty())
         return;
@@ -29,6 +32,21 @@ void ParticleEmitterMgr::Update()
             itr = Emitters.erase(itr);
         }
     }
+}
+
+void ParticleEmitterMgr::PauseEmitters()
+{
+    m_pauseTime = clock();
+}
+
+void ParticleEmitterMgr::UnpauseEmitters()
+{
+    clock_t diff = clock() - m_pauseTime;
+
+    m_pauseTime = 0;
+
+    for (EmitterList::iterator itr = Emitters.begin(); itr != Emitters.end(); ++itr)
+        (*itr)->m_endTime += diff;
 }
 
 Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
@@ -167,7 +185,7 @@ bool Emitter::Update()
             else if (m_template->m_type == DL_TYPE_MODEL)
             {
                 ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
-                pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate);
+                pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
             }
             // hypoteticky jina moznost nastat nemuze
 

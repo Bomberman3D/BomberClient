@@ -34,6 +34,9 @@ void Animator::Update()
         // Ulozit do temp promenne, abychom se z toho nezblaznili
         temp = &itr->second;
 
+        if (temp->disabled)
+            continue;
+
         temp->passedInterval += m_diff;
 
         if (temp->animType == ANIM_TYPE_TEXTURE)
@@ -117,6 +120,28 @@ uint32 Animator::GetAnimId(uint32 id)
 
     // Jinak vrati platnou hodnotu
     return itr->second.animId;
+}
+
+void Animator::EnableAnimation(uint32 id)
+{
+    // Hleda ticket v mape
+    AnimMap::iterator itr = Anims.find(id);
+    // Pokud nenajde, vrati se
+    if (itr == Anims.end())
+        return;
+
+    itr->second.disabled = false;
+}
+
+void Animator::DisableAnimation(uint32 id)
+{
+    // Hleda ticket v mape
+    AnimMap::iterator itr = Anims.find(id);
+    // Pokud nenajde, vrati se
+    if (itr == Anims.end())
+        return;
+
+    itr->second.disabled = true;
 }
 
 uint32 Animator::GetActualTexture(uint32 id)

@@ -153,17 +153,12 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
         // Dovolime prepnuti pouze kdyz jsme zapauzovani nebo hrajeme
         if (m_subStage == 2)
         {
-            // Nejdriv nastavit pozici mysi doprostred, abychom zamezili ostremu otoceni
-            int middleX = sConfig->WindowWidth >> 1;
-            int middleY = sConfig->WindowHeight >> 1;
-            SetCursorPos(middleX, middleY);
-
-            sGameplayMgr->UnblockMovement();
+            sGameplayMgr->UnpauseGame();
             m_subStage = 0;
         }
         else if (m_subStage == 0)
         {
-            sGameplayMgr->BlockMovement();
+            sGameplayMgr->PauseGame();
             m_subStage = 2;
         }
     }
@@ -243,12 +238,7 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             // Zpet do hry
             if (IN_RANGE(x, y, WIDTH/2-38*5.5f*FONT_SIZE_3, WIDTH/2+38*5.5f*FONT_SIZE_3, 250-5, 250+35))
             {
-                // Nejdriv nastavit pozici mysi doprostred, abychom zamezili ostremu otoceni
-                int middleX = sConfig->WindowWidth >> 1;
-                int middleY = sConfig->WindowHeight >> 1;
-                SetCursorPos(middleX, middleY);
-
-                sGameplayMgr->UnblockMovement();
+                sGameplayMgr->UnpauseGame();
                 m_subStage = 0;
             }
             // Ukoncit hru

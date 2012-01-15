@@ -22,20 +22,25 @@ struct TimerSetRecord
 
 class Timer
 {
-public:
-    Timer() {};
-    ~Timer() {};
+    public:
+        Timer() {};
+        ~Timer() {};
 
-    void Initialize();
-    void Update();
+        void Initialize();
+        void Update();
 
-    void AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32),uint32 param1, uint32 param2, uint32 param3);
-    void AddTimedSetEvent(uint32 time, uint32* target, uint32 value);
-    void RemoveTimerSetEventByTarget(uint32* target);
+        void AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32),uint32 param1, uint32 param2, uint32 param3);
+        void AddTimedSetEvent(uint32 time, uint32* target, uint32 value);
+        void RemoveTimerSetEventByTarget(uint32* target);
 
-protected:
-    std::list<TimerRecord> TimedEvents;
-    std::list<TimerSetRecord> TimedSetEvents;
+        void PauseTimers();
+        void UnpauseTimers();
+
+    protected:
+        std::list<TimerRecord> TimedEvents;
+        std::list<TimerSetRecord> TimedSetEvents;
+
+        clock_t m_pauseTime;
 };
 
 #define sTimer Singleton<Timer>::instance()

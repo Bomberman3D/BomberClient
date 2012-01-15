@@ -97,6 +97,11 @@ class GameplayMgr
         void SetGameType(GameType type);
         GameType GetGameType();
 
+        bool IsSingleGameType()
+        {
+            return (GetGameType() >= GAME_TYPE_SP_MIN && GetGameType() <= GAME_TYPE_SP_MAX);
+        }
+
         void OnGameInit();
         void OnGameLeave();
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
@@ -126,6 +131,9 @@ class GameplayMgr
         void UnsetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = false; };
         void BlockMovement() { m_movementBlocked = true; };
         void UnblockMovement() { m_movementBlocked = false; };
+        void PauseGame();
+        void UnpauseGame();
+        bool IsGamePaused() { return m_gamePaused; };
 
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
 
@@ -140,6 +148,8 @@ class GameplayMgr
         std::vector<bool> m_moveElements;
         float m_moveAngle;
         bool m_movementBlocked;
+        bool m_gamePaused;
+        clock_t m_pauseTime;
 
         ModelDisplayListRecord* m_playerRec;
         uint32 m_playerX, m_playerY;

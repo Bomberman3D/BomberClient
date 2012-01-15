@@ -88,13 +88,13 @@ void MapManager::FillDynamicRecords()
                         case DYNAMIC_TYPE_BOMB:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true, true, 0, 8));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(2, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true, true, 0, 8, ANIM_RESTRICTION_NOT_PAUSED));
                             }
                             break;
                         case DYNAMIC_TYPE_BOX:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(6, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.35f, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED));
                             }
                             break;
                         case DYNAMIC_TYPE_BONUS:
@@ -108,7 +108,7 @@ void MapManager::FillDynamicRecords()
                                     case 2:   texture = 35;   break;
                                     default:  texture = 33;   break;
                                 }
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawBillboard(texture, i-0.5f, 0.0f, j-0.5f, 0, 0, 0.8f, 0.8f, false, true));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawBillboard(texture, i-0.5f, 0.0f, j-0.5f, 0, 0, 0.8f, 0.8f, false, true, false, ANIM_RESTRICTION_NOT_PAUSED));
                             }
                             break;
                     }

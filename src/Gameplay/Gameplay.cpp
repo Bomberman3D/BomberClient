@@ -3,6 +3,7 @@
 #include <Timer.h>
 #include <Map.h>
 #include <Effects/Animations.h>
+#include <Effects/ParticleEmitter.h>
 
 GameplayMgr::GameplayMgr()
 {
@@ -53,7 +54,7 @@ void GameplayMgr::Update()
         }
     }
 
-    if (!DangerousMap.empty())
+    if (!DangerousMap.empty() && !m_gamePaused)
     {
         for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end();)
         {
@@ -96,12 +97,13 @@ void GameplayMgr::OnGameInit()
 
     m_plActiveBombs = 0;
     m_movementBlocked = false;
+    m_gamePaused = false;
 
     m_moveElements.resize(MOVE_MAX);
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
 
-    m_playerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.20f, 90.0f, true);
+    m_playerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.20f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
     m_moveAngle = 0.0f;
     m_playerX = 0;
     m_playerY = 0;
@@ -235,6 +237,56 @@ void GameplayMgr::PlayerDied(uint32 x, uint32 y)
         sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
 
     sApplication->SetStagePhase(3);
+}
+
+void GameplayMgr::PauseGame()
+{
+    if (IsGamePaused())
+        return;
+
+    m_gamePaused = true;
+    m_pauseTime = clock();
+
+    if (IsSingleGameType())
+    {
+        BlockMovement();
+        sTimer->PauseTimers();
+        sParticleEmitterMgr->PauseEmitters();
+        sDisplay->DisableRestrictedAnimations(ANIM_RESTRICTION_NOT_PAUSED);
+    }
+}
+
+void GameplayMgr::UnpauseGame()
+{
+    if (!IsGamePaused())
+        return;
+
+    m_gamePaused = false;
+    clock_t diff = clock() - m_pauseTime;
+    m_pauseTime = 0;
+
+    if (IsSingleGameType())
+    {
+        UnblockMovement();
+        sTimer->UnpauseTimers();
+        sParticleEmitterMgr->UnpauseEmitters();
+        sDisplay->EnableRestrictedAnimations(ANIM_RESTRICTION_NOT_PAUSED);
+    }
+
+    if (!DangerousMap.empty())
+    {
+        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end(); ++itr)
+        {
+            if ((*itr).second->registered)
+                (*itr).second->activeTime += diff;
+            else
+                (*itr).second->activeSince += diff;
+        }
+    }
+
+    int middleX = sConfig->WindowWidth >> 1;
+    int middleY = sConfig->WindowHeight >> 1;
+    SetCursorPos(middleX, middleY);
 }
 
 void GameplayMgr::UpdatePlayerMoveAngle()
