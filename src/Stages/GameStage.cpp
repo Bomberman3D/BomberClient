@@ -72,10 +72,18 @@ void GameStage::OnDraw(uint32 diff)
         if (!sDisplay->IsIn2DMode())
             sDisplay->Setup2DMode();
 
-        sDisplay->Draw2D(15, 150, 80, WIDTH-150-150, HEIGHT-80-80);
-        sDisplay->PrintText(FONT_ONE, WIDTH/2-33*2.5f, 130, FONT_SIZE_1, NOCOLOR, "PAUZA");
+        sDisplay->Draw2D(15, 150, 80, WIDTH-150-150, 320);
+        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*4.5f*FONT_SIZE_1, 130, FONT_SIZE_1, NOCOLOR, "P a u z a");
 
-        sDisplay->PrintText(FONT_ONE, 250, 200, FONT_SIZE_3, COLOR(200, 0, 0), "Zpìt do hry");
+        if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*5.5f*FONT_SIZE_3, WIDTH/2+38*5.5f*FONT_SIZE_3, 250-5, 250+35))
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, COLOR(200, 200, 0), "Zpìt do hry");
+        else
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, COLOR(200, 0, 0), "Zpìt do hry");
+
+        if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*5.5f*FONT_SIZE_3,  WIDTH/2+38*5.5f*FONT_SIZE_3, 250+35, 250+95))
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, COLOR(200, 200, 0), "Ukonèit hru");
+        else
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, COLOR(200, 0, 0), "Ukonèit hru");
 
         sDisplay->Setup3DMode();
     }
@@ -232,6 +240,22 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         // jsme zapauzovani
         else if (m_subStage == 2)
         {
+            // Zpet do hry
+            if (IN_RANGE(x, y, WIDTH/2-38*5.5f*FONT_SIZE_3, WIDTH/2+38*5.5f*FONT_SIZE_3, 250-5, 250+35))
+            {
+                // Nejdriv nastavit pozici mysi doprostred, abychom zamezili ostremu otoceni
+                int middleX = sConfig->WindowWidth >> 1;
+                int middleY = sConfig->WindowHeight >> 1;
+                SetCursorPos(middleX, middleY);
+
+                sGameplayMgr->UnblockMovement();
+                m_subStage = 0;
+            }
+            // Ukoncit hru
+            else if (IN_RANGE(x, y, WIDTH/2-38*5.5f*FONT_SIZE_3,  WIDTH/2+38*5.5f*FONT_SIZE_3, 250+35, 250+95))
+            {
+                m_subStage = 4;
+            }
         }
         // jsme mrtvi
         else if (m_subStage == 3)
