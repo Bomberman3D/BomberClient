@@ -112,7 +112,7 @@ void GameStage::OnDraw(uint32 diff)
         sDisplay->Setup3DMode();
     }
     // Statistiky (po smrti)
-    else if (m_subStage == 4)
+    else if (m_subStage == 4 || m_subStage == 5)
     {
         if (!sDisplay->IsIn2DMode())
             sDisplay->Setup2DMode();
@@ -122,7 +122,10 @@ void GameStage::OnDraw(uint32 diff)
         // Singleplayer only
         // TODO: multiplayer stats (vice hracu, ...)
 
-        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 50, FONT_SIZE_N, COLOR(255,0,0), "Statistiky");
+        if (m_subStage == 4)
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 50, FONT_SIZE_N, COLOR(255,0,0), "Statistiky");
+        else
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*3, 50, FONT_SIZE_N, NOCOLOR, "Výhra!");
 
         sDisplay->PrintText(FONT_ONE, 1*HEIGHT/8, 150, FONT_SIZE_4, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][0]);
         sDisplay->PrintText(MAIN_FONT, 1*HEIGHT/8+20, 150+50, FONT_SIZE_H3, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field1);
@@ -263,14 +266,16 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             }
         }
         // jsme ve statistikach
-        else if (m_subStage == 4)
+        else if (m_subStage == 4 || m_subStage == 5)
         {
             if (IN_RANGE(x, y, 50, 50+38*12, HEIGHT-64*FONT_SIZE_2-50, HEIGHT-50))
             {
+                sGameplayMgr->UnpauseGame();
                 sApplication->SetStage(STAGE_LOADING, 1);
             }
             else if (IN_RANGE(x, y, WIDTH-50-38*12*FONT_SIZE_2, WIDTH-50, HEIGHT-64*FONT_SIZE_2-50, HEIGHT-50))
             {
+                sGameplayMgr->UnpauseGame();
                 sApplication->SetStage(STAGE_MENU);
             }
         }

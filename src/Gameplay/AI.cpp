@@ -514,6 +514,14 @@ void MovementHolder::Mutate(MovementType moveType)
     if (moveType >= MOVEMENT_MAX)
         return;
 
+    if (moveType == MOVEMENT_NONE)
+    {
+        m_moveType = moveType;
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_IDLE, 0, 5);
+        m_path.clear();
+        return;
+    }
+
     m_moveType = moveType;
     Generator();
 
@@ -628,32 +636,34 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 
 void EnemyTemplate::Update()
 {
-    // TODO: podminka na singleplayer ?
-    if (sApplication->GetStagePhase() == 2)
+    if (sGameplayMgr->IsSingleGameType() && sApplication->GetStagePhase() == 2)
         return;
 
     // Samotny update
 
     clock_t tnow = clock();
 
-    if (m_movement)
+    if (!IsDead())
     {
-        // Pokud uz je cas na update typu pohybu
-        if (m_nextMoveTypeUpdate <= tnow)
+        if (m_movement)
         {
-            // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
-            if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
-                m_movement->TryMutate(MOVEMENT_TARGETTED);
+            // Pokud uz je cas na update typu pohybu
+            if (m_nextMoveTypeUpdate <= tnow)
+            {
+                // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
+                if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                    m_movement->TryMutate(MOVEMENT_TARGETTED);
 
-            // Pokud ne (cesta neexistuje), presedlame na nahodny pohyb
-            if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
-                m_movement->TryMutate(MOVEMENT_RANDOM);
+                // Pokud ne (cesta neexistuje), presedlame na nahodny pohyb
+                if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
+                    m_movement->TryMutate(MOVEMENT_RANDOM);
 
-            m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
+                m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
+            }
+
+            // A samotny update pohybu
+            // Musi byt spusten pokazde - tam se posunuje model po vektoru
+            m_movement->Update();
         }
-
-        // A samotny update pohybu
-        // Musi byt spusten pokazde - tam se posunuje model po vektoru
-        m_movement->Update();
     }
 }

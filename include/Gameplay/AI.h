@@ -114,9 +114,12 @@ class MovementHolder
 class EnemyTemplate
 {
     public:
-        EnemyTemplate() { pRecord = NULL; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; };
+        EnemyTemplate() { pRecord = NULL; m_isDead = false; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; };
         void Init(uint32 modelId, uint32 x, uint32 y);
         void Update();
+
+        bool IsDead() { return m_isDead; };
+        void SetDead(bool dead = true) { m_isDead = dead; };
 
         ModelDisplayListRecord* pRecord;
 
@@ -124,6 +127,7 @@ class EnemyTemplate
 
     private:
         clock_t m_nextMoveTypeUpdate;
+        bool m_isDead;
 };
 
 #endif

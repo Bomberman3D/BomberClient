@@ -286,4 +286,31 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
         // GameplayMgr se postara o zbytek.. ouch!
         sGameplayMgr->PlayerDied(x, y);
     }
+
+    // Projit vsechny nepratele, zdali nestoji na miste s ohnem
+    for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end();)
+    {
+        // Znicit nepritele pokud je na poli s vybuchem
+        if (!(*itr)->IsDead() && ceil((*itr)->pRecord->x) == x && ceil((*itr)->pRecord->z) == y)
+        {
+            (*itr)->SetDead(true);
+            (*itr)->m_movement->Mutate(MOVEMENT_NONE);
+
+            sGameplayMgr->localPlayerStats.ClassicSingleStats.enemiesKilled += 1;
+
+            // TODO: animace smrti
+
+            itr = m_enemies.erase(itr);
+            continue;
+        }
+        ++itr;
+    }
+
+    // Vyhra - zabiti vsichni nepratele
+    if (m_enemies.empty())
+    {
+        sGameplayMgr->PauseGame();
+        sApplication->SetStagePhase(5);
+        // TODO: jeste neco?
+    }
 }
