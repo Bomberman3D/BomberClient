@@ -58,6 +58,7 @@ class Map
         {
             uint32 type;
             uint32 texture;
+            DisplayListRecord* pRec;
         };
 
         struct DynamicCell

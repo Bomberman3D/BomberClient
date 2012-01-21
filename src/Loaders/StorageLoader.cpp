@@ -170,3 +170,29 @@ bool Storage::LoadMapData()
 
     return true;
 }
+
+bool Storage::LoadMapObjectData()
+{
+    Database* pDB = OpenDatabase("mapobjects.db3");
+    Query qry(*pDB);
+    SQLiteQuery(&qry, "SELECT * FROM solid_box");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    uint32 count = 0;
+    uint32 id;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        SolidBoxProp[id].texture_top = qry.getval();
+        for (uint8 i = 0; i < 4; i++)
+            SolidBoxProp[id].texture_sides[i] = qry.getval();
+        SolidBoxProp[id].model_id = qry.getval();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u dat pro objekty mapy\n",count);
+    qry.free_result();
+
+    return true;
+}

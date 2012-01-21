@@ -762,7 +762,7 @@ void Display::Draw2D(uint32 textureId, float left, float top, float width, float
 
 void Display::DrawMap()
 {
-    const Map* pMap = sMapManager->GetMap();
+    Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap || pMap->field.size() < 1 || pMap->field[0].size() < 1)
         return;
 
@@ -871,39 +871,74 @@ void Display::DrawMap()
             }
             else if (pMap->field[w][h].type == TYPE_SOLID_BOX)
             {
-                glBegin(GL_QUADS);
-                    glNormal3f(0.0f,-1.0f, 0.0f);
-                    // horni
-                    glNormal3f( 0.0f, 1.0f, 0.0f);
-                    glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
-                    glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
-                    glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
-                    glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
-                    // levobok
-                    glNormal3f(-1.0f, 0.0f, 0.0f);
-                    glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
-                    glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z-1);
-                    glTexCoord2f(0.0f, 0.0f); glVertex3f(x-1, y                 , z  );
-                    glTexCoord2f(0.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
-                    // pravobok
-                    glNormal3f( 1.0f, 0.0f, 0.0f);
-                    glTexCoord2f(1.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
-                    glTexCoord2f(1.0f, 0.0f); glVertex3f(x  , y                 , z  );
-                    glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z-1);
-                    glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
-                    // predni
-                    glNormal3f( 0.0f, 0.0f, 1.0f);
-                    glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
-                    glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z  );
-                    glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z  );
-                    glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
-                    // zadni
-                    glNormal3f( 0.0f, 0.0f,-1.0f);
-                    glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
-                    glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y                 , z-1);
-                    glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y                 , z-1);
-                    glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
-                glEnd();
+                Storage::SolidBoxDataMap::const_iterator itr = sStorage->SolidBoxProp.find(pMap->field[w][h].texture);
+
+                if (itr != sStorage->SolidBoxProp.end())
+                {
+                    if (itr->second.model_id == 0)
+                    {
+                        BindTexture(itr->second.texture_top);
+                        glBegin(GL_QUADS);
+                            glNormal3f(0.0f,-1.0f, 0.0f);
+                            // horni
+                            glNormal3f( 0.0f, 1.0f, 0.0f);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
+                        glEnd();
+                        BindTexture(itr->second.texture_sides[0]);
+                        glBegin(GL_QUADS);
+                            // levobok
+                            glNormal3f(-1.0f, 0.0f, 0.0f);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-1, y                 , z-1);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y                 , z  );
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
+                        glEnd();
+                        BindTexture(itr->second.texture_sides[1]);
+                        glBegin(GL_QUADS);
+                            // pravobok
+                            glNormal3f( 1.0f, 0.0f, 0.0f);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y                 , z  );
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x  , y                 , z-1);
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
+                        glEnd();
+                        BindTexture(itr->second.texture_sides[2]);
+                        glBegin(GL_QUADS);
+                            // predni
+                            glNormal3f( 0.0f, 0.0f, 1.0f);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z  );
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x-1, y                 , z  );
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x  , y                 , z  );
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z  );
+                        glEnd();
+                        BindTexture(itr->second.texture_sides[3]);
+                        glBegin(GL_QUADS);
+                            // zadni
+                            glNormal3f( 0.0f, 0.0f,-1.0f);
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y+SOLID_BOX_HEIGHT, z-1);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y                 , z-1);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y                 , z-1);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y+SOLID_BOX_HEIGHT, z-1);
+                        glEnd();
+                    }
+                    else
+                    {
+                        BindTexture(itr->second.texture_top);
+                        glBegin(GL_POLYGON);
+                            glNormal3f(0.0f,-1.0f, 0.0f);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(x-1, y, z-1);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(x  , y, z-1);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(x  , y, z  );
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y, z  );
+                        glEnd();
+
+                        if (!pMap->field[w][h].pRec)
+                            pMap->field[w][h].pRec = DrawModel(itr->second.model_id, w-0.5f, 0.0f, h-0.5f, ANIM_IDLE, 0.2f, 45.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE);
+                    }
+                }
             }
         }
     }

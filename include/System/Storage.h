@@ -52,6 +52,13 @@ struct MapData
     std::string mapname;
 };
 
+struct SolidBoxData
+{
+    uint32 texture_top;
+    uint32 texture_sides[4];
+    uint32 model_id;
+};
+
 class Storage
 {
     public:
@@ -65,6 +72,7 @@ class Storage
         bool LoadModelData();
         bool LoadSkyboxData();
         bool LoadMapData();
+        bool LoadMapObjectData();
 
         // Typedefs
         typedef std::map<uint32, std::string> IdFilenameMap;
@@ -72,6 +80,7 @@ class Storage
         typedef std::map<uint32, TextureAnim> TextureAnimMap;
         typedef std::map<uint32, Skybox>      SkyboxMap;
         typedef std::map<uint32, MapData>     MapDataMap;
+        typedef std::map<uint32, SolidBoxData> SolidBoxDataMap;
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
@@ -80,6 +89,7 @@ class Storage
         TextureAnimMap TextureAnimation;
         SkyboxMap SkyboxData;
         MapDataMap MapData;
+        SolidBoxDataMap SolidBoxProp;
 
         // Dynamicky ukladana data
         // textury, modely a podobne

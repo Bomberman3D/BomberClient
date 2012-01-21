@@ -55,6 +55,7 @@ bool MapManager::LoadMap(uint32 id)
         }
         pMap->field[pChunk->x][pChunk->y].type = pChunk->type;
         pMap->field[pChunk->x][pChunk->y].texture = pChunk->texture;
+        pMap->field[pChunk->x][pChunk->y].pRec = NULL;
     }
 
     // A inicializujeme dynamickou mapu na stejny rozmer

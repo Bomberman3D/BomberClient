@@ -11,6 +11,7 @@ void Storage::Load()
     LoadTextureData();
     LoadModelData();
     LoadSkyboxData();
+    LoadMapObjectData();
 
     PrepareDynamicStorages();
 }
