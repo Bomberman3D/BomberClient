@@ -232,6 +232,14 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
                     }
                 }
 
+                /*
+                glShadeModel(GL_SMOOTH);
+                GLfloat mShininess[] = {2+4};
+                GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
+                */
+
                 glBegin(GL_TRIANGLES);
 
                 for(int j = 0; j < pObject->numOfFaces; j++)
@@ -358,6 +366,8 @@ void Display::DrawModels()
         glTranslatef(x,y,z);
 
         glRotatef(temp->rotate,0.0f,1.0f,0.0f);
+
+        glScalef(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
 
         // Pokud mame vygenerovany GL display list pro dany model
         if (sStorage->Models[temp->modelId]->displayListSize != 0)
@@ -795,6 +805,7 @@ void Display::DrawMap()
     // Predni cast
     sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[3]);
     glBegin(GL_QUADS);
+        glNormal3f( 0.0f, 0.0f, 1.0f);
         glTexCoord2f(1, 1); glVertex3f(  skyboxSize, -skyboxSize, -skyboxSize );
         glTexCoord2f(0, 1); glVertex3f( -skyboxSize, -skyboxSize, -skyboxSize );
         glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize, -skyboxSize );
@@ -804,6 +815,7 @@ void Display::DrawMap()
     // Cast vlevo
     sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[4]);
     glBegin(GL_QUADS);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
         glTexCoord2f(1, 1); glVertex3f(  skyboxSize, -skyboxSize,  skyboxSize );
         glTexCoord2f(0, 1); glVertex3f(  skyboxSize, -skyboxSize, -skyboxSize );
         glTexCoord2f(0, 0); glVertex3f(  skyboxSize,  skyboxSize, -skyboxSize );
@@ -813,6 +825,7 @@ void Display::DrawMap()
     // Zadni cast
     sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[2]);
     glBegin(GL_QUADS);
+        glNormal3f( 0.0f, 0.0f,-1.0f);
         glTexCoord2f(1, 1); glVertex3f( -skyboxSize, -skyboxSize,  skyboxSize );
         glTexCoord2f(0, 1); glVertex3f(  skyboxSize, -skyboxSize,  skyboxSize );
         glTexCoord2f(0, 0); glVertex3f(  skyboxSize,  skyboxSize,  skyboxSize );
@@ -822,6 +835,7 @@ void Display::DrawMap()
     // Cast vpravo
     sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[5]);
     glBegin(GL_QUADS);
+        glNormal3f( 1.0f, 0.0f, 0.0f);
         glTexCoord2f(1, 1); glVertex3f( -skyboxSize, -skyboxSize, -skyboxSize );
         glTexCoord2f(0, 1); glVertex3f( -skyboxSize, -skyboxSize,  skyboxSize );
         glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize,  skyboxSize );
@@ -831,6 +845,7 @@ void Display::DrawMap()
     // Strop
     sDisplay->BindTexture(sStorage->SkyboxData[m_skybox].box_textures[1]);
     glBegin(GL_QUADS);
+        glNormal3f( 0.0f, 1.0f, 0.0f);
         glTexCoord2f(0, 1); glVertex3f( -skyboxSize,  skyboxSize, -skyboxSize );
         glTexCoord2f(0, 0); glVertex3f( -skyboxSize,  skyboxSize,  skyboxSize );
         glTexCoord2f(1, 0); glVertex3f(  skyboxSize,  skyboxSize,  skyboxSize );
