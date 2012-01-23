@@ -56,12 +56,18 @@ bool Loaders::t3DSLoader::Import3DS(t3DModel *pModel, char *strFileName)
 
 void Loaders::t3DSLoader::ResizeObjects(t3DModel* pModel)
 {
-    if(pModel->numOfObjects <= 0)
+    if (pModel->numOfObjects <= 0)
         return;
 
-    for(int index = 0; index < pModel->numOfObjects; index++)
+    float nx, ny, nz;
+
+    for (int index = 0; index < pModel->numOfObjects; index++)
     {
-        for(int i = 0; i <= pModel->numberOfFrames; ++i)
+        nx = pModel->pObject[index].vScale[0].x - 1.0f;
+        ny = pModel->pObject[index].vScale[0].y - 1.0f;
+        nz = pModel->pObject[index].vScale[0].z - 1.0f;
+
+        for (int i = 0; i <= pModel->numberOfFrames; ++i)
         {
             if (pModel->pObject[index].vScale.size() <= i)
             {
@@ -71,16 +77,17 @@ void Loaders::t3DSLoader::ResizeObjects(t3DModel* pModel)
                 pModel->pObject[index].vScale[i].z = 1;
             }
 
-            pModel->pObject[index].vScale[i].x *= MODEL_SCALE;
-            pModel->pObject[index].vScale[i].y *= MODEL_SCALE;
-            pModel->pObject[index].vScale[i].z *= MODEL_SCALE;
-
             if (pModel->pObject[index].vPosition.size() <= i)
+            {
                 pModel->pObject[index].vPosition.resize(pModel->pObject[index].vPosition.size()+1);
+                pModel->pObject[index].vPosition[i].x = 0.0f;
+                pModel->pObject[index].vPosition[i].y = 0.0f;
+                pModel->pObject[index].vPosition[i].z = 0.0f;
+            }
 
-            pModel->pObject[index].vPosition[i].x *= MODEL_SCALE;
-            pModel->pObject[index].vPosition[i].y *= MODEL_SCALE;
-            pModel->pObject[index].vPosition[i].z *= MODEL_SCALE;
+            pModel->pObject[index].vScale[i].x -= nx;
+            pModel->pObject[index].vScale[i].y -= ny;
+            pModel->pObject[index].vScale[i].z -= nz;
         }
     }
 }
@@ -213,6 +220,18 @@ void Loaders::t3DSLoader::ProcessNextMaterialChunk(t3DModel *pModel, tChunk *pPr
         case MATMAPFILE:
             m_CurrentChunk->bytesRead += fread(pModel->pMaterials[pModel->numOfMaterials - 1].strFile, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
             break;
+        case MATSPECULAR:
+            ReadColorChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].specularcolor[0]), m_CurrentChunk);
+            break;
+        case MATSHININESS:
+            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[0]), m_CurrentChunk);
+            break;
+        case MATSHININESSSTR:
+            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[1]), m_CurrentChunk);
+            break;
+        case MATSHININESSSTR2:
+            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[2]), m_CurrentChunk);
+            break;
         default:
             m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
             break;
@@ -306,6 +325,24 @@ void Loaders::t3DSLoader::ReadColorChunk(tMaterialInfo *pMaterial, tChunk *pChun
     ReadChunk(m_TempChunk);
 
     m_TempChunk->bytesRead += fread(pMaterial->color, 1, m_TempChunk->length - m_TempChunk->bytesRead, m_FilePointer);
+
+    pChunk->bytesRead += m_TempChunk->bytesRead;
+}
+
+void Loaders::t3DSLoader::ReadColorChunkDest(uint8 *dest, tChunk *pChunk)
+{
+    ReadChunk(m_TempChunk);
+
+    m_TempChunk->bytesRead += fread(dest, 1, m_TempChunk->length - m_TempChunk->bytesRead, m_FilePointer);
+
+    pChunk->bytesRead += m_TempChunk->bytesRead;
+}
+
+void Loaders::t3DSLoader::ReadPercentageChunkDest(uint8 *dest, tChunk* pChunk)
+{
+    ReadChunk(m_TempChunk);
+
+    m_TempChunk->bytesRead += fread(dest, 1, m_TempChunk->length - m_TempChunk->bytesRead, m_FilePointer);
 
     pChunk->bytesRead += m_TempChunk->bytesRead;
 }

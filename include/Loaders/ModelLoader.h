@@ -5,6 +5,9 @@
 
 #define MODEL_SCALE 0.1f
 
+#define PERCENT_CHUNK_INT   0x0030
+#define PERCENT_CHUNK_FLOAT 0x0031
+
 #define PRIMARY       0x4D4D
 #define OBJECTINFO    0x3D3D
 #define VERSION       0x0002
@@ -14,6 +17,11 @@
 #define MATDIFFUSE    0xA020
 #define MATMAP        0xA200
 #define MATMAPFILE    0xA300
+
+#define MATSPECULAR      0xA030
+#define MATSHININESS     0xA040
+#define MATSHININESSSTR  0xA041
+#define MATSHININESSSTR2 0xA042
 
 #define OBJECT_MESH       0x4100
 #define OBJECT_VERTICES   0x4110
@@ -48,11 +56,19 @@ struct tMaterialInfo
     char   strName[255];
     char   strFile[255];
     uint8  color[3];
+    uint8  specularcolor[3];
     uint32 texureId;
     float  uTile;
     float  vTile;
     float  uOffset;
     float  vOffset;
+
+    // lesklost
+    union
+    {
+        float fShininess[3];
+        uint8 uShininess[3];
+    } shininess;
 } ;
 
 struct t3DObject
@@ -133,6 +149,8 @@ namespace Loaders
         void ProcessNextMaterialChunk(t3DModel *pModel, tChunk *);
         void ProcessNextKeyFrameChunk(t3DModel *pModel, tChunk *);
         void ReadColorChunk(tMaterialInfo *pMaterial, tChunk *pChunk);
+        void ReadColorChunkDest(uint8 *dest, tChunk *pChunk);
+        void ReadPercentageChunkDest(uint8 *dest, tChunk *pChunk);
         void ReadVertices(t3DObject *pObject, tChunk *);
         void ReadVertexIndices(t3DObject *pObject, tChunk *);
         void ReadUVCoordinates(t3DObject *pObject, tChunk *);
