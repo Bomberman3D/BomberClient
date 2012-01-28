@@ -66,6 +66,11 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                 accessMatrixDyn[tmp] = 0;
                 continue;
             }
+            else if (sGameplayMgr->WouldBeDangerousField(i,j))
+            {
+                accessMatrixDyn[tmp] = 0;
+                continue;
+            }
 
             // Pokud je pristupne, jednicku
             accessMatrixDyn[tmp] = 1;
@@ -283,8 +288,8 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
     accessMatrixDyn.clear();
     CoordPair tmp;
 
-    // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
-    // a nulami tam, kam nemuze
+    // "Pristupova mapa" se naplni nulami tam, kde pathfinder muze hledat cestu
+    // a trojkami tam, kam nemuze (jakekoliv pole s 1 je cilove)
     for (uint32 i = 0; i < m_mapSizeX; i++)
     {
         for (uint32 j = 0; j < m_mapSizeY; j++)
@@ -292,7 +297,14 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
             tmp = std::make_pair(i,j);
 
             // Podminky na pristupnost / nepristupnost pole na souradnicich [x,y]
-            if (pMap->field[i][j].type == TYPE_SOLID_BOX
+            if (i == sourceX && j == sourceY)
+            {
+                // At stojime kdekoliv, vzdycky muzeme z toho mista odejit
+                // napriklad pokud nam pod zadek byla polozena bomba
+                accessMatrixDyn[tmp] = 0;
+                continue;
+            }
+            else if (pMap->field[i][j].type == TYPE_SOLID_BOX
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX))
             {
@@ -470,6 +482,11 @@ void RandomPathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 length)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
             {
                 // Vynulujeme ho v hledaci mape
+                accessMatrixDyn[tmp] = 0;
+                continue;
+            }
+            else if (sGameplayMgr->WouldBeDangerousField(i,j))
+            {
                 accessMatrixDyn[tmp] = 0;
                 continue;
             }
@@ -855,11 +872,17 @@ void EnemyTemplate::Update()
             {
                 // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
                 if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
-                    m_movement->TryMutate(MOVEMENT_TARGETTED);
+                {
+                    if (!m_movement->TryMutate(MOVEMENT_TARGETTED))
+                        m_movement->TryMutate(MOVEMENT_OUTOFZERO);
+                }
 
                 // Pokud ne (cesta neexistuje), presedlame na nahodny pohyb
                 if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
-                    m_movement->TryMutate(MOVEMENT_RANDOM);
+                {
+                    if (!m_movement->TryMutate(MOVEMENT_RANDOM))
+                        m_movement->TryMutate(MOVEMENT_OUTOFZERO);
+                }
 
                 m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
             }
