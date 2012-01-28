@@ -187,22 +187,7 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
         sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100 + (rx1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 0, 0, 1500);
 
-        // Nakonec nacasujeme vybuch na vsech "nebezpecnych" polich, aby se bedny odpalily s dobre casovanym vybuchem
-        // (v pripade true hodnoty bool promenne +1 / -1 proto, ze reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
-        clock_t tnow = clock();
-
-        sGameplayMgr->SetDangerous(bomb->x, bomb->y, tnow, 1500);
-        for (uint32 i = 1; i <= bombreach; i++)
-        {
-            if (reach_x1 + (rx1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, tnow+i*100, 1500);
-            if (reach_x2 + (rx2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, tnow+i*100, 1500);
-            if (reach_y1 + (ry1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, tnow+i*100, 1500);
-            if (reach_y2 + (ry2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, tnow+i*100, 1500);
-        }
+        // Casovani vybuchu je implementovano pri polozeni bomby
     }
 }
 

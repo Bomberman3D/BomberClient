@@ -122,6 +122,7 @@ class GameplayMgr
         std::vector<uint32>* SettingsPointer() { return &m_settings; };
 
         bool IsDangerousField(uint32 x, uint32 y);
+        bool WouldBeDangerousField(uint32 x, uint32 y);
         void SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong);
 
         void PlayerDied(uint32 x, uint32 y);

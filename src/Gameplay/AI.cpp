@@ -246,6 +246,178 @@ void Pathfinder::GeneratePath()
 
 /********************************************************************/
 /*                                                                  */
+/*               Targetted Out Of Unacessible pathfinder            */
+/*                                                                  */
+/********************************************************************/
+
+OutOfZeroPathfinder::OutOfZeroPathfinder(Path* path)
+{
+    m_sourceX = 0;
+    m_sourceY = 0;
+
+    m_path = path;
+
+    m_path->clear();
+}
+
+OutOfZeroPathfinder::~OutOfZeroPathfinder()
+{
+}
+
+void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
+{
+    // Inicializace vstupnich dat
+    m_sourceX = sourceX;
+    m_sourceY = sourceY;
+
+    m_path->clear();
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    // Naplneni pomocnych promennych
+    m_mapSizeX = pMap->field.size();
+    m_mapSizeY = pMap->field[0].size();
+
+    accessMatrixDyn.clear();
+    CoordPair tmp;
+
+    // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
+    // a nulami tam, kam nemuze
+    for (uint32 i = 0; i < m_mapSizeX; i++)
+    {
+        for (uint32 j = 0; j < m_mapSizeY; j++)
+        {
+            tmp = std::make_pair(i,j);
+
+            // Podminky na pristupnost / nepristupnost pole na souradnicich [x,y]
+            if (pMap->field[i][j].type == TYPE_SOLID_BOX
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB)
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX))
+            {
+                accessMatrixDyn[tmp] = 3;
+                continue;
+            }
+            else if (sGameplayMgr->WouldBeDangerousField(i,j))
+            {
+                accessMatrixDyn[tmp] = 0;
+                continue;
+            }
+
+            // Pokud je pristupne, jednicku
+            accessMatrixDyn[tmp] = 1;
+        }
+    }
+}
+
+// Makra pro rekurzivni postup po poli
+// ve zkratce jen volaji dalsi zanoreni funkce Recursor a pri uspechu (true) zapisou bod do cesty
+// Nastaveni na 9 je zde jen kvuli pripadnemu debugu a vystupu
+#define OOZ_RECURSE_RIGHT   if ((x+1) < m_mapSizeX && (accessMatrixDyn[std::make_pair(x+1,y)] == 0 || accessMatrixDyn[std::make_pair(x+1,y)] == 1)) \
+                            {                         \
+                                if (Recursor(x+1, y)) \
+                                {                     \
+                                    p->x = x+1;       \
+                                    p->y = y;         \
+                                    p->flags = 0;     \
+                                    accessMatrixDyn[std::make_pair(x+1,y)] = 9; \
+                                    m_path->push_back(*p); \
+                                    return true;      \
+                                }                     \
+                            }
+
+#define OOZ_RECURSE_DOWN    if ((y+1) < m_mapSizeY && (accessMatrixDyn[std::make_pair(x,y+1)] == 0 || accessMatrixDyn[std::make_pair(x,y+1)] == 1)) \
+                            {                         \
+                                if (Recursor(x, y+1)) \
+                                {                     \
+                                    p->x = x;         \
+                                    p->y = y+1;       \
+                                    p->flags = 0;     \
+                                    accessMatrixDyn[std::make_pair(x,y+1)] = 9; \
+                                    m_path->push_back(*p); \
+                                    return true;      \
+                                }                     \
+                            }
+
+#define OOZ_RECURSE_LEFT    if (x > 0 && (accessMatrixDyn[std::make_pair(x-1,y)] == 0 || accessMatrixDyn[std::make_pair(x-1,y)] == 1)) \
+                            {                         \
+                                if (Recursor(x-1, y)) \
+                                {                     \
+                                    p->x = x-1;       \
+                                    p->y = y;         \
+                                    p->flags = 0;     \
+                                    accessMatrixDyn[std::make_pair(x-1,y)] = 9; \
+                                    m_path->push_back(*p); \
+                                    return true;      \
+                                }                     \
+                            }
+
+#define OOZ_RECURSE_UP      if (y > 0 && (accessMatrixDyn[std::make_pair(x,y-1)] == 0 || accessMatrixDyn[std::make_pair(x,y-1)] == 1)) \
+                            {                         \
+                                if (Recursor(x, y-1)) \
+                                {                     \
+                                    p->x = x;         \
+                                    p->y = y-1;       \
+                                    p->flags = 0;     \
+                                    accessMatrixDyn[std::make_pair(x,y-1)] = 9; \
+                                    m_path->push_back(*p); \
+                                    return true;      \
+                                }                     \
+                            }
+
+bool OutOfZeroPathfinder::Recursor(uint32 x, uint32 y)
+{
+    // trojky jsou jako pevna pole - nejde pres ne projit
+    if (accessMatrixDyn[std::make_pair(x,y)] == 2 || accessMatrixDyn[std::make_pair(x,y)] == 3)
+        return false;
+
+    // Overeni, zdali se jedna o cilove pole. Pokud ano, vratime true a cela rekurze se pote vrati a cesta se zapise
+    if (accessMatrixDyn[std::make_pair(x,y)] == 1)
+        return true;
+
+    // Automaticky nastavime pole jako "navstivene"
+    accessMatrixDyn[std::make_pair(x,y)] = 2;
+
+    // Minimalizujeme pocet lokalnich promennych kvuli velikosti zasobniku
+    PathNode* p = new PathNode;
+
+    OOZ_RECURSE_LEFT;
+    OOZ_RECURSE_RIGHT;
+    OOZ_RECURSE_UP;
+    OOZ_RECURSE_DOWN;
+
+    return false;
+}
+
+void OutOfZeroPathfinder::GeneratePath()
+{
+    // Pokud stojime na pristupnem poli, jsme v suchu
+    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 1)
+        return;
+
+    if (!Recursor(m_sourceX, m_sourceY))
+    {
+        // Cesta se nevygenerovala, nejspis budeme stat na miste a cekat na smrt - neni uniku
+    }
+    else
+    {
+        // Cesta se nasla, muzeme se pohybovat po ceste
+
+        // Vlozime i zdrojovou node
+        PathNode node;
+        node.x = m_sourceX;
+        node.y = m_sourceY;
+        node.flags = 0;
+        m_path->push_back(node);
+
+        // Ovsem.. vygenerovala se v opacnem poradi. Prevratime ji tedy
+        std::reverse(m_path->begin(), m_path->end());
+    }
+}
+
+/********************************************************************/
+/*                                                                  */
 /*               Random pathfinder                                  */
 /*                                                                  */
 /********************************************************************/
@@ -439,6 +611,24 @@ void MovementHolder::Generator()
             }
             break;
         }
+        case MOVEMENT_OUTOFZERO:
+        {
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
+            OutOfZeroPathfinder p(&m_path);
+            p.Initialize(mx, my);
+            p.GeneratePath();
+
+            // Musi byt vetsi nez 1, aby melo smysl se pohybovat
+            if (m_path.size() > 1)
+            {
+                m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
+                m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
+                m_currentPathNode = 0;
+                m_nodeStartTime = clock();
+            }
+            break;
+        }
         case MOVEMENT_RANDOM:
         {
             uint32 mx = ceil(m_src->pRecord->x);
@@ -481,6 +671,19 @@ bool MovementHolder::TryGenerator(MovementType moveType)
             uint32 ty = ceil(pTarget->z);
             Pathfinder p(&m_tryPath);
             p.Initialize(mx, my, tx, ty);
+            p.GeneratePath();
+
+            if (m_tryPath.size() > 1)
+                return true;
+
+            break;
+        }
+        case MOVEMENT_OUTOFZERO:
+        {
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
+            OutOfZeroPathfinder p(&m_tryPath);
+            p.Initialize(mx, my);
             p.GeneratePath();
 
             if (m_tryPath.size() > 1)

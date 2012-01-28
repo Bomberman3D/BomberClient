@@ -103,7 +103,7 @@ void GameplayMgr::OnGameInit()
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
 
-    m_playerRec = sDisplay->DrawModel(1, 0.5f, 0, 0.5f, ANIM_IDLE, 0.20f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    m_playerRec = sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 0.10f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
     m_moveAngle = 0.0f;
     m_playerX = 0;
     m_playerY = 0;
@@ -184,18 +184,105 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     if (m_plActiveBombs >= m_plMaxBombs)
         return false;
 
-    BombRecord* temp = new BombRecord;
-    temp->x = x;
-    temp->y = y;
-    temp->state = 0;
-    temp->reach = GetFlameReach();
-    BombMap.push_back(temp);
+    BombRecord* bomb = new BombRecord;
+    bomb->x = x;
+    bomb->y = y;
+    bomb->state = 0;
+    bomb->reach = GetFlameReach();
+    BombMap.push_back(bomb);
 
-    sTimer->AddTimedSetEvent(2500, &temp->state, 1);
+    sTimer->AddTimedSetEvent(2500, &bomb->state, 1);
     m_plActiveBombs++;
 
     if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
         localPlayerStats.ClassicSingleStats.bombsPlanted += 1;
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (pMap)
+    {
+        // Nyni promenliva hodnota podle bonusu
+        // Bonus se ale zapocita jen pokud je bomba polozena az po vzeti bonusu, ne na vsechny
+        // Jednak je to realistictejsi a jednak to usnadni trochu pathfinding pro AI
+        uint32 bombreach = bomb->reach;
+
+        // Projdeme vsechny mozne zaznamy na mape az na maximalni definovany dosah
+        // pokud tam neco je, zamezime dalsimu prepsani a zapiseme
+        uint32 reach_x1 = bombreach+1, reach_x2 = bombreach+1, reach_y1 = bombreach+1, reach_y2 = bombreach+1;
+        // Promenna urcujici, zdali doslo ke kolizi kvuli objektu (true) nebo kvuli dosahu (false)
+        bool rx1_box = false, rx2_box = false, ry1_box = false, ry2_box = false;
+
+        for (uint32 i = 0; i < bombreach; i++)
+        {
+            // Pokud jeste nebylo zapsano
+            if (reach_x1 == bombreach+1)
+            {
+                // Overime, zdali na dane pozici neco neprostupneho je
+                if (pMap->IsDynamicRecordPresent(bomb->x + i + 1, bomb->y, DYNAMIC_TYPE_BOX))
+                {
+                    // Pokud ano, zamezime zapsanim maximalni pozice dalsimu prepsani
+                    reach_x1 = i+1;
+                    rx1_box = true;
+                }
+                else if (pMap->GetStaticRecord(bomb->x + i + 1,bomb->y) == TYPE_SOLID_BOX)
+                    reach_x1 = i+1;
+            }
+
+            if (reach_x2 == bombreach+1)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x - i - 1, bomb->y, DYNAMIC_TYPE_BOX))
+                {
+                    reach_x2 = i+1;
+                    rx2_box = true;
+                }
+                else if (pMap->GetStaticRecord(bomb->x - i - 1,bomb->y) == TYPE_SOLID_BOX)
+                    reach_x2 = i+1;
+            }
+
+            if (reach_y1 == bombreach+1)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y + i + 1, DYNAMIC_TYPE_BOX))
+                {
+                    reach_y1 = i+1;
+                    ry1_box = true;
+                }
+                else if (pMap->GetStaticRecord(bomb->x,bomb->y + i + 1) == TYPE_SOLID_BOX)
+                    reach_y1 = i+1;
+            }
+
+            if (reach_y2 == bombreach+1)
+            {
+                if (pMap->IsDynamicRecordPresent(bomb->x, bomb->y - i - 1, DYNAMIC_TYPE_BOX))
+                {
+                    reach_y2 = i+1;
+                    ry2_box = true;
+                }
+                else if (pMap->GetStaticRecord(bomb->x,bomb->y - i - 1) == TYPE_SOLID_BOX)
+                    reach_y2 = i+1;
+            }
+        }
+        // Pak vsechno dekrementujeme - zapise se vzdy pozice uz nepristupneho pole
+        --reach_x1;
+        --reach_x2;
+        --reach_y1;
+        --reach_y2;
+
+        // Nakonec nacasujeme vybuch na vsech "nebezpecnych" polich, aby se bedny odpalily s dobre casovanym vybuchem
+        // (v pripade true hodnoty bool promenne +1 / -1 proto, ze reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
+        clock_t tnow = clock();
+
+        sGameplayMgr->SetDangerous(bomb->x, bomb->y, tnow+2500, 1500);
+        for (uint32 i = 1; i <= bombreach; i++)
+        {
+            if (reach_x1 + (rx1_box?1:0) >= i)
+                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, tnow+i*100+2500, 1500);
+            if (reach_x2 + (rx2_box?1:0) >= i)
+                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, tnow+i*100+2500, 1500);
+            if (reach_y1 + (ry1_box?1:0) >= i)
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, tnow+i*100+2500, 1500);
+            if (reach_y2 + (ry2_box?1:0) >= i)
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, tnow+i*100+2500, 1500);
+        }
+    }
 
     return true;
 }
@@ -216,6 +303,15 @@ bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
         return true;
 
     return false;
+}
+
+bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
+{
+    std::map<std::pair<uint32, uint32>, DangerousField*>::const_iterator itr = DangerousMap.find(std::make_pair(x,y));
+    if (itr == DangerousMap.end())
+        return false;
+
+    return true;
 }
 
 void GameplayMgr::SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong)

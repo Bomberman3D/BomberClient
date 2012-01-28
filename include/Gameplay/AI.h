@@ -40,6 +40,30 @@ class Pathfinder
         uint32 m_mapSizeY;
 };
 
+class OutOfZeroPathfinder
+{
+    public:
+        OutOfZeroPathfinder(Path* path);
+        ~OutOfZeroPathfinder();
+
+        void Initialize(uint32 sourceX, uint32 sourceY);
+        void GeneratePath();
+        bool Recursor(uint32 x, uint32 y);
+
+        // Mapa, kde jsou same jednotky, vynuluji se pouze nepristupna mista (bomby, krabice,..)
+        // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
+        std::map<CoordPair, int8> accessMatrixDyn;
+
+    private:
+        Path* m_path;
+
+        uint32 m_sourceX;
+        uint32 m_sourceY; // v OGL prostoru by to bylo Z
+
+        uint32 m_mapSizeX;
+        uint32 m_mapSizeY;
+};
+
 class RandomPathfinder
 {
     public:
@@ -72,6 +96,7 @@ enum MovementType
     MOVEMENT_NONE      = 0,
     MOVEMENT_TARGETTED = 1,
     MOVEMENT_RANDOM    = 2,
+    MOVEMENT_OUTOFZERO = 3,
     MOVEMENT_MAX,
 };
 
