@@ -86,7 +86,7 @@ void Animator::Update()
                     if (temp->actualFrame >= temp->frameSkipSpeed)
                         temp->actualFrame -= temp->frameSkipSpeed; // posunout frame zpet
                     else
-                        temp->actualFrame = 0;
+                        temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
                 }
                 else
                     temp->actualFrame += temp->frameSkipSpeed; // posunout frame
@@ -100,10 +100,10 @@ void Animator::Update()
                         temp->reversed = true;
                     }
                     else
-                        temp->actualFrame = 0;
+                        temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
                 }
 
-                if (temp->reversed && temp->actualFrame == 0)
+                if (temp->reversed && temp->actualFrame == sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst)
                     temp->reversed = false;
             }
         }
