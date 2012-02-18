@@ -103,7 +103,7 @@ void GameplayMgr::OnGameInit()
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
 
-    m_playerRec = sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 0.10f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    m_playerRec = sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
     m_moveAngle = 0.0f;
     m_playerX = 0;
     m_playerY = 0;
@@ -454,7 +454,7 @@ void GameplayMgr::UpdatePlayerMotion(uint32 diff)
     if (move)
     {
         if (sAnimator->GetAnimId(m_playerRec->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 0, 5);
+            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 0, 2);
 
         // Nejdrive se zkontroluje kolize na ose X
         float newx = m_playerRec->x + dist*cos(angle_rad);

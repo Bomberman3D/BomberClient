@@ -458,10 +458,19 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
 {
     uint32 frame = sAnimator->GetActualFrame(pData->AnimTicket);
 
+    // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
+    if (sCustomAnimator->HaveModelCustomAnim(pData->modelId))
+    {
+        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData, frame);
+        return;
+    }
+
     CVector3 vPosition = pObject->vPosition[frame];
-    glTranslatef(vPosition.x*pData->scale, vPosition.y*pData->scale, vPosition.z*pData->scale);
+    vPosition.multiply(pData->scale);
+    glTranslatef(vPosition.x, vPosition.y, vPosition.z);
     CVector3 vScale = pObject->vScale[frame];
-    glScalef(vScale.x*pData->scale, vScale.y*pData->scale, vScale.z*pData->scale);
+    vScale.multiply(pData->scale);
+    glScalef(vScale.x, vScale.y, vScale.z);
 
     for (uint32 i = 1; i <= frame; i++)
     {
@@ -475,6 +484,13 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
 
 void Display::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* pData, uint32 frame)
 {
+    // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
+    if (sCustomAnimator->HaveModelCustomAnim(pData->modelId))
+    {
+        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData, frame);
+        return;
+    }
+
     CVector3 vPosition = pObject->vPosition[frame];
     glTranslatef(vPosition.x, vPosition.y, vPosition.z);
     CVector3 vScale = pObject->vScale[frame];

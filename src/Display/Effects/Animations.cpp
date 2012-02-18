@@ -258,3 +258,261 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
     if (frameSkipSpeed > 0)
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }
+
+CustomAnimator::CustomAnimator()
+{
+}
+
+bool CustomAnimator::HaveModelCustomAnim(uint32 id)
+{
+    // TODO: odebrat staticke zaznamy, nahradit necim dynamickym !!!
+
+    // Model hlavni postavy
+    if (id == 9)
+        return true;
+
+    return false;
+}
+
+void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord *model, uint32 frame)
+{
+    /*  Magicka funkce, majici za ukol zastirat programatorovu neschopnost a obchazet absenci kompletni dokumentace formatu 3DS
+     *  Trocha vysvetleni
+     *
+     *  Ve skutecnosti jde o neco, co dokaze animovat objekty nebo skupinu objektu (viz. vicecetne strcmp v podminkach a animace
+     *  podle pozice jineho objektu) podle relativniho stredu nebo stredu jineho objektu. To nam dovoluje obejit veskery pivot
+     *  mechanizmus obsazeny primo ve formatu 3DS. Tady se tedy deje veskera magie, bohuzel se mi nechtelo patlat s kombinaci
+     *  s puvodnim animacnim systemem, proto to vypada tak jak to vypada, tzn. bud built-in animace nebo tahle staticka hnusna
+     *
+     *  Budoucimu ja preji pevne nervy pri cteni a lusteni tohoto kodu a take prosim o trochu pochopeni.
+     */
+
+    /*
+     * Trochu popis:
+     *
+     *  Zpravidla se nejdrive najde objekt, jehoz stred se bude povazovat za vychozi (FindModelObject, ..)
+     *  Bod rotPos (deklarovany jako vektor, ale ne vsechno co ma tri souradnice je vektor, ze..) dokaze oznacit stred otaceni,
+     *  ktery je polozen relativne vuci pocatku celeho modelu.
+     *  Pote se matrix posune do danych souradnic a objekt se zvetsi/zmensi/zrotuje jak je treba.
+     *  Nakonec se souradnice prelozi zpet na puvodni pozici a nasledne hned na pozici puvodniho objektu, aby se nevykreslovalo
+     *  relativne k objektu, jehoz pozice vyuzivame jen k pootoceni.
+     *
+     *  Co se tyce "vzorecku" pro rotaci napr. rukou postavy atp.:
+     *  Cely vzorec sestava z nekolika zakladnich prvku, ktere se daji defakto identifikovat podle standardniho vzorce linearni
+     *  funkce s absolutni hodnotou:
+     *
+     *  y = -| x/{nejvyssi_bod} - 1 | + {bod_zlomu}
+     *
+     *  nejvyssi bod je takovy, ve kterem ma jednak dana funkce maximum, a jednak je to frame animace s nejvyssi hodnotou rotace.
+     *  Pri posunu animace se samozrejme musi posunout i "x", aby "zacinalo od nuly" a ne od prvniho framu animace.
+     *  bod zlomu je takovy bod, ve kterem se meni znamenko, tedy pokud z absolutni hodnoty "padaji" cisla v intervalu <0;1>,
+     *  tento bod zaruci jakysi posun. Viz napr. pohyb ruky, kdy je treba nejdrive rotovat do plusu a pak do minusu.
+     */
+    bool processed = false;
+
+    if (model->modelId == 9 && sStorage->GetAnimTypeForFrame(model->modelId, frame) == ANIM_WALK)
+    {
+        float wholePosMod = 1.0f-fabs((float(frame%50)/25.0f)-1.0f);
+        wholePosMod = cos(wholePosMod*PI/2);
+        glTranslatef(0, wholePosMod*0.2f, 0);
+
+        if (strcmp(pObject->strName, "Hlava") == 0 || strcmp(pObject->strName, "Oci") == 0 || strcmp(pObject->strName, "Antena") == 0
+             || strcmp(pObject->strName, "AntenaS") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "Hlava");
+            if (!pObj)
+                return;
+
+            // Rotaci budeme resit podle sdileneho stredu otaceni hlavy
+            CVector3 vPosition = pObj->vPosition[frame];
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.5f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(anglemod*35.0f, 0, 1.0f, 0);
+
+            // Po otoceni prelozime zpaky na puvodni pozice a prelozime na pozice objektu pro korektni zobrazeni
+            glTranslatef(-vPosition.x, -vPosition.y, -vPosition.z);
+            vPosition = pObject->vPosition[frame];
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        if (strcmp(pObject->strName, "Telo") == 0 || strcmp(pObject->strName, "Pasek") == 0 || strcmp(pObject->strName, "Preska") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "Telo");
+            if (!pObj)
+                return;
+
+            // Rotaci budeme resit podle sdileneho stredu otaceni hlavy
+            CVector3 vPosition = pObj->vPosition[frame];
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.5f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(anglemod*15.0f, 0, 1.0f, 0);
+
+            // Po otoceni prelozime zpaky na puvodni pozice a prelozime na pozice objektu pro korektni zobrazeni
+            glTranslatef(-vPosition.x, -vPosition.y, -vPosition.z);
+            vPosition = pObject->vPosition[frame];
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        else if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaRuka");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(-0.173f, 1.353f, 0.08f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.6f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(50.0f, 0, 0, 1.0f);
+            glRotatef(anglemod*80.0f, 0, 1.0f, 0);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaRuka");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(0.173f, 1.353f, 0.08f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.6f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(50.0f, 0, 0, -1.0f);
+            glRotatef(anglemod*80.0f, 0, 1.0f, 0);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        else if (strcmp(pObject->strName, "LevaNoha") == 0 || strcmp(pObject->strName, "LeveCh") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaNoha");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(-0.118f, 0.761f, 0.083f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.45f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(anglemod*75.0f, 1.0f, 0, 0);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        else if (strcmp(pObject->strName, "PravaNoha") == 0 || strcmp(pObject->strName, "PraveCh") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaNoha");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(0.118f, 0.761f, 0.083f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            float anglemod = 0.45f-fabs(((float(frame))/50.0f)-1.0f);
+
+            glRotatef(anglemod*75.0f, -1.0f, 0, 0);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+    }
+    else if (model->modelId == 9 && sStorage->GetAnimTypeForFrame(model->modelId, frame) == ANIM_IDLE)
+    {
+        if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaRuka");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(-0.173f, 1.353f, 0.08f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            glRotatef(50.0f, 0, 0, 1.0f);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+        else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
+        {
+            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaRuka");
+            if (!pObj)
+                return;
+
+            CVector3 rotPos(0.173f, 1.353f, 0.08f);
+
+            CVector3 vPosition = pObject->vPosition[frame];
+            glTranslatef(rotPos.x, rotPos.y, rotPos.z);
+            CVector3 vScale = pObject->vScale[frame];
+            glScalef(vScale.x, vScale.y, vScale.z);
+
+            glRotatef(50.0f, 0, 0, -1.0f);
+
+            glTranslatef(-rotPos.x, -rotPos.y, -rotPos.z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+            processed = true;
+        }
+    }
+
+    // Pokud se "nechytnul" ani jeden z nami deklarovanych objektu na danou animaci, vyuzijeme standardni postupy
+    if (!processed)
+    {
+        CVector3 vPosition = pObject->vPosition[frame];
+        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+        CVector3 vScale = pObject->vScale[frame];
+        glScalef(vScale.x, vScale.y, vScale.z);
+
+        for (uint32 i = 1; i <= frame; i++)
+        {
+            CVector3 vRotation = pObject->vRotation[i];
+            float rotDegree = pObject->vRotDegree[i];
+
+            if(rotDegree)
+                glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);
+        }
+    }
+}

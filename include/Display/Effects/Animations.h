@@ -64,4 +64,15 @@ class Animator
 
 #define sAnimator Singleton<Animator>::instance()
 
+class CustomAnimator
+{
+    public:
+        CustomAnimator();
+
+        bool HaveModelCustomAnim(uint32 id);
+        void AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* model, uint32 frame);
+};
+
+#define sCustomAnimator Singleton<CustomAnimator>::instance()
+
 #endif

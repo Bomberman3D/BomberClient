@@ -67,6 +67,10 @@ class Storage
         void Load();
         void PrepareDynamicStorages();
 
+        // Helper funkce
+        t3DObject* FindModelObject(uint32 modelId, const char* objectname);
+        ModelAnimType GetAnimTypeForFrame(uint32 modelId, uint32 frame);
+
         // StorageLoader.cpp
         bool LoadTextureData();
         bool LoadModelData();

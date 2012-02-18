@@ -634,7 +634,7 @@ void Loaders::t3DSLoader::ComputeNormals(t3DModel *pModel)
             pNormals[i] = vNormal;
         }
 
-        CVector3 vSum = {0.0, 0.0, 0.0};
+        CVector3 vSum(0.0, 0.0, 0.0);
         CVector3 vZero = vSum;
         int shared = 0;
 
