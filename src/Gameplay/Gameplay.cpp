@@ -454,7 +454,7 @@ void GameplayMgr::UpdatePlayerMotion(uint32 diff)
     if (move)
     {
         if (sAnimator->GetAnimId(m_playerRec->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 0, 2);
+            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 25, 2);
 
         // Nejdrive se zkontroluje kolize na ose X
         float newx = m_playerRec->x + dist*cos(angle_rad);

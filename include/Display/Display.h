@@ -142,7 +142,8 @@ class Display
                                           ModelAnimType Animation = ANIM_IDLE,
                                           float scale = 1.0f, float rotate = 0.0f,
                                           bool genGLDisplayList = false, bool animReverse = false,
-                                          uint32 startFrame = 0, uint32 frameSkipSpeed = 0, AnimRestriction animRest = ANIM_RESTRICTION_NONE);
+                                          uint32 startFrame = 0, uint32 frameSkipSpeed = 0, AnimRestriction animRest = ANIM_RESTRICTION_NONE,
+                                          bool GLDisplayListOnly = false);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
         void AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData);
