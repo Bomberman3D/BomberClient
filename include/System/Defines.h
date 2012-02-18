@@ -31,6 +31,9 @@ typedef GLuint GLDisplayList;
 
 struct CVector3
 {
+    CVector3() {};
+    CVector3(float nx, float ny, float nz): x(nx), y(ny), z(nz) {};
+
     float x, y, z;
 
     float mySize()
@@ -45,6 +48,9 @@ struct CVector3
     }
     void unitMultiply(float a)
     {
+        if (mySize() == 0)
+            return;
+
         multiply(a/mySize());
     }
     CVector3 vectorMultiply(CVector3 second)
@@ -55,6 +61,27 @@ struct CVector3
         result.z = x*second.y - y*second.x;
 
         return result;
+    }
+    void makeNull()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
+
+    CVector3 operator+(const CVector3 &sec)
+    {
+        x = x + sec.x;
+        y = y + sec.y;
+        z = z + sec.z;
+        return (*this);
+    }
+    CVector3 operator-(const CVector3 &sec)
+    {
+        x = x - sec.x;
+        y = y - sec.y;
+        z = z - sec.z;
+        return (*this);
     }
 };
 
@@ -73,7 +100,15 @@ struct CVector2
     }
     void unitMultiply(float a)
     {
+        if (mySize() == 0)
+            return;
+
         multiply(a/mySize());
+    }
+    void makeNull()
+    {
+        x = 0;
+        y = 0;
     }
 };
 
