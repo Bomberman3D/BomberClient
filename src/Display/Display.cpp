@@ -4,6 +4,7 @@
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
 #include <Map.h>
+#include <LoadingThread.h>
 
 Display::Display()
 {
@@ -70,7 +71,14 @@ void Display::InitFont(uint8 font)
     m_fontBase[font] = glGenLists(256);
 
     // Textura s fontem
-    BindTexture(fontTextures[font]);
+    if (!BindTexture(fontTextures[font]))
+    {
+        // Pockame na jeji nacteni
+        while (sStorage->Textures[fontTextures[font]] == NULL)
+            boost::this_thread::yield();
+        //Loaders::LoadTexture(fontTextures[font]);
+    }
+
     for (uint16 loop = 0; loop < 256; loop++)
     {
         cx = float(loop%charsperline)/float(charsperline);
@@ -102,7 +110,12 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32
     glEnable(GL_BLEND);
 
     // Nabindujeme texturu s fontem
-    BindTexture(fontTextures[font]);
+    if (!BindTexture(fontTextures[font]))
+    {
+        // A pockame na jeji nacteni (pokud neni)
+        while (sStorage->Textures[fontTextures[font]] == NULL)
+            boost::this_thread::yield();
+    }
 
     char text[512];
     va_list ap;
@@ -138,17 +151,25 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32
         Setup3DMode();
 }
 
-void Display::BindTexture(uint32 textureId)
+bool Display::BindTexture(uint32 textureId)
 {
     // Pokud neni nactena, nacteme ji
-    if (!sStorage->Textures[textureId])
-        Loaders::LoadTexture(textureId);
+    if (sStorage->Textures[textureId] == NULL)
+    {
+        if (sLoader->IsCurrentlyLoaded(LOAD_TEXTURE, textureId))
+            return false;
+
+        sLoader->RequestLoad(LOAD_TEXTURE, textureId);
+        return false;
+    }
 
     // Pokud jiz je aktualne nabindovana, neni treba nic delat
     if (textureId == m_boundTexture)
-        return;
+        return true;
 
     glBindTexture(GL_TEXTURE_2D, *(sStorage->Textures[textureId]));
+
+    return true;
 }
 
 void Display::Update(const uint32 diff)
@@ -168,9 +189,6 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
 
-    if (sStorage->Models[modelId] == NULL)
-        Loaders::LoadModel(modelId);
-
     pNew->modelId = modelId;
     pNew->x = x;
     pNew->y = y;
@@ -188,6 +206,48 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->remove = false;
     pNew->scale = scale;
     pNew->rotate = rotate;
+
+    // Pokud potrebujeme vygenerovat displaylist, musime nacist i model a take pockat na jeho uplne nacteni
+    if (sStorage->Models[modelId] == NULL)
+    {
+        if (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
+            sLoader->RequestLoad(LOAD_MODEL, modelId);
+
+        if (genGLDisplayList)
+        {
+            while (sStorage->Models[modelId] == NULL)
+                boost::this_thread::yield();
+
+            //if (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
+            //{
+            //    sLoader->RequestLoad(LOAD_MODEL, modelId);
+
+            //    // TODO: je tohle doopravdy spravne? Takhle "hnusne" cekani na to, az se bude nacitat model
+            //    //       a jakmile je oznacen jako nacitany, pockat na jeho donacteni?
+            //    //       race condition pri rychlejsim nacteni nez je jeden pruchod while?
+            //    /*while (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
+            //    {
+            //    }
+            //    while (sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
+            //    {
+            //    }*/
+
+            //    while (sStorage->Models[modelId] == NULL)
+            //    {
+            //    }
+            //}
+            //else
+            //{
+                /*while (sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
+                {
+                }*/
+
+            //    while (sStorage->Models[modelId] == NULL)
+            //    {
+            //    }
+            //}
+        }
+    }
 
     if (genGLDisplayList && sStorage->Models[modelId]->displayListSize == 0)
     {
@@ -334,6 +394,15 @@ void Display::DrawModels()
         if (!temp)
         {
             itr = ModelDisplayList.erase(itr);
+            continue;
+        }
+
+        // Pokud ho jeste nenacetlo nacitaci vlakno, musime cekat..
+        if (sStorage->Models[temp->modelId] == NULL)
+        {
+            if (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, temp->modelId))
+                sLoader->RequestLoad(LOAD_MODEL, temp->modelId);
+
             continue;
         }
 
@@ -512,9 +581,6 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
     assert(pNew != NULL);
 
-    if (sStorage->Textures[textureId] == NULL)
-        Loaders::LoadTexture(textureId);
-
     pNew->textureId = textureId;
     pNew->x = x;
     pNew->y = y;
@@ -549,6 +615,12 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     }
 
     BillboardDisplayList.push_front(pNew);
+
+    if (sStorage->Textures[textureId] == NULL)
+    {
+        if (!sLoader->IsCurrentlyLoaded(LOAD_TEXTURE, textureId))
+            sLoader->RequestLoad(LOAD_TEXTURE, textureId);
+    }
 
     return pNew;
 }
@@ -776,7 +848,8 @@ void Display::Draw2D(uint32 textureId, float left, float top, float width, float
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-    BindTexture(textureId);
+    if (!BindTexture(textureId))
+        return;
 
     glBegin(GL_QUADS);
       glColor3ub(255, 255, 255);

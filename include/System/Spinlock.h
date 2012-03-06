@@ -7,6 +7,8 @@
 enum LockType
 {
     LOCK_DISPLAYLIST = 0,
+    LOCK_LOADLIST,
+    LOCK_STORAGE,
     LOCK_MAX
 };
 
@@ -15,6 +17,7 @@ enum LockThread
     THREAD_MAIN = 0,
     THREAD_NETWORK,
     THREAD_ANIMATION,
+    THREAD_LOADING,
     THREAD_MAX
 };
 

@@ -684,9 +684,12 @@ void Loaders::LoadModel(uint32 id)
 
     for (uint32 i = 0; i < dest->pMaterials.size(); i++)
     {
-        memset(path, 0, 2048);
-        sprintf(path, "%s/%s", DATA_PATH, dest->pMaterials[i].strFile);
-        Loaders::LoadGLImage(&dest->pMaterials[i].texureId, path);
+        if (dest->pMaterials[i].strFile && strlen(dest->pMaterials[i].strFile) > 1)
+        {
+            memset(path, 0, 2048);
+            sprintf(path, "%s/%s", DATA_PATH, dest->pMaterials[i].strFile);
+            Loaders::LoadGLImage(&dest->pMaterials[i].texureId, path);
+        }
     }
 
     if (dest)

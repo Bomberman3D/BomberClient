@@ -230,6 +230,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\System\LoadingThread.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\System\Main.cpp"
 					>
 				</File>
@@ -377,6 +381,10 @@
 				</File>
 				<File
 					RelativePath="..\include\System\Helpers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\System\LoadingThread.h"
 					>
 				</File>
 				<File

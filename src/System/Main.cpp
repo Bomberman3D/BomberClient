@@ -12,8 +12,7 @@
 #include <Effects/ParticleEmitter.h>
 #include <Network.h>
 #include <Timer.h>
-
-#include <boost/thread.hpp>
+#include <LoadingThread.h>
 
 #include <io.h>
 #include <stdlib.h>
@@ -424,6 +423,8 @@ bool Application::Init()
     sNetwork->Initialize();
     if (sNetwork->IsInitialized())
         boost::thread NetworkThread(runNetworkWorker);
+
+    boost::thread LoadingThread(runLoaderWorker);
 
     m_currStage = new MenuStage;
     SetStage(STAGE_MENU);

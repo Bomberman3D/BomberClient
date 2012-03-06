@@ -6,6 +6,7 @@
 #include <Effects/Animations.h>
 #include <Map.h>
 #include <Gameplay.h>
+#include <LoadingThread.h>
 
 void GameStageSet(uint32 param1, uint32 param2, uint32 param3)
 {
@@ -26,10 +27,12 @@ void LoadingStage::OnEnter()
     sMapManager->LoadMap(sGameplayMgr->GetSetting(SETTING_MAP_ID));
 
     // Nacist modely a jejich display listy!
-    Loaders::LoadModel(8); // bomba
+    sLoader->RequestLoad(LOAD_MODEL, 8);
+    //Loaders::LoadModel(8); // bomba
     sDisplay->DrawModel(8, 0,0,0,ANIM_NONE, 1,0,true, false, 0, 0, ANIM_RESTRICTION_NONE, true);
 
-    Loaders::LoadModel(9); // model postavy
+    sLoader->RequestLoad(LOAD_MODEL, 9);
+    //Loaders::LoadModel(9); // model postavy
     sDisplay->DrawModel(9, 0,0,0,ANIM_NONE, 1,0,true, false, 0, 0, ANIM_RESTRICTION_NONE, true);
 }
 

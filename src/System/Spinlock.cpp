@@ -41,6 +41,12 @@ void SpinLock::UnNeedToken(LockType target, LockThread releaser)
 
 bool SpinLock::HasToken(LockType target, LockThread questioner)
 {
+    if (HolderMap[target] == THREAD_MAX)
+    {
+        HolderMap[target] = questioner;
+        return true;
+    }
+
     return (HolderMap[target] == questioner);
 }
 

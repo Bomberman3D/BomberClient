@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <locale>
+#include <boost/thread.hpp>
 
 #include <string> // for std::string
 #include <vector> // for std::vector
