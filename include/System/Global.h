@@ -8,6 +8,7 @@
 #define BOMB_GLOBAL_H
 
 #include <windows.h>
+#include <wingdi.h>
 #include <iostream>
 #include <gl\gl.h>
 #include <gl\glu.h>

@@ -13,6 +13,13 @@
 
 #include <ctime>
 
+enum RenderingContext
+{
+    RC_MAIN,
+    RC_LOADING,
+    RC_MAX
+};
+
 // Samotna kostra aplikace
 class Application
 {
@@ -43,6 +50,8 @@ class Application
         uint32 GetMouseY() { return mouseXY[1]; };
 
         bool IsKeyPressed(uint8 key) { return keys[key]; };
+
+        void ApplyRenderContext(RenderingContext cont);
 
     protected:
         uint32 Stage;

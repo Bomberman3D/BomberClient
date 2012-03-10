@@ -14,6 +14,8 @@ void Loaders::LoadGLImage(uint32* dest, const char* path)
     GLubyte *imgArray;
     imgArray = SOIL_load_image(path, &width, &height, &channels, SOIL_LOAD_AUTO);
 
+    glEnable(GL_TEXTURE_2D);
+
     glGenTextures(1, dest);
     glBindTexture(GL_TEXTURE_2D, *dest);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

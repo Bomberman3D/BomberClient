@@ -1,4 +1,5 @@
 #include <Global.h>
+#include <Application.h>
 #include <LoadingThread.h>
 #include <Storage.h>
 #include <ImageLoader.h>
@@ -124,5 +125,6 @@ void LoaderWorker::Worker()
 
 void runLoaderWorker()
 {
+    sApplication->ApplyRenderContext(RC_LOADING);
     sLoader->Worker();
 }

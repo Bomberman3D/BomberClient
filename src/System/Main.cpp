@@ -20,9 +20,10 @@
 
 #include <GL/glut.h>
 
-HDC hDC=NULL;
-HGLRC hRC=NULL;
-HWND hWnd=NULL;
+HDC hDC       = NULL;
+HGLRC hRC     = NULL;
+HGLRC hRC_sec = NULL;
+HWND hWnd     = NULL;
 HINSTANCE hInstance;
 
 bool fullscreen = false;
@@ -112,6 +113,15 @@ void KillGLWindow(GLvoid)
             MessageBox(NULL,"Release Rendering Context Failed.","SHUTDOWN ERROR",MB_OK | MB_ICONINFORMATION);
         }
         hRC = NULL;
+    }
+
+    if (hRC_sec)
+    {
+        if (!wglDeleteContext(hRC_sec))
+        {
+            MessageBox(NULL,"Release Second Rendering Context Failed.","SHUTDOWN ERROR",MB_OK | MB_ICONINFORMATION);
+        }
+        hRC_sec = NULL;
     }
 
     if (hDC && !ReleaseDC(hWnd,hDC))
@@ -273,6 +283,20 @@ bool CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
         return false;
     }
 
+    if (!(hRC_sec = wglCreateContext(hDC)))
+    {
+        KillGLWindow();
+        MessageBox(NULL,"Can't Create A Second GL Rendering Context.","ERROR",MB_OK|MB_ICONEXCLAMATION);
+        return false;
+    }
+
+    if (!wglShareLists(hRC, hRC_sec))
+    {
+        KillGLWindow();
+        MessageBox(NULL,"Can't share display lists between main and loading rendering contexts","ERROR",MB_OK|MB_ICONEXCLAMATION);
+        return false;
+    }
+
     if (!wglMakeCurrent(hDC,hRC))
     {
         KillGLWindow();
@@ -426,6 +450,8 @@ bool Application::Init()
 
     boost::thread LoadingThread(runLoaderWorker);
 
+    sApplication->ApplyRenderContext(RC_MAIN);
+
     m_currStage = new MenuStage;
     SetStage(STAGE_MENU);
 
@@ -542,4 +568,20 @@ void Application::MouseButtonStateChange(bool left, bool press)
 void Application::SetStagePhase(uint32 newphase)
 {
     m_currStage->SetSubStage(newphase);
+}
+
+void Application::ApplyRenderContext(RenderingContext cont)
+{
+    switch (cont)
+    {
+        case RC_MAIN:
+            wglMakeCurrent(hDC, hRC);
+            break;
+        case RC_LOADING:
+            wglMakeCurrent(hDC, hRC_sec);
+            break;
+        default:
+            PMessageBox("RC swich error", "Unhandled rendering context: %u", uint32(cont));
+            break;
+    }
 }
