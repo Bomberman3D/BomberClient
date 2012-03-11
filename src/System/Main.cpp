@@ -453,9 +453,9 @@ bool Application::Init()
 
     sStorage->Load();
 
-    sNetwork->Initialize();
-    if (sNetwork->IsInitialized())
-        boost::thread NetworkThread(runNetworkWorker);
+    //sNetwork->Initialize();
+    //if (sNetwork->IsInitialized())
+    //    boost::thread NetworkThread(runNetworkWorker);
 
     boost::thread LoadingThread(runLoaderWorker);
 
