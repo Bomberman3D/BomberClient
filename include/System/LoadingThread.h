@@ -31,10 +31,15 @@ class LoaderWorker
         bool IsCurrentlyLoaded(LoadType type, uint32 sourceId);
         bool IsAlreadyLoaded(LoadType type, uint32 sourceId);
         void Worker();
+
+        void ShutdownThread();
+        bool m_isDead;
     private:
 
         LoadPair m_currentlyLoaded;
         std::vector<LoadRecord> m_loadList;
+        bool m_isShuttingDown;
+        bool m_somethingToLoad;
 };
 
 #define sLoader Singleton<LoaderWorker>::instance()

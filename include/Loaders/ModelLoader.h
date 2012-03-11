@@ -172,6 +172,7 @@ namespace Loaders
     } ModelLoader;
 
     void LoadModel(uint32 id);
+    void GenDisplayLists(t3DModel* pModel, uint32 modelId);
 };
 
 #endif

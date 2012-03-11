@@ -65,7 +65,7 @@ void Network::Worker()
     {
         if (!m_connected)
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            boost::this_thread::yield();
             continue;
         }
 
@@ -83,7 +83,7 @@ void Network::Worker()
             // some error
         }
 
-        boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+        boost::this_thread::yield();
     }
 }
 

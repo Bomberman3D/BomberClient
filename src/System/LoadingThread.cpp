@@ -9,6 +9,9 @@ LoaderWorker::LoaderWorker()
 {
     m_loadList.clear();
     m_currentlyLoaded = std::make_pair(LOAD_MAX, 0);
+    m_isDead = true;
+    m_isShuttingDown = false;
+    m_somethingToLoad = false;
 }
 
 LoaderWorker::~LoaderWorker()
@@ -45,6 +48,7 @@ void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySig
 
     while (!sLockMgr->HasToken(LOCK_LOADLIST, THREAD_MAIN))
     {
+        boost::this_thread::yield();
     }
 
     // Projdeme list, jestli uz nahodou nekdo nezadal o nacteni daneho prvku
@@ -59,6 +63,7 @@ void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySig
                 if ((*itr).priority > prioritySign)
                     (*itr).priority = prioritySign;
 
+                sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_MAIN);
                 return;
             }
         }
@@ -71,6 +76,7 @@ void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySig
     m_loadList[index].type = type;
     m_loadList[index].sourceId = sourceId;
     m_loadList[index].priority = prioritySign;
+    m_somethingToLoad = true;
 
     sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_MAIN);
 }
@@ -79,12 +85,19 @@ void LoaderWorker::Worker()
 {
     LoadPair chosen = std::make_pair(LOAD_MAX, 0);
 
-    while(1)
+    while(!m_isShuttingDown)
     {
+        if (!m_somethingToLoad)
+        {
+            boost::this_thread::yield();
+            continue;
+        }
+
         sLockMgr->NeedToken(LOCK_LOADLIST, THREAD_LOADING);
 
         while (!sLockMgr->HasToken(LOCK_LOADLIST, THREAD_LOADING))
         {
+            boost::this_thread::yield();
         }
 
         // operace s loadlistem
@@ -107,6 +120,23 @@ void LoaderWorker::Worker()
                 if (chosen.first != LOAD_MAX)
                     break;
             }
+
+            if (m_loadList.empty())
+                m_somethingToLoad = false;
+        }
+        else
+        {
+            sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
+            boost::this_thread::yield();
+            continue;
+        }
+
+        // Nic k nacteni
+        if (chosen.first == LOAD_MAX)
+        {
+            sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
+            boost::this_thread::yield();
+            continue;
         }
 
         m_currentlyLoaded = chosen;
@@ -123,8 +153,18 @@ void LoaderWorker::Worker()
     }
 }
 
+void LoaderWorker::ShutdownThread()
+{
+    m_isShuttingDown = true;
+}
+
 void runLoaderWorker()
 {
+    sLoader->m_isDead = false;
+
     sApplication->ApplyRenderContext(RC_LOADING);
     sLoader->Worker();
+    wglMakeCurrent(NULL,NULL);
+
+    sLoader->m_isDead = true;
 }

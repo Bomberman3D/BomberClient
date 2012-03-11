@@ -115,6 +115,15 @@ void KillGLWindow(GLvoid)
         hRC = NULL;
     }
 
+    // Vyradime z provozu nacitaci vlakno - nutnost pockat na ukonceni kvuli rendering contextu a jeho vycisteni
+    time_t fuck_that_shit = time(NULL) + 3;
+    sLoader->ShutdownThread();
+    while (!sLoader->m_isDead)
+    {
+        if (time(NULL) >= fuck_that_shit)
+            break;
+    }
+
     if (hRC_sec)
     {
         if (!wglDeleteContext(hRC_sec))

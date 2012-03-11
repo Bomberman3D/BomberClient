@@ -156,12 +156,16 @@ bool Display::BindTexture(uint32 textureId)
     // Pokud neni nactena, nacteme ji
     if (sStorage->Textures[textureId] == NULL)
     {
+        glDisable(GL_TEXTURE_2D);
+
         if (sLoader->IsCurrentlyLoaded(LOAD_TEXTURE, textureId))
             return false;
 
         sLoader->RequestLoad(LOAD_TEXTURE, textureId);
         return false;
     }
+
+    glEnable(GL_TEXTURE_2D);
 
     // Pokud jiz je aktualne nabindovana, neni treba nic delat
     if (textureId == m_boundTexture)
@@ -212,128 +216,6 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     {
         if (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
             sLoader->RequestLoad(LOAD_MODEL, modelId);
-
-        if (genGLDisplayList)
-        {
-            while (sStorage->Models[modelId] == NULL)
-                boost::this_thread::yield();
-
-            //if (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
-            //{
-            //    sLoader->RequestLoad(LOAD_MODEL, modelId);
-
-            //    // TODO: je tohle doopravdy spravne? Takhle "hnusne" cekani na to, az se bude nacitat model
-            //    //       a jakmile je oznacen jako nacitany, pockat na jeho donacteni?
-            //    //       race condition pri rychlejsim nacteni nez je jeden pruchod while?
-            //    /*while (!sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
-            //    {
-            //    }
-            //    while (sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
-            //    {
-            //    }*/
-
-            //    while (sStorage->Models[modelId] == NULL)
-            //    {
-            //    }
-            //}
-            //else
-            //{
-                /*while (sLoader->IsCurrentlyLoaded(LOAD_MODEL, modelId))
-                {
-                }*/
-
-            //    while (sStorage->Models[modelId] == NULL)
-            //    {
-            //    }
-            //}
-        }
-    }
-
-    if (genGLDisplayList && sStorage->Models[modelId]->displayListSize == 0)
-    {
-        glLoadIdentity();
-
-        uint32 maxFrame = 0;
-        for (uint32 an = 0; an < MAX_ANIM; an++)
-            if (maxFrame < sStorage->ModelAnimation[modelId].Anim[an].frameLast)
-                maxFrame = sStorage->ModelAnimation[modelId].Anim[an].frameLast;
-
-        sStorage->Models[modelId]->displayList = glGenLists(maxFrame+1);
-        sStorage->Models[modelId]->displayListSize = maxFrame + 1;
-
-        t3DModel* pModel = sStorage->Models[modelId];
-
-        for (uint32 a = 0; a <= maxFrame; a++)
-        {
-            glNewList(sStorage->Models[modelId]->displayList + a,GL_COMPILE);
-            for(int i = 0; i < pModel->numOfObjects; i++)
-            {
-                if (pModel->pObject.size() <= 0) break;
-                t3DObject *pObject = &pModel->pObject[i];
-
-                glPushMatrix();
-                AnimateModelObjectByFrame(pObject, pNew, a);
-
-                if (pObject->bHasTexture)
-                {
-                    glEnable(GL_TEXTURE_2D);
-                    glColor3ub(255, 255, 255);
-                    glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                }
-                else
-                {
-                    glDisable(GL_TEXTURE_2D);
-                    if (pModel->pMaterials.size() && pObject->materialID >= 0)
-                    {
-                        BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
-                        glColor3ub(pColor[0], pColor[1], pColor[2]);
-                    }
-                }
-
-                /*
-                glShadeModel(GL_SMOOTH);
-                GLfloat mShininess[] = {2+4};
-                GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
-                */
-
-                glBegin(GL_TRIANGLES);
-
-                for(int j = 0; j < pObject->numOfFaces; j++)
-                {
-                    for(int whichVertex = 0; whichVertex < 3; whichVertex++)
-                    {
-                        int index = pObject->pFaces[j].vertIndex[whichVertex];
-
-                        if (pObject->pNormals)
-                        {
-                            CVector3* pNormal = &pObject->pNormals[index];
-                            glNormal3f(pNormal->x, pNormal->y, pNormal->z);
-                        }
-
-                        if (pObject->bHasTexture && pObject->pTexVerts != NULL)
-                        {
-                            CVector2* pTexVert = &pObject->pTexVerts[index];
-                            glTexCoord2f(pTexVert->x, pTexVert->y);
-                        }
-
-                        if (pObject->pVerts)
-                        {
-                            CVector3* pVert = &pObject->pVerts[index];
-                            glVertex3f(pVert->x, pVert->y, pVert->z);
-                        }
-                    }
-                }
-
-                glEnd();
-
-                glPopMatrix();
-            }
-            glEndList();
-        }
     }
 
     if (!GLDisplayListOnly)
@@ -531,7 +413,7 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
     if (sCustomAnimator->HaveModelCustomAnim(pData->modelId))
     {
-        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData, frame);
+        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData->modelId, frame);
         return;
     }
 
@@ -552,12 +434,12 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
     }
 }
 
-void Display::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord* pData, uint32 frame)
+void Display::AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame)
 {
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
-    if (sCustomAnimator->HaveModelCustomAnim(pData->modelId))
+    if (sCustomAnimator->HaveModelCustomAnim(modelId))
     {
-        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData, frame);
+        sCustomAnimator->AnimateModelObjectByFrame(pObject, modelId, frame);
         return;
     }
 

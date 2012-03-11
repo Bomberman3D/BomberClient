@@ -274,7 +274,7 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
     return false;
 }
 
-void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayListRecord *model, uint32 frame)
+void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame)
 {
     /*  Magicka funkce, majici za ukol zastirat programatorovu neschopnost a obchazet absenci kompletni dokumentace formatu 3DS
      *  Trocha vysvetleni
@@ -310,7 +310,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
      */
     bool processed = false;
 
-    if (model->modelId == 9 && sStorage->GetAnimTypeForFrame(model->modelId, frame) == ANIM_WALK)
+    if (modelId == 9 && sStorage->GetAnimTypeForFrame(modelId, frame) == ANIM_WALK)
     {
         float wholePosMod = 1.0f-fabs((float(frame%50)/25.0f)-1.0f);
         wholePosMod = cos(wholePosMod*PI/2);
@@ -319,7 +319,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         if (strcmp(pObject->strName, "Hlava") == 0 || strcmp(pObject->strName, "Oci") == 0 || strcmp(pObject->strName, "Antena") == 0
              || strcmp(pObject->strName, "AntenaS") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "Hlava");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "Hlava");
             if (!pObj)
                 return;
 
@@ -342,7 +342,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         if (strcmp(pObject->strName, "Telo") == 0 || strcmp(pObject->strName, "Pasek") == 0 || strcmp(pObject->strName, "Preska") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "Telo");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "Telo");
             if (!pObj)
                 return;
 
@@ -365,7 +365,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         else if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaRuka");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "LevaRuka");
             if (!pObj)
                 return;
 
@@ -388,7 +388,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaRuka");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "PravaRuka");
             if (!pObj)
                 return;
 
@@ -411,7 +411,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         else if (strcmp(pObject->strName, "LevaNoha") == 0 || strcmp(pObject->strName, "LeveCh") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaNoha");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "LevaNoha");
             if (!pObj)
                 return;
 
@@ -433,7 +433,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         else if (strcmp(pObject->strName, "PravaNoha") == 0 || strcmp(pObject->strName, "PraveCh") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaNoha");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "PravaNoha");
             if (!pObj)
                 return;
 
@@ -454,11 +454,11 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
             processed = true;
         }
     }
-    else if (model->modelId == 9 && sStorage->GetAnimTypeForFrame(model->modelId, frame) == ANIM_IDLE)
+    else if (modelId == 9 && sStorage->GetAnimTypeForFrame(modelId, frame) == ANIM_IDLE)
     {
         if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "LevaRuka");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "LevaRuka");
             if (!pObj)
                 return;
 
@@ -478,7 +478,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, ModelDisplayL
         }
         else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
         {
-            t3DObject* pObj = sStorage->FindModelObject(model->modelId, "PravaRuka");
+            t3DObject* pObj = sStorage->FindModelObject(modelId, "PravaRuka");
             if (!pObj)
                 return;
 
