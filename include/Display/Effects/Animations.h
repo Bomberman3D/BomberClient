@@ -12,6 +12,12 @@ enum AnimRecordType
     ANIM_TYPE_MODEL   = 2,
 };
 
+enum AnimFlags
+{
+    ANIM_FLAG_BOTHWAY            = 0x01,
+    ANIM_FLAG_FORCE_LOADING      = 0x02,
+};
+
 struct AnimationRecord
 {
     // Staticka data
@@ -35,10 +41,10 @@ class Animator
         Animator();
 
         // System vyzvedavani, vyhledavani a znaceni ticketu
-        uint32 GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed = 1, bool bothWay = false);
+        uint32 GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed = 1, uint8 flags = 0);
         void DestroyAnimTicket(uint32 id);
-        uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1, bool bothWay = false);
-        void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0, bool bothWay = false);
+        uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1, uint8 flags = 0);
+        void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0, uint8 flags = 0);
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);
         uint32 GetAnimId(uint32 id);

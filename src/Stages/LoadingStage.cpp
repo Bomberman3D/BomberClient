@@ -6,30 +6,60 @@
 #include <Effects/Animations.h>
 #include <Map.h>
 #include <Gameplay.h>
-#include <LoadingThread.h>
 #include <Storage.h>
 
-void GameStageSet(uint32 param1, uint32 param2, uint32 param3)
+void LoadingStage::PreLoad(LoadType type, uint32 sourceId)
 {
-    sApplication->SetStage(STAGE_GAME);
+    sLoader->RequestLoad(type, sourceId);
+    m_toLoad.push_back(std::make_pair(type, sourceId));
+}
+
+bool LoadingStage::IsAllLoaded()
+{
+    for (std::vector<LoadPair>::const_iterator itr = m_toLoad.begin(); itr != m_toLoad.end(); ++itr)
+    {
+        if ((*itr).first == LOAD_MODEL && sStorage->Models[(*itr).second] == NULL)
+            return false;
+        else if ((*itr).first == LOAD_TEXTURE && sStorage->Textures[(*itr).second] == NULL)
+            return false;
+    }
+
+    return true;
+}
+
+float LoadingStage::GetLoadingPercentage()
+{
+    float finished = 0;
+
+    for (std::vector<LoadPair>::const_iterator itr = m_toLoad.begin(); itr != m_toLoad.end(); ++itr)
+    {
+        if ((*itr).first == LOAD_MODEL && sStorage->Models[(*itr).second] != NULL)
+            finished += 1.0f;
+        else if ((*itr).first == LOAD_TEXTURE && sStorage->Textures[(*itr).second] != NULL)
+            finished += 1.0f;
+    }
+
+    return (finished / float(m_toLoad.size()));
 }
 
 void LoadingStage::OnEnter()
 {
-    // TODO: nacitaci vlakno, pote nechat zde odeslat pozadavek na nacteni a vpustit do hry
-    //       az po nacteni vseho potrebneho
+    m_toLoad.clear();
 
-    // Pro efekt :-D
-    //sTimer->AddTimedEvent(1000, &GameStageSet, 0, 0, 0);
-
-    ImgAnimTicket = sAnimator->GetTextureAnimTicket(21, 1);
+    ImgAnimTicket = sAnimator->GetTextureAnimTicket(21, 1, 1, ANIM_FLAG_FORCE_LOADING);
 
     // GameSettings stage by nam mela do storage nastavit ID mapy, kterou si uzivatel vybral
     sMapManager->LoadMap(sGameplayMgr->GetSetting(SETTING_MAP_ID));
 
     // Nacist modely a jejich display listy!
-    sLoader->RequestLoad(LOAD_MODEL, 8);
-    sLoader->RequestLoad(LOAD_MODEL, 9);
+    PreLoad(LOAD_MODEL, 8);
+    PreLoad(LOAD_MODEL, 9);
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    uint32 skybox = pMap->m_skybox;
+
+    for (uint32 i = 0; i < 6; i++)
+        PreLoad(LOAD_TEXTURE, sStorage->SkyboxData[skybox].box_textures[i]);
 }
 
 void LoadingStage::OnDraw(uint32 diff)
@@ -38,9 +68,13 @@ void LoadingStage::OnDraw(uint32 diff)
         sDisplay->Setup2DMode();
 
     sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+100,FONT_SIZE_N, NOCOLOR, "Naèítání");
+    sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+150,FONT_SIZE_N, NOCOLOR, "%u%%", uint32(GetLoadingPercentage()*100.0f));
 
     sDisplay->Draw2D(sAnimator->GetActualTexture(ImgAnimTicket), WIDTHPCT*50-75, HEIGHTPCT*50-75,150,150);
 
-    if (sStorage->Models[8] && sStorage->Models[9])
-        GameStageSet(0,0,0);
+    if (IsAllLoaded())
+    {
+        m_toLoad.clear();
+        sApplication->SetStage(STAGE_GAME);
+    }
 }

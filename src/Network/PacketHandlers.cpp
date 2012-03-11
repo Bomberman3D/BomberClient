@@ -17,9 +17,7 @@ void PacketHandlers::HandleInitiateSessionResponse(SmartPacket* data)
     sLockMgr->NeedToken(LOCK_DISPLAYLIST, THREAD_NETWORK);
 
     while (!sLockMgr->HasToken(LOCK_DISPLAYLIST, THREAD_NETWORK))
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
-    }
+        boost::this_thread::yield();
 
     if (lock > 0)
         sApplication->SetStage(STAGE_MENU, 0);

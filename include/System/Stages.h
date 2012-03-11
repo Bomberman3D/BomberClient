@@ -3,6 +3,7 @@
 
 #include <Display.h>
 #include <GameTypes.h>
+#include <LoadingThread.h>
 
 enum Stages
 {
@@ -80,8 +81,13 @@ class LoadingStage: public StageControl
         void OnEnter();
         void OnDraw(uint32 diff);
 
+        void PreLoad(LoadType type, uint32 sourceId);
+        bool IsAllLoaded();
+        float GetLoadingPercentage();
+
     protected:
         uint32 ImgAnimTicket;
+        std::vector<LoadPair> m_toLoad;
 };
 
 class GameSettingsStage: public StageControl

@@ -1,6 +1,7 @@
 #include <Global.h>
 #include <Effects/Animations.h>
 #include <Storage.h>
+#include <LoadingThread.h>
 
 Animator::Animator()
 {
@@ -192,7 +193,7 @@ uint32 Animator::GetLowestAnimTicketId()
     return (uint32)-1;
 }
 
-uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed, bool bothWay)
+uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed, uint8 flags)
 {
     // Ziska nejnizsi mozne ID ticketu
     uint32 pos = GetLowestAnimTicketId();
@@ -210,12 +211,24 @@ uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 fr
     temp->actualFrame     = 0;
     temp->passedInterval  = 0;
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
-    temp->bothWay         = bothWay;
+    temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
+
+    if (flags & ANIM_FLAG_FORCE_LOADING)
+    {
+        for (std::vector<std::vector<TextureAnim::FrameData>>::const_iterator itr = sStorage->TextureAnimation[textureId].AnimFrameData.begin()
+             ;itr != sStorage->TextureAnimation[textureId].AnimFrameData.end(); ++itr)
+        {
+            for (std::vector<TextureAnim::FrameData>::const_iterator ittr = (*itr).begin(); ittr != (*itr).end(); ++ittr)
+            {
+                sLoader->RequestLoadBlocking(LOAD_TEXTURE, (*ittr).textureId);
+            }
+        }
+    }
 
     return pos;
 }
 
-uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed, bool bothWay)
+uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed, uint8 flags)
 {
     // Pokud vubec muzeme animovat
     if (animId > MAX_ANIM)
@@ -237,12 +250,12 @@ uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameS
     temp->actualFrame     = sStorage->ModelAnimation[modelId].Anim[animId].frameFirst;
     temp->passedInterval  = 0;
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
-    temp->bothWay         = bothWay;
+    temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
 
     return pos;
 }
 
-void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame, uint32 frameSkipSpeed, bool bothWay)
+void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame, uint32 frameSkipSpeed, uint8 flags)
 {
     if (animId > MAX_ANIM || ticketId == 0)
         return;
@@ -254,7 +267,7 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
     itr->second.animId         = animId;
     itr->second.actualFrame    = sStorage->ModelAnimation[itr->second.sourceId].Anim[animId].frameFirst + startFrame;
     itr->second.passedInterval = 0;
-    itr->second.bothWay        = bothWay;
+    itr->second.bothWay        = (flags & ANIM_FLAG_BOTHWAY);
     if (frameSkipSpeed > 0)
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }

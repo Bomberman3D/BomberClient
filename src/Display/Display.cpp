@@ -200,7 +200,7 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     if (Animation != ANIM_NONE)
     {
         pNew->AnimTicket = sAnimator->GetModelAnimTicket(modelId, Animation);
-        sAnimator->ChangeModelAnim(pNew->AnimTicket, Animation, startFrame, frameSkipSpeed, animReverse);
+        sAnimator->ChangeModelAnim(pNew->AnimTicket, Animation, startFrame, frameSkipSpeed, (animReverse ? ANIM_FLAG_BOTHWAY : 0));
     }
     else
         pNew->AnimTicket = 0;
