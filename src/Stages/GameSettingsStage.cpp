@@ -53,7 +53,7 @@ void GameSettingsStage::OnDraw(uint32 diff)
     // Multiplayer
     if (m_subStage == 0)
     {
-       sDisplay->PrintText(MAIN_FONT, 100,100,FONT_SIZE_N, NOCOLOR, "Pøipojování...");
+       sDisplay->PrintText(MAIN_FONT, 100, 100, FONT_SIZE_N, 0, NOCOLOR, "Pøipojování...");
 
        if (sNetwork->IsConnected())
        {
@@ -64,15 +64,15 @@ void GameSettingsStage::OnDraw(uint32 diff)
     }
     else if (m_subStage == 1)
     {
-       sDisplay->PrintText(MAIN_FONT, 100,100,FONT_SIZE_N, NOCOLOR, "Inicializace komunikace...");
+       sDisplay->PrintText(MAIN_FONT, 100, 100, FONT_SIZE_N, 0, NOCOLOR, "Inicializace komunikace...");
     }
     else if (m_subStage == 2)
     {
-       sDisplay->PrintText(MAIN_FONT, 100,100,FONT_SIZE_N, NOCOLOR, "Ovìøování...");
+       sDisplay->PrintText(MAIN_FONT, 100, 100, FONT_SIZE_N, 0, NOCOLOR, "Ovìøování...");
     }
     else if (m_subStage == 3)
     {
-       sDisplay->PrintText(MAIN_FONT, 100,100,FONT_SIZE_N, NOCOLOR, "Získávání instance listu...");
+       sDisplay->PrintText(MAIN_FONT, 100, 100, FONT_SIZE_N, 0, NOCOLOR, "Získávání instance listu...");
     }
     else if (m_subStage == 4)
     {
@@ -80,7 +80,7 @@ void GameSettingsStage::OnDraw(uint32 diff)
         sDisplay->Draw2D(12, 20, 20, 500, 80);
         // Nick pole
         sDisplay->Draw2D(15, 30, 60, 500, 30);
-        sDisplay->PrintText(MAIN_FONT, 35, 65,FONT_SIZE_N, NOCOLOR, "%s%s", m_nickfield.c_str(), m_nickselected?" |":"");
+        sDisplay->PrintText(MAIN_FONT, 35, 65, FONT_SIZE_N, 0, NOCOLOR, "%s%s", m_nickfield.c_str(), m_nickselected?" |":"");
         // Mistnosti nadpis
         sDisplay->Draw2D(13, 20, 130, 200, 40);
         // Mistnosti podklad
@@ -92,10 +92,10 @@ void GameSettingsStage::OnDraw(uint32 diff)
         std::vector<string> exploded = explode(sStorage->m_instanceList.c_str(),'|');
         for (int i = 0; (i < exploded.size()/4) && (i < (18*sConfig->WindowHeight/768)); i++)
         {
-            sDisplay->PrintText(MAIN_FONT, 5*WIDTHPCT+10, 194.0f+i*27,FONT_SIZE_N, NOCOLOR,"%s",exploded[(i*4)+0].c_str());
-            sDisplay->PrintText(MAIN_FONT, 10*WIDTHPCT  , 194.0f+i*27,FONT_SIZE_N, NOCOLOR,"%s",exploded[(i*4)+1].c_str());
-            sDisplay->PrintText(MAIN_FONT, 50*WIDTHPCT  , 194.0f+i*27,FONT_SIZE_N, NOCOLOR,"%s",exploded[(i*4)+2].c_str());
-            sDisplay->PrintText(MAIN_FONT, 70*WIDTHPCT  , 194.0f+i*27,FONT_SIZE_N, NOCOLOR,"%s",exploded[(i*4)+3].c_str());
+            sDisplay->PrintText(MAIN_FONT, 5*WIDTHPCT+10, 194.0f+i*27, FONT_SIZE_N, 0, NOCOLOR,"%s",exploded[(i*4)+0].c_str());
+            sDisplay->PrintText(MAIN_FONT, 10*WIDTHPCT  , 194.0f+i*27, FONT_SIZE_N, 0, NOCOLOR,"%s",exploded[(i*4)+1].c_str());
+            sDisplay->PrintText(MAIN_FONT, 50*WIDTHPCT  , 194.0f+i*27, FONT_SIZE_N, 0, NOCOLOR,"%s",exploded[(i*4)+2].c_str());
+            sDisplay->PrintText(MAIN_FONT, 70*WIDTHPCT  , 194.0f+i*27, FONT_SIZE_N, 0, NOCOLOR,"%s",exploded[(i*4)+3].c_str());
         }
 
         // Tlacitko "Pripojit"
@@ -116,26 +116,26 @@ void GameSettingsStage::OnDraw(uint32 diff)
         switch (m_selectedMode)
         {
             case GAME_TYPE_SP_CLASSIC:
-                sDisplay->PrintText(FONT_ONE, 140, 45,FONT_SIZE_3, NOCOLOR, "Rychlá hra");
+                sDisplay->PrintText(FONT_ONE, 140, 45, FONT_SIZE_3, 0, NOCOLOR, "Rychlá hra");
 
                 // TODO: funkce pro odstavcovy text a zalamovani
                 sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
-                sDisplay->PrintText(FONT_ONE, 100, 150,FONT_SIZE_4, NOCOLOR, "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou.");
-                sDisplay->PrintText(FONT_ONE, 100, 170,FONT_SIZE_4, NOCOLOR, "Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat");
-                sDisplay->PrintText(FONT_ONE, 100, 190,FONT_SIZE_4, NOCOLOR, "všechny nepøátele v èasovém limitu.");
+                sDisplay->PrintText(FONT_ONE, 100, 150, FONT_SIZE_4, 0, NOCOLOR, "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou.");
+                sDisplay->PrintText(FONT_ONE, 100, 170, FONT_SIZE_4, 0, NOCOLOR, "Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat");
+                sDisplay->PrintText(FONT_ONE, 100, 190, FONT_SIZE_4, 0, NOCOLOR, "všechny nepøátele v èasovém limitu.");
                 break;
             case GAME_TYPE_SP_MEME:
-                sDisplay->PrintText(FONT_ONE, 140, 45,FONT_SIZE_3, NOCOLOR, "Meme wars");
+                sDisplay->PrintText(FONT_ONE, 140, 45, FONT_SIZE_3, 0, NOCOLOR, "Meme wars");
 
                 // TODO: funkce pro odstavcovy text a zalamovani
                 sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
-                sDisplay->PrintText(FONT_ONE, 100, 150,FONT_SIZE_4, NOCOLOR, "Meme wars je typ hry inspirovaný internetovými meme postavièkami a");
-                sDisplay->PrintText(FONT_ONE, 100, 170,FONT_SIZE_4, NOCOLOR, "srandièkami, jako napøíklad troll, nyan cat, rickroll, rage comics, pedobear,");
-                sDisplay->PrintText(FONT_ONE, 100, 190,FONT_SIZE_4, NOCOLOR, "o rly?, a další. Úkolem je opìt znièit všechny nepøátele v èasovém limitu,");
-                sDisplay->PrintText(FONT_ONE, 100, 210,FONT_SIZE_4, NOCOLOR, "ovšem za pomoci bonusù, které se v originální høe neobjevily. Co tøeba Nyan");
-                sDisplay->PrintText(FONT_ONE, 100, 230,FONT_SIZE_4, NOCOLOR, "cat speed bonus?");
+                sDisplay->PrintText(FONT_ONE, 100, 150, FONT_SIZE_4, 0, NOCOLOR, "Meme wars je typ hry inspirovaný internetovými meme postavièkami a");
+                sDisplay->PrintText(FONT_ONE, 100, 170, FONT_SIZE_4, 0, NOCOLOR, "srandièkami, jako napøíklad troll, nyan cat, rickroll, rage comics, pedobear,");
+                sDisplay->PrintText(FONT_ONE, 100, 190, FONT_SIZE_4, 0, NOCOLOR, "o rly?, a další. Úkolem je opìt znièit všechny nepøátele v èasovém limitu,");
+                sDisplay->PrintText(FONT_ONE, 100, 210, FONT_SIZE_4, 0, NOCOLOR, "ovšem za pomoci bonusù, které se v originální høe neobjevily. Co tøeba Nyan");
+                sDisplay->PrintText(FONT_ONE, 100, 230, FONT_SIZE_4, 0, NOCOLOR, "cat speed bonus?");
 
-                sDisplay->PrintText(FONT_ONE, 100, 270,FONT_SIZE_4, NOCOLOR, "NYI");
+                sDisplay->PrintText(FONT_ONE, 100, 270, FONT_SIZE_4, 0, NOCOLOR, "NYI");
                 break;
             default:
                 break;
@@ -150,44 +150,44 @@ void GameSettingsStage::OnDraw(uint32 diff)
         {
             case GAME_TYPE_SP_CLASSIC:
             {
-                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50,FONT_SIZE_N, NOCOLOR, "Rychlá hra");
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50, FONT_SIZE_N, 0, NOCOLOR, "Rychlá hra");
 
-                sDisplay->PrintText(FONT_ONE, 50, 150,FONT_SIZE_4, NOCOLOR, "Poèet nepøátel");
-                sDisplay->PrintText(MAIN_FONT, 105, 183,FONT_SIZE_N, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT));
+                sDisplay->PrintText(FONT_ONE, 50, 150, FONT_SIZE_4, 0, NOCOLOR, "Poèet nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT));
                 sDisplay->Draw2D(43, 80, 180, 18, 20);
                 sDisplay->Draw2D(41, 140, 180, 18, 20);
 
                 uint32 spacing = 0;
                 uint32 leftspacing = 300;
-                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing,FONT_SIZE_4, NOCOLOR, "Intenzita beden");
-                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing,FONT_SIZE_N, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_BOX_DENSITY));
+                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Intenzita beden");
+                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_BOX_DENSITY));
                 sDisplay->Draw2D(43, 80+leftspacing, 180+spacing, 18, 20);
                 sDisplay->Draw2D(41, 140+leftspacing, 180+spacing, 18, 20);
 
                 spacing = 80;
-                sDisplay->PrintText(FONT_ONE, 50, 150+spacing,FONT_SIZE_4, NOCOLOR, "Inteligence nepøátel");
-                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing,FONT_SIZE_N, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
+                sDisplay->PrintText(FONT_ONE, 50, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Inteligence nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
                 sDisplay->Draw2D(43, 80, 180+spacing, 18, 20);
                 sDisplay->Draw2D(41, 140, 180+spacing, 18, 20);
 
-                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing,FONT_SIZE_3, NOCOLOR, "Mapa");
+                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing, FONT_SIZE_3, 0, NOCOLOR, "Mapa");
                 std::string mapname = "! Neznámá mapa !";
                 if (sStorage->MapData.find(sGameplayMgr->GetSetting(SETTING_MAP_ID)) != sStorage->MapData.end())
                     mapname = sStorage->MapData[sGameplayMgr->GetSetting(SETTING_MAP_ID)].mapname;
-                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing,FONT_SIZE_N, NOCOLOR, "%s", mapname.c_str());
+                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%s", mapname.c_str());
                 sDisplay->Draw2D(43, 80+leftspacing, 180+spacing, 18, 20);
                 sDisplay->Draw2D(41, 380+leftspacing, 180+spacing, 18, 20);
 
                 spacing = 2*80;
-                sDisplay->PrintText(FONT_ONE, 50, 150+spacing,FONT_SIZE_4, NOCOLOR, "Rychlost nepøátel");
-                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing,FONT_SIZE_N, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED));
+                sDisplay->PrintText(FONT_ONE, 50, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Rychlost nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED));
                 sDisplay->Draw2D(43, 80, 180+spacing, 18, 20);
                 sDisplay->Draw2D(41, 140, 180+spacing, 18, 20);
                 break;
             }
             case GAME_TYPE_SP_MEME:
             {
-                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50,FONT_SIZE_N, NOCOLOR, "Meme wars");
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50, FONT_SIZE_N, 0, NOCOLOR, "Meme wars");
                 break;
             }
         }

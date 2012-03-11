@@ -76,7 +76,6 @@ void Display::InitFont(uint8 font)
         // Pockame na jeji nacteni
         while (sStorage->Textures[fontTextures[font]] == NULL)
             boost::this_thread::yield();
-        //Loaders::LoadTexture(fontTextures[font]);
     }
 
     for (uint16 loop = 0; loop < 256; loop++)
@@ -99,7 +98,7 @@ void Display::InitFont(uint8 font)
 }
 
 //Vykresleni textu
-void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32 color, const char *fmt, ...)
+void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char *fmt, ...)
 {
     if (font >= MAX_FONTS)
         return;
@@ -126,6 +125,24 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32
     va_start(ap, fmt);
       vsprintf(text, fmt, ap);
     va_end(ap);
+
+    // Ted brat v potaz flagy
+    if (flags & TEXT_FLAG_CENTERED_X)
+    {
+        float charsize = 10.0f;
+        if (font == FONT_ONE)
+            charsize = 36.0f;
+
+        left = uint32(WIDTHPCT*50 - (charsize*scale)*(float(strlen(text)) / 2.0f));
+    }
+    if (flags & TEXT_FLAG_CENTERED_Y)
+    {
+        float charsize = 16.0f;
+        if (font == FONT_ONE)
+            charsize = 64.0f;
+
+        top = uint32(HEIGHTPCT*50 - (charsize*scale*0.5f));
+    }
 
     // Pokud jsme ve 3D rezimu
     bool in3D = !IsIn2DMode();

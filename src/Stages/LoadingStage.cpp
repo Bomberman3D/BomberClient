@@ -67,8 +67,8 @@ void LoadingStage::OnDraw(uint32 diff)
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
 
-    sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+100,FONT_SIZE_N, NOCOLOR, "Naèítání");
-    sDisplay->PrintText(MAIN_FONT, WIDTHPCT*50-11*16/4, HEIGHTPCT*50+150,FONT_SIZE_N, NOCOLOR, "%u%%", uint32(GetLoadingPercentage()*100.0f));
+    sDisplay->PrintText(FONT_ONE, 0, HEIGHTPCT*50+100, FONT_SIZE_2, TEXT_FLAG_CENTERED_X, NOCOLOR, "Naèítání");
+    sDisplay->PrintText(FONT_ONE, 0, HEIGHTPCT*50+150, FONT_SIZE_4, TEXT_FLAG_CENTERED_X, NOCOLOR, "%u%%", uint32(GetLoadingPercentage()*100.0f));
 
     sDisplay->Draw2D(sAnimator->GetActualTexture(ImgAnimTicket), WIDTHPCT*50-75, HEIGHTPCT*50-75,150,150);
 

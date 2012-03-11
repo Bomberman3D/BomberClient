@@ -73,17 +73,17 @@ void GameStage::OnDraw(uint32 diff)
             sDisplay->Setup2DMode();
 
         sDisplay->Draw2D(15, 150, 80, WIDTH-150-150, 320);
-        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*4.5f*FONT_SIZE_1, 130, FONT_SIZE_1, NOCOLOR, "P a u z a");
+        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*4.5f*FONT_SIZE_1, 130, FONT_SIZE_1, 0, NOCOLOR, "P a u z a");
 
         if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*5.5f*FONT_SIZE_3, WIDTH/2+38*5.5f*FONT_SIZE_3, 250-5, 250+35))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, COLOR(200, 200, 0), "Zpìt do hry");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, 0, COLOR(200, 200, 0), "Zpìt do hry");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, COLOR(200, 0, 0), "Zpìt do hry");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250    , FONT_SIZE_3, 0, COLOR(200, 0, 0), "Zpìt do hry");
 
         if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*5.5f*FONT_SIZE_3,  WIDTH/2+38*5.5f*FONT_SIZE_3, 250+35, 250+95))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, COLOR(200, 200, 0), "Ukonèit hru");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, 0, COLOR(200, 200, 0), "Ukonèit hru");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, COLOR(200, 0, 0), "Ukonèit hru");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, 0, COLOR(200, 0, 0), "Ukonèit hru");
 
         sDisplay->Setup3DMode();
     }
@@ -95,19 +95,19 @@ void GameStage::OnDraw(uint32 diff)
 
         // 38 px na 1 znak
         sDisplay->Draw2D(14, WIDTH/8, 2*HEIGHT/7, 3*WIDTH/4, 100);
-        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 2*HEIGHT/7+25, FONT_SIZE_N, COLOR(255, 0, 0), "Jsi mrtev!");
+        sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 2*HEIGHT/7+25, FONT_SIZE_N, 0, COLOR(255, 0, 0), "Jsi mrtev!");
 
         sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 160);
 
         if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125, 2*HEIGHT/7+125+60))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, COLOR(255, 255, 0)  , "Pokraèovat");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Pokraèovat");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, COLOR(255, 0, 255), "Pokraèovat");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Pokraèovat");
 
         if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125+60, 2*HEIGHT/7+125+130))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, COLOR(255, 255, 0)  , "Hlavní menu");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Hlavní menu");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, COLOR(255, 0, 255), "Hlavní menu");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Hlavní menu");
 
         sDisplay->Setup3DMode();
     }
@@ -123,26 +123,26 @@ void GameStage::OnDraw(uint32 diff)
         // TODO: multiplayer stats (vice hracu, ...)
 
         if (m_subStage == 4)
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 50, FONT_SIZE_N, COLOR(255,0,0), "Statistiky");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 50, FONT_SIZE_N, 0, COLOR(255,0,0), "Statistiky");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*3, 50, FONT_SIZE_N, NOCOLOR, "Výhra!");
+            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*3, 50, FONT_SIZE_N, 0, NOCOLOR, "Výhra!");
 
-        sDisplay->PrintText(FONT_ONE, 1*HEIGHT/8, 150, FONT_SIZE_4, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][0]);
-        sDisplay->PrintText(MAIN_FONT, 1*HEIGHT/8+20, 150+50, FONT_SIZE_H3, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field1);
-        sDisplay->PrintText(FONT_ONE, 3*HEIGHT/8, 150, FONT_SIZE_4, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][1]);
-        sDisplay->PrintText(MAIN_FONT, 3*HEIGHT/8+20, 150+50, FONT_SIZE_H3, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field2);
-        sDisplay->PrintText(FONT_ONE, 5*HEIGHT/8, 150, FONT_SIZE_4, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][2]);
-        sDisplay->PrintText(MAIN_FONT, 5*HEIGHT/8+20, 150+50, FONT_SIZE_H3, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field3);
+        sDisplay->PrintText(FONT_ONE, 1*HEIGHT/8, 150, FONT_SIZE_4, 0, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][0]);
+        sDisplay->PrintText(MAIN_FONT, 1*HEIGHT/8+20, 150+50, FONT_SIZE_H3, 0, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field1);
+        sDisplay->PrintText(FONT_ONE, 3*HEIGHT/8, 150, FONT_SIZE_4, 0, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][1]);
+        sDisplay->PrintText(MAIN_FONT, 3*HEIGHT/8+20, 150+50, FONT_SIZE_H3, 0, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field2);
+        sDisplay->PrintText(FONT_ONE, 5*HEIGHT/8, 150, FONT_SIZE_4, 0, COLOR(255,255,255), PlayerStatsNames[sGameplayMgr->GetGameType()][2]);
+        sDisplay->PrintText(MAIN_FONT, 5*HEIGHT/8+20, 150+50, FONT_SIZE_H3, 0, COLOR(255,255,255), "%u", sGameplayMgr->localPlayerStats.UniversalStats.field3);
 
         if (IN_RANGE(mousePos.x, mousePos.y, 50, 50+38*12, HEIGHT-64*FONT_SIZE_2-50, HEIGHT-50))
-            sDisplay->PrintText(FONT_ONE, 50,                         HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, COLOR(255, 255, 0), "Zkusit znovu");
+            sDisplay->PrintText(FONT_ONE, 50,                         HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 255, 0), "Zkusit znovu");
         else
-            sDisplay->PrintText(FONT_ONE, 50,                         HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, COLOR(255, 0, 0), "Zkusit znovu");
+            sDisplay->PrintText(FONT_ONE, 50,                         HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 0, 0), "Zkusit znovu");
 
         if (IN_RANGE(mousePos.x, mousePos.y, WIDTH-50-38*12*FONT_SIZE_2, WIDTH-50, HEIGHT-64*FONT_SIZE_2-50, HEIGHT-50))
-            sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, COLOR(255, 255, 0), "Zpìt do menu");
+            sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 255, 0), "Zpìt do menu");
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, COLOR(255, 0, 0), "Zpìt do menu");
+            sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 0, 0), "Zpìt do menu");
 
         sDisplay->Setup3DMode();
     }

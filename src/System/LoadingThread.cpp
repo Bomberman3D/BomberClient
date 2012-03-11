@@ -105,7 +105,10 @@ void LoaderWorker::Worker()
     while(!m_isShuttingDown)
     {
         if (!m_somethingToLoad)
+        {
+            LoadingThread = NULL;
             break;
+        }
 
         sLockMgr->NeedToken(LOCK_LOADLIST, THREAD_LOADING);
 
@@ -138,6 +141,7 @@ void LoaderWorker::Worker()
         }
         else
         {
+            LoadingThread = NULL;
             sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
             break;
         }
@@ -145,6 +149,7 @@ void LoaderWorker::Worker()
         // Nic k nacteni
         if (chosen.first == LOAD_MAX)
         {
+            LoadingThread = NULL;
             sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
             break;
         }
@@ -177,5 +182,4 @@ void runLoaderWorker()
     wglMakeCurrent(NULL,NULL);
 
     sLoader->m_isDead = true;
-    LoadingThread = NULL;
 }

@@ -63,6 +63,13 @@ enum AnimRestriction
     ANIM_RESTRICTION_MAX = 2
 };
 
+// flagy pro text
+enum TextFlags
+{
+    TEXT_FLAG_CENTERED_X    = 0x01,
+    TEXT_FLAG_CENTERED_Y    = 0x02,
+};
+
 // Zakladni struktura pro vsechny
 // vyuzitelne napriklad v particle emitter kodu - hybat muze jak modelem tak billboardem
 struct DisplayListRecord
@@ -169,7 +176,7 @@ class Display
         bool IsIn2DMode() { return m_is2D; };
 
         // Text
-        void PrintText(uint8 font, uint32 left, uint32 top, float scale, uint32 color, const char* fmt, ...);
+        void PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char* fmt, ...);
 
         // 2D funkce
         void Draw2D(uint32 textureId, float left, float top, float width, float height);

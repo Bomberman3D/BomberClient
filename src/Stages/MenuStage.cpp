@@ -54,8 +54,8 @@ void MenuStage::OnDraw(uint32 diff)
     // Odejit
     sDisplay->Draw2D(11,WIDTH-350,270,350,80);
 
-    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15-15-15,FONT_SIZE_N, NOCOLOR,"Verze %u.%u", 0, 1);
-    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15,FONT_SIZE_1, NOCOLOR,"Copyright (c) Kennny 2011");
+    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15-15-15, FONT_SIZE_N, 0, NOCOLOR,"Verze %u.%u", 0, 1);
+    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15, FONT_SIZE_1, 0, NOCOLOR,"Copyright (c) Kennny 2011-2012");
 }
 
 void MenuStage::OnKeyStateChange(uint16 key, bool press)
