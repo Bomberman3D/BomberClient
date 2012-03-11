@@ -457,8 +457,6 @@ bool Application::Init()
     //if (sNetwork->IsInitialized())
     //    boost::thread NetworkThread(runNetworkWorker);
 
-    boost::thread LoadingThread(runLoaderWorker);
-
     sApplication->ApplyRenderContext(RC_MAIN);
 
     m_currStage = new MenuStage;

@@ -5,6 +5,8 @@
 #include <ImageLoader.h>
 #include <ModelLoader.h>
 
+boost::thread* LoadingThread = NULL;
+
 LoaderWorker::LoaderWorker()
 {
     m_loadList.clear();
@@ -35,6 +37,18 @@ bool LoaderWorker::IsAlreadyLoaded(LoadType type, uint32 sourceId)
         return true;
 
     return false;
+}
+
+void LoaderWorker::RequestLoadBlocking(LoadType type, uint32 sourceId)
+{
+    // Nejdrive overime, jestli uz neni dany prvek nacten, nebo zrovna nacitan
+    if (IsAlreadyLoaded(type, sourceId) || IsCurrentlyLoaded(type, sourceId))
+        return;
+
+    if (type == LOAD_MODEL)
+        Loaders::LoadModel(sourceId);
+    else if (type == LOAD_TEXTURE)
+        Loaders::LoadTexture(sourceId);
 }
 
 void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySign)
@@ -79,6 +93,9 @@ void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySig
     m_somethingToLoad = true;
 
     sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_MAIN);
+
+    if (!LoadingThread)
+        LoadingThread = new boost::thread(runLoaderWorker);
 }
 
 void LoaderWorker::Worker()
@@ -88,17 +105,12 @@ void LoaderWorker::Worker()
     while(!m_isShuttingDown)
     {
         if (!m_somethingToLoad)
-        {
-            boost::this_thread::yield();
-            continue;
-        }
+            break;
 
         sLockMgr->NeedToken(LOCK_LOADLIST, THREAD_LOADING);
 
         while (!sLockMgr->HasToken(LOCK_LOADLIST, THREAD_LOADING))
-        {
             boost::this_thread::yield();
-        }
 
         // operace s loadlistem
         if (!m_loadList.empty())
@@ -127,16 +139,14 @@ void LoaderWorker::Worker()
         else
         {
             sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
-            boost::this_thread::yield();
-            continue;
+            break;
         }
 
         // Nic k nacteni
         if (chosen.first == LOAD_MAX)
         {
             sLockMgr->UnNeedToken(LOCK_LOADLIST, THREAD_LOADING);
-            boost::this_thread::yield();
-            continue;
+            break;
         }
 
         m_currentlyLoaded = chosen;
@@ -167,4 +177,5 @@ void runLoaderWorker()
     wglMakeCurrent(NULL,NULL);
 
     sLoader->m_isDead = true;
+    LoadingThread = NULL;
 }

@@ -28,6 +28,7 @@ class LoaderWorker
         ~LoaderWorker();
 
         void RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySign = 3);
+        void RequestLoadBlocking(LoadType type, uint32 sourceId);
         bool IsCurrentlyLoaded(LoadType type, uint32 sourceId);
         bool IsAlreadyLoaded(LoadType type, uint32 sourceId);
         void Worker();
