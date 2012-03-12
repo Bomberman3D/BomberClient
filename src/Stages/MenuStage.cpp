@@ -9,12 +9,8 @@ void MenuStage::OnEnter()
 {
     // Vynulovat vsechny mozne uhly a podobne
     sDisplay->Initialize();
-    sDisplay->DrawModel(9, -1.0f, -5.0f, -9.2f, ANIM_IDLE, 14.0f, 45.0f, true, false, 1, 2);
-    sDisplay->DrawModel(8, 2.0f, -5.0f,  -6.5f, ANIM_NONE, 0.6f, 60.0f, false, true, 0, 4);
     // Menu scene
-    sDisplay->DrawModel(4, -0.5f, -5.0f, -8.0f, ANIM_NONE, 2.0f);
-    sDisplay->DrawModel(2, -4.0f, -5.0f, -13.0f, ANIM_IDLE, 1.0f, 0.0f, true, true, 0, 2);
-    sDisplay->DrawModel(2, -4.0f, -5.0f, -10.0f, ANIM_IDLE, 1.0f, 0.0f, true, true, 0, 3);
+    sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
 
     sDisplay->SetAngleX(20.0f);
 
@@ -24,7 +20,7 @@ void MenuStage::OnEnter()
     GLfloat lAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f};
     GLfloat lDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat lSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat lPosition[]= {0.0f, 2.0f, 0.0f, 1.0f};
+    GLfloat lPosition[]= {0.0f, 2.0f, 0.0f, 0.8f};
     glLightfv(GL_LIGHT1, GL_AMBIENT,  lAmbient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
     glLightfv(GL_LIGHT1, GL_SPECULAR, lSpecular);

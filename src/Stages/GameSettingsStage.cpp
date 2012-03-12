@@ -12,10 +12,8 @@
 void GameSettingsStage::OnEnter()
 {
     // Menu scene
-    sDisplay->DrawModel(4, -0.5f, -5.0f, -8.0f, ANIM_NONE, 2.0f);
-    sDisplay->DrawModel(2, -4.0f, -5.0f, -13.0f, ANIM_IDLE, 1.0f, 0.0f, false, true, 0, 2);
-    sDisplay->DrawModel(2, -4.0f, -5.0f, -10.0f, ANIM_IDLE, 1.0f, 0.0f, false, true, 0, 3);
-    sDisplay->DrawModel(2, -4.0f, -5.0f,  -7.5f, ANIM_IDLE, 1.0f, 0.0f, false, true, 0, 4);
+    sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
+
     sDisplay->SetAngleX(20.0f);
 
     // Defaultni hodnoty nastaveni
@@ -31,9 +29,11 @@ void GameSettingsStage::OnEnter()
     glEnable(GL_NORMALIZE);
     GLfloat lAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f};
     GLfloat lDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat lPosition[]= {0.0f, 2.0f, 0.0f, 1.0f};
+    GLfloat lSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat lPosition[]= {0.0f, 2.0f, 0.0f, 0.8f};
     glLightfv(GL_LIGHT1, GL_AMBIENT,  lAmbient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lDiffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, lSpecular);
     glLightfv(GL_LIGHT1, GL_POSITION, lPosition);
     glEnable(GL_LIGHT1);
 }
