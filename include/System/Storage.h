@@ -59,6 +59,12 @@ struct SolidBoxData
     uint32 model_id;
 };
 
+struct ObjectModifierData
+{
+    float texture_repeat_x;
+    float texture_repeat_y;
+};
+
 class Storage
 {
     public:
@@ -71,6 +77,8 @@ class Storage
         t3DObject* FindModelObject(uint32 modelId, const char* objectname);
         ModelAnimType GetAnimTypeForFrame(uint32 modelId, uint32 frame);
 
+        ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);
+
         // StorageLoader.cpp
         bool LoadTextureData();
         bool LoadModelData();
@@ -79,12 +87,15 @@ class Storage
         bool LoadMapObjectData();
 
         // Typedefs
+        typedef std::pair<uint32, std::string> IDNamePair;
+
         typedef std::map<uint32, std::string> IdFilenameMap;
         typedef std::map<uint32, ModelAnim>   ModelAnimMap;
         typedef std::map<uint32, TextureAnim> TextureAnimMap;
         typedef std::map<uint32, Skybox>      SkyboxMap;
         typedef std::map<uint32, MapData>     MapDataMap;
         typedef std::map<uint32, SolidBoxData> SolidBoxDataMap;
+        typedef std::map<IDNamePair, ObjectModifierData> ObjectModifierMap;
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
@@ -94,6 +105,7 @@ class Storage
         SkyboxMap SkyboxData;
         MapDataMap MapData;
         SolidBoxDataMap SolidBoxProp;
+        ObjectModifierMap ObjectModifiers;
 
         // Dynamicky ukladana data
         // textury, modely a podobne

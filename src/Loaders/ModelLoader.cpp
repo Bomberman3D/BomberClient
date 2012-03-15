@@ -767,7 +767,19 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
                         if (pObject->bHasTexture && pObject->pTexVerts != NULL)
                         {
                             CVector2* pTexVert = &pObject->pTexVerts[index];
-                            glTexCoord2f(pTexVert->x, pTexVert->y);
+
+                            // Pokud existuji modifiery pro opakovatelnost textur, nacteme je
+                            float mod_x = 1.0f, mod_y = 1.0f;
+                            if (pObject->strName)
+                            {
+                                if (ObjectModifierData* pMod = sStorage->GetObjectModifierData(modelId, &(pObject->strName[0])))
+                                {
+                                    mod_x = pMod->texture_repeat_x;
+                                    mod_y = pMod->texture_repeat_y;
+                                }
+                            }
+
+                            glTexCoord2f(pTexVert->x * mod_x, pTexVert->y * mod_y);
                         }
 
                         if (pObject->pVerts)

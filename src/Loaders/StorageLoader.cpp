@@ -120,6 +120,30 @@ bool Storage::LoadModelData()
     fprintf(stdout,"Nacteno %u dat animaci modelu\n",count);
     qry.free_result();
 
+    // Specialni modifikace pro objekty
+
+    SQLiteQuery(&qry, "SELECT * FROM object_modifiers");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    count = 0;
+    id = 0;
+    std::string name;
+    IDNamePair index;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        name = qry.getstr();
+        index = std::make_pair(id, name.c_str());
+
+        ObjectModifiers[index].texture_repeat_x = qry.getnum();
+        ObjectModifiers[index].texture_repeat_y = qry.getnum();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u objektovych modifikatoru\n",count);
+    qry.free_result();
+
     return true;
 }
 

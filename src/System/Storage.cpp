@@ -54,3 +54,17 @@ ModelAnimType Storage::GetAnimTypeForFrame(uint32 modelId, uint32 frame)
 
     return ANIM_NONE;
 }
+
+ObjectModifierData* Storage::GetObjectModifierData(uint32 modelId, const char* objectname)
+{
+    // Neexistuje
+    if (ModelFilename.find(modelId) == ModelFilename.end())
+        return NULL;
+
+    IDNamePair index = std::make_pair(modelId, objectname);
+    ObjectModifierMap::iterator itr = ObjectModifiers.find(index);
+    if (itr == ObjectModifiers.end())
+        return NULL;
+
+    return &((*itr).second);
+}
