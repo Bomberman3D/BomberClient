@@ -42,9 +42,22 @@ t3DObject* Storage::FindModelObject(uint32 modelId, const char *objectname)
     return NULL;
 }
 
+t3DObject* Storage::FindModelObjectInNonStored(t3DModel* model, const char *objectname)
+{
+    if (!model || model->pObject.empty())
+        return NULL;
+
+    for (std::vector<t3DObject>::iterator itr = model->pObject.begin(); itr != model->pObject.end(); ++itr)
+        if (strcmp(itr->strName, objectname) == 0)
+            return (&(*itr));
+
+    return NULL;
+}
+
 ModelAnimType Storage::GetAnimTypeForFrame(uint32 modelId, uint32 frame)
 {
-    if (!Models[modelId] || Models[modelId]->pObject.empty())
+    // Kdyz model nema definovanou animaci
+    if (ModelAnimation.find(modelId) == ModelAnimation.end())
         return ANIM_NONE;
 
     // preskocit "zadnou" animaci

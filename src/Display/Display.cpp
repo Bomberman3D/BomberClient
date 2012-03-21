@@ -451,6 +451,14 @@ void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pDa
     }
 }
 
+void Display::AnimateModelObjectByFrame(t3DModel* model, t3DObject *pObject, uint32 modelId, uint32 frame)
+{
+    if (sCustomAnimator->HaveModelCustomAnim(modelId))
+        sCustomAnimator->AnimateModelObjectByFrame(pObject, model, modelId, frame);
+    else
+        AnimateModelObjectByFrame(pObject, modelId, frame);
+}
+
 void Display::AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame)
 {
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)

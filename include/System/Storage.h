@@ -75,6 +75,7 @@ class Storage
 
         // Helper funkce
         t3DObject* FindModelObject(uint32 modelId, const char* objectname);
+        t3DObject* FindModelObjectInNonStored(t3DModel* model, const char* objectname);
         ModelAnimType GetAnimTypeForFrame(uint32 modelId, uint32 frame);
 
         ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);

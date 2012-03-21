@@ -722,7 +722,7 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
                 t3DObject *pObject = &pModel->pObject[i];
 
                 glPushMatrix();
-                sDisplay->AnimateModelObjectByFrame(pObject, modelId, a);
+                sDisplay->AnimateModelObjectByFrame(pModel, pObject, modelId, a);
 
                 if (pObject->bHasTexture)
                 {

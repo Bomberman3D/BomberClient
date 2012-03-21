@@ -3,6 +3,7 @@
 
 #include <Global.h>
 #include <Singleton.h>
+#include <Storage.h>
 #include <ctime>
 
 enum AnimRecordType
@@ -77,6 +78,8 @@ class CustomAnimator
 
         bool HaveModelCustomAnim(uint32 id);
         void AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* model, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim);
 };
 
 #define sCustomAnimator Singleton<CustomAnimator>::instance()

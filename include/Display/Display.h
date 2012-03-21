@@ -155,6 +155,7 @@ class Display
         void DrawModels();
         void AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData);
         void AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DModel* model, t3DObject *pObject, uint32 modelId, uint32 frame);
         void FlushModelDisplayList();
 
         // Vse co se tyce vykreslovani billboardu
