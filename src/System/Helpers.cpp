@@ -14,17 +14,6 @@ CVector3 Vector(CVector3 vPoint1, CVector3 vPoint2)
     return vVector;
 }
 
-CVector3 AddVector(CVector3 vVector1, CVector3 vVector2)
-{
-    CVector3 vResult;
-
-    vResult.x = vVector2.x + vVector1.x;
-    vResult.y = vVector2.y + vVector1.y;
-    vResult.z = vVector2.z + vVector1.z;
-
-    return vResult;
-}
-
 CVector3 DivideVectorByScaler(CVector3 vVector1, float Scaler)
 {
     CVector3 vResult;
@@ -44,19 +33,6 @@ CVector3 Cross(CVector3 vVector1, CVector3 vVector2)
     vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
 
     return vCross;
-}
-
-CVector3 Normalize(CVector3 vNormal)
-{
-    double Magnitude;
-
-    Magnitude = Mag(vNormal);
-
-    vNormal.x /= (float)Magnitude;
-    vNormal.y /= (float)Magnitude;
-    vNormal.z /= (float)Magnitude;
-
-    return vNormal;
 }
 
 float RoundFloat(float number)

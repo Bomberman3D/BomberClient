@@ -44,7 +44,7 @@ void Animator::Update()
         {
             if (temp->passedInterval >= sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval)
             {
-                temp->passedInterval = 0;                    // Resetovat casovac
+                temp->passedInterval = 0;                          // Resetovat casovac
 
                 if (temp->reversed)
                 {
@@ -54,7 +54,7 @@ void Animator::Update()
                         temp->actualFrame = 0;
                 }
                 else
-                    temp->actualFrame += temp->frameSkipSpeed; // posunout frame dopredu
+                    temp->actualFrame += temp->frameSkipSpeed;     // posunout frame dopredu
 
                 // Pokud jsme se dostali na konec, opakovat animaci
                 if (!temp->reversed && sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
@@ -80,7 +80,7 @@ void Animator::Update()
         {
             if (temp->passedInterval >= sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval)
             {
-                temp->passedInterval = 0;                    // Resetovat casovac
+                temp->passedInterval = 0;                          // Resetovat casovac
 
                 if (temp->reversed)
                 {
@@ -90,7 +90,7 @@ void Animator::Update()
                         temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
                 }
                 else
-                    temp->actualFrame += temp->frameSkipSpeed; // posunout frame
+                    temp->actualFrame += temp->frameSkipSpeed;     // posunout frame
 
                 // Pokud jsme na poslednim framu animace, opakujeme
                 if (!temp->reversed && sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
@@ -287,17 +287,17 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
     return false;
 }
 
-void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame)
+void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame)
 {
-    AnimateModelObjectByFrame(pObject, sStorage->Models[modelId], modelId, frame);
+    AnimateModelObjectByFrame(object, sStorage->Models[modelId], modelId, frame);
 }
 
-void CustomAnimator::AnimateModelObjectByFrame(t3DObject* pObject, t3DModel* model, uint32 modelId, uint32 frame)
+void CustomAnimator::AnimateModelObjectByFrame(t3DObject* object, t3DModel* model, uint32 modelId, uint32 frame)
 {
-    AnimateModelObjectByFrame(pObject, model, modelId, frame, sStorage->GetAnimTypeForFrame(modelId, frame));
+    AnimateModelObjectByFrame(object, model, modelId, frame, sStorage->GetAnimTypeForFrame(modelId, frame));
 }
 
-void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim)
+void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim)
 {
     /*  Magicka funkce, majici za ukol zastirat programatorovu neschopnost a obchazet absenci kompletni dokumentace formatu 3DS
      *  Trocha vysvetleni
@@ -333,7 +333,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
      */
     bool processed = false;
 
-    if (!model || !pObject)
+    if (!model || !object)
         return;
 
     if (modelId == 9 && anim == ANIM_WALK)
@@ -342,8 +342,8 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
         wholePosMod = cos(wholePosMod*PI/2);
         glTranslatef(0, wholePosMod*0.2f, 0);
 
-        if (strcmp(pObject->strName, "Hlava") == 0 || strcmp(pObject->strName, "Oci") == 0 || strcmp(pObject->strName, "Antena") == 0
-             || strcmp(pObject->strName, "AntenaS") == 0)
+        if (strcmp(object->strName, "Hlava") == 0 || strcmp(object->strName, "Oci") == 0 || strcmp(object->strName, "Antena") == 0
+             || strcmp(object->strName, "AntenaS") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Hlava");
             if (!pObj)
@@ -352,7 +352,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
             // Rotaci budeme resit podle sdileneho stredu otaceni hlavy
             CVector3 vPosition = pObj->vPosition[frame];
             glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.5f-fabs(((float(frame))/50.0f)-1.0f);
@@ -361,12 +361,12 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             // Po otoceni prelozime zpaky na puvodni pozice a prelozime na pozice objektu pro korektni zobrazeni
             glTranslatef(-vPosition.x, -vPosition.y, -vPosition.z);
-            vPosition = pObject->vPosition[frame];
+            vPosition = object->vPosition[frame];
             glTranslatef(vPosition.x, vPosition.y, vPosition.z);
 
             processed = true;
         }
-        if (strcmp(pObject->strName, "Telo") == 0 || strcmp(pObject->strName, "Pasek") == 0 || strcmp(pObject->strName, "Preska") == 0)
+        if (strcmp(object->strName, "Telo") == 0 || strcmp(object->strName, "Pasek") == 0 || strcmp(object->strName, "Preska") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Telo");
             if (!pObj)
@@ -375,7 +375,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
             // Rotaci budeme resit podle sdileneho stredu otaceni hlavy
             CVector3 vPosition = pObj->vPosition[frame];
             glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.5f-fabs(((float(frame))/50.0f)-1.0f);
@@ -384,12 +384,12 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             // Po otoceni prelozime zpaky na puvodni pozice a prelozime na pozice objektu pro korektni zobrazeni
             glTranslatef(-vPosition.x, -vPosition.y, -vPosition.z);
-            vPosition = pObject->vPosition[frame];
+            vPosition = object->vPosition[frame];
             glTranslatef(vPosition.x, vPosition.y, vPosition.z);
 
             processed = true;
         }
-        else if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
+        else if (strcmp(object->strName, "LevaRuka") == 0 || strcmp(object->strName, "LevaDlan") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "LevaRuka");
             if (!pObj)
@@ -397,9 +397,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(-0.173f, 1.353f, 0.08f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.6f-fabs(((float(frame))/50.0f)-1.0f);
@@ -412,7 +412,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             processed = true;
         }
-        else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
+        else if (strcmp(object->strName, "PravaRuka") == 0 || strcmp(object->strName, "PravaDlan") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "PravaRuka");
             if (!pObj)
@@ -420,9 +420,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(0.173f, 1.353f, 0.08f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.6f-fabs(((float(frame))/50.0f)-1.0f);
@@ -435,7 +435,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             processed = true;
         }
-        else if (strcmp(pObject->strName, "LevaNoha") == 0 || strcmp(pObject->strName, "LeveCh") == 0)
+        else if (strcmp(object->strName, "LevaNoha") == 0 || strcmp(object->strName, "LeveCh") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "LevaNoha");
             if (!pObj)
@@ -443,9 +443,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(-0.118f, 0.761f, 0.083f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.45f-fabs(((float(frame))/50.0f)-1.0f);
@@ -457,7 +457,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             processed = true;
         }
-        else if (strcmp(pObject->strName, "PravaNoha") == 0 || strcmp(pObject->strName, "PraveCh") == 0)
+        else if (strcmp(object->strName, "PravaNoha") == 0 || strcmp(object->strName, "PraveCh") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "PravaNoha");
             if (!pObj)
@@ -465,9 +465,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(0.118f, 0.761f, 0.083f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             float anglemod = 0.45f-fabs(((float(frame))/50.0f)-1.0f);
@@ -482,7 +482,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
     }
     else if (modelId == 9 && anim == ANIM_IDLE)
     {
-        if (strcmp(pObject->strName, "LevaRuka") == 0 || strcmp(pObject->strName, "LevaDlan") == 0)
+        if (strcmp(object->strName, "LevaRuka") == 0 || strcmp(object->strName, "LevaDlan") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "LevaRuka");
             if (!pObj)
@@ -490,9 +490,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(-0.173f, 1.353f, 0.08f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             glRotatef(50.0f, 0, 0, 1.0f);
@@ -502,7 +502,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             processed = true;
         }
-        else if (strcmp(pObject->strName, "PravaRuka") == 0 || strcmp(pObject->strName, "PravaDlan") == 0)
+        else if (strcmp(object->strName, "PravaRuka") == 0 || strcmp(object->strName, "PravaDlan") == 0)
         {
             t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "PravaRuka");
             if (!pObj)
@@ -510,9 +510,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
 
             CVector3 rotPos(0.173f, 1.353f, 0.08f);
 
-            CVector3 vPosition = pObject->vPosition[frame];
+            CVector3 vPosition = object->vPosition[frame];
             glTranslatef(rotPos.x, rotPos.y, rotPos.z);
-            CVector3 vScale = pObject->vScale[frame];
+            CVector3 vScale = object->vScale[frame];
             glScalef(vScale.x, vScale.y, vScale.z);
 
             glRotatef(50.0f, 0, 0, -1.0f);
@@ -527,15 +527,15 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* mod
     // Pokud se "nechytnul" ani jeden z nami deklarovanych objektu na danou animaci, vyuzijeme standardni postupy
     if (!processed)
     {
-        CVector3 vPosition = pObject->vPosition[frame];
+        CVector3 vPosition = object->vPosition[frame];
         glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-        CVector3 vScale = pObject->vScale[frame];
+        CVector3 vScale = object->vScale[frame];
         glScalef(vScale.x, vScale.y, vScale.z);
 
         for (uint32 i = 1; i <= frame; i++)
         {
-            CVector3 vRotation = pObject->vRotation[i];
-            float rotDegree = pObject->vRotDegree[i];
+            CVector3 vRotation = object->vRotation[i];
+            float rotDegree = object->vRotDegree[i];
 
             if(rotDegree)
                 glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);

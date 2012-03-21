@@ -1,5 +1,5 @@
 /**********************************
-*      Enigmatic Fate Engine      *
+*        Bomberman3D Engine       *
 *  Created by: Cmaranec (Kennny)  *
 **********************************/
 // Application singleton defines

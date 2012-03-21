@@ -243,7 +243,7 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
 
 bool Display::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
 {
-    for(std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
     {
         if (!itr._Has_container())
             continue;
@@ -260,7 +260,7 @@ bool Display::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
 
 bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
 {
-    for(std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
+    for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
     {
         if (!itr._Has_container())
             continue;
@@ -280,7 +280,7 @@ void Display::DrawModels()
     float x,y,z;
     ModelDisplayListRecord* temp = NULL;
 
-    for(std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end();)
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end();)
     {
         if (!itr._Has_container())
         {
@@ -351,9 +351,11 @@ void Display::DrawModels()
 
         t3DModel* pModel = sStorage->Models[temp->modelId];
 
-        for(int i = 0; i < pModel->numOfObjects; i++)
+        for (int i = 0; i < pModel->numOfObjects; i++)
         {
-            if (pModel->pObject.size() <= 0) break;
+            if (pModel->pObject.size() <= 0)
+                break;
+
             t3DObject *pObject = &pModel->pObject[i];
 
             glPushMatrix();
@@ -379,9 +381,9 @@ void Display::DrawModels()
 
             glBegin(GL_TRIANGLES);
 
-            for(int j = 0; j < pObject->numOfFaces; j++)
+            for (int j = 0; j < pObject->numOfFaces; j++)
             {
-                for(int whichVertex = 0; whichVertex < 3; whichVertex++)
+                for (int whichVertex = 0; whichVertex < 3; whichVertex++)
                 {
                     int index = pObject->pFaces[j].vertIndex[whichVertex];
 
@@ -423,60 +425,60 @@ void Display::FlushModelDisplayList()
         (*itr)->remove = true;
 }
 
-void Display::AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData)
+void Display::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData)
 {
     uint32 frame = sAnimator->GetActualFrame(pData->AnimTicket);
 
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
     if (sCustomAnimator->HaveModelCustomAnim(pData->modelId))
     {
-        sCustomAnimator->AnimateModelObjectByFrame(pObject, pData->modelId, frame);
+        sCustomAnimator->AnimateModelObjectByFrame(object, pData->modelId, frame);
         return;
     }
 
-    CVector3 vPosition = pObject->vPosition[frame];
+    CVector3 vPosition = object->vPosition[frame];
     vPosition.multiply(pData->scale);
     glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-    CVector3 vScale = pObject->vScale[frame];
+    CVector3 vScale = object->vScale[frame];
     vScale.multiply(pData->scale);
     glScalef(vScale.x, vScale.y, vScale.z);
 
     for (uint32 i = 1; i <= frame; i++)
     {
-        CVector3 vRotation = pObject->vRotation[i];
-        float rotDegree = pObject->vRotDegree[i];
+        CVector3 vRotation = object->vRotation[i];
+        float rotDegree = object->vRotDegree[i];
 
         if(rotDegree)
             glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);
     }
 }
 
-void Display::AnimateModelObjectByFrame(t3DModel* model, t3DObject *pObject, uint32 modelId, uint32 frame)
+void Display::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, uint32 modelId, uint32 frame)
 {
-    if (sCustomAnimator->HaveModelCustomAnim(modelId))
-        sCustomAnimator->AnimateModelObjectByFrame(pObject, model, modelId, frame);
+    if (model && sCustomAnimator->HaveModelCustomAnim(modelId))
+        sCustomAnimator->AnimateModelObjectByFrame(object, model, modelId, frame);
     else
-        AnimateModelObjectByFrame(pObject, modelId, frame);
+        AnimateModelObjectByFrame(object, modelId, frame);
 }
 
-void Display::AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame)
+void Display::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint32 frame)
 {
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
     if (sCustomAnimator->HaveModelCustomAnim(modelId))
     {
-        sCustomAnimator->AnimateModelObjectByFrame(pObject, modelId, frame);
+        sCustomAnimator->AnimateModelObjectByFrame(object, modelId, frame);
         return;
     }
 
-    CVector3 vPosition = pObject->vPosition[frame];
+    CVector3 vPosition = object->vPosition[frame];
     glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-    CVector3 vScale = pObject->vScale[frame];
+    CVector3 vScale = object->vScale[frame];
     glScalef(vScale.x, vScale.y, vScale.z);
 
     for (uint32 i = 1; i <= frame; i++)
     {
-        CVector3 vRotation = pObject->vRotation[i];
-        float rotDegree = pObject->vRotDegree[i];
+        CVector3 vRotation = object->vRotation[i];
+        float rotDegree = object->vRotDegree[i];
 
         if(rotDegree)
             glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);
@@ -632,10 +634,6 @@ void Display::DrawBillboards()
         // Nechat depth test pro ted zapnuty, zpusobuje nepruhlednost
         // vykreslenych spritu vuci jinym spritum
         //glDisable(GL_DEPTH_TEST);
-
-        // TODO: blending zvlast kanalu
-        //       asi useless
-        //glColor4f(1,1,1,0.85);
 
         glTranslatef(temp->x, temp->y, temp->z);
         if (temp->billboard_y)
@@ -1051,7 +1049,7 @@ uint16 Display::CheckCollision(float newx, float newy, float newz)
         for (int32 j = lh_z; j <= pd_z; j++)
         {
             // Kolize s pevnymi objekty mapy
-            if (/*pMap->field[i][j].type == TYPE_ROCK || */pMap->field[i][j].type == TYPE_SOLID_BOX)
+            if (pMap->field[i][j].type == TYPE_SOLID_BOX)
             {
                 conx = (i-1);
                 conz = (j-1);

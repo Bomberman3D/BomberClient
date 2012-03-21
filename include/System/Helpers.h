@@ -3,13 +3,9 @@
 
 #include <Defines.h>
 
-#define Mag(Normal) (sqrt(Normal.x*Normal.x + Normal.y*Normal.y + Normal.z*Normal.z))
-
 extern CVector3 Vector(CVector3 vPoint1, CVector3 vPoint2);
-extern CVector3 AddVector(CVector3 vVector1, CVector3 vVector2);
 extern CVector3 DivideVectorByScaler(CVector3 vVector1, float Scaler);
 extern CVector3 Cross(CVector3 vVector1, CVector3 vVector2);
-extern CVector3 Normalize(CVector3 vNormal);
 extern float RoundFloat(float number);
 
 static float frand() { return rand() / (float) RAND_MAX; }

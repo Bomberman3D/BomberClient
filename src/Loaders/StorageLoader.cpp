@@ -59,6 +59,7 @@ bool Storage::LoadTextureData()
             TextureAnimation[textureId].AnimFrameData.resize(animId+1);
         if (frame >= TextureAnimation[textureId].AnimFrameData[animId].size())
             TextureAnimation[textureId].AnimFrameData[animId].resize(frame+1);
+
         TextureAnimation[textureId].AnimFrameData[animId][frame].textureId = qry.getval();
         TextureAnimation[textureId].AnimFrameData[animId][frame].interval = qry.getval();
         count++;

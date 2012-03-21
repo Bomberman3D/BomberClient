@@ -1,10 +1,16 @@
-// Original code by DigiBen (digiben@gametutorials.com)
+/**********************************
+*        Bomberman3D Engine       *
+*  Created by: Cmaranec (Kennny)  *
+**********************************/
+// Model loader unit
+// Original loader code by DigiBen (digiben@gametutorials.com)
+// Edit by me - codestyle, adjustments and some corrections for my engine
+
 #include <Global.h>
 #include <ModelLoader.h>
 #include <Helpers.h>
 #include <Storage.h>
 
-// Global
 int gBuffer[50000] = {0};
 
 Loaders::t3DSLoader::t3DSLoader()
@@ -208,33 +214,33 @@ void Loaders::t3DSLoader::ProcessNextMaterialChunk(t3DModel *pModel, tChunk *pPr
 
         switch (pModel, m_CurrentChunk->ID)
         {
-        case MATNAME:
-            m_CurrentChunk->bytesRead += fread(pModel->pMaterials[pModel->numOfMaterials - 1].strName, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
-            break;
-        case MATDIFFUSE:
-            ReadColorChunk(&(pModel->pMaterials[pModel->numOfMaterials - 1]), m_CurrentChunk);
-            break;
-        case MATMAP:
-            ProcessNextMaterialChunk(pModel, m_CurrentChunk);
-            break;
-        case MATMAPFILE:
-            m_CurrentChunk->bytesRead += fread(pModel->pMaterials[pModel->numOfMaterials - 1].strFile, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
-            break;
-        case MATSPECULAR:
-            ReadColorChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].specularcolor[0]), m_CurrentChunk);
-            break;
-        case MATSHININESS:
-            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[0]), m_CurrentChunk);
-            break;
-        case MATSHININESSSTR:
-            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[1]), m_CurrentChunk);
-            break;
-        case MATSHININESSSTR2:
-            ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[2]), m_CurrentChunk);
-            break;
-        default:
-            m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
-            break;
+            case MATNAME:
+                m_CurrentChunk->bytesRead += fread(pModel->pMaterials[pModel->numOfMaterials - 1].strName, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
+                break;
+            case MATDIFFUSE:
+                ReadColorChunk(&(pModel->pMaterials[pModel->numOfMaterials - 1]), m_CurrentChunk);
+                break;
+            case MATMAP:
+                ProcessNextMaterialChunk(pModel, m_CurrentChunk);
+                break;
+            case MATMAPFILE:
+                m_CurrentChunk->bytesRead += fread(pModel->pMaterials[pModel->numOfMaterials - 1].strFile, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
+                break;
+            case MATSPECULAR:
+                ReadColorChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].specularcolor[0]), m_CurrentChunk);
+                break;
+            case MATSHININESS:
+                ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[0]), m_CurrentChunk);
+                break;
+            case MATSHININESSSTR:
+                ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[1]), m_CurrentChunk);
+                break;
+            case MATSHININESSSTR2:
+                ReadPercentageChunkDest((uint8*)&(pModel->pMaterials[pModel->numOfMaterials - 1].shininess.uShininess[2]), m_CurrentChunk);
+                break;
+            default:
+                m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
+                break;
         }
 
         pPreviousChunk->bytesRead += m_CurrentChunk->bytesRead;
@@ -257,39 +263,39 @@ void Loaders::t3DSLoader::ProcessNextKeyFrameChunk(t3DModel *pModel, tChunk *pPr
 
         switch (m_CurrentChunk->ID)
         {
-        case KEYFRAME_MESH_INFO:
-            ProcessNextKeyFrameChunk(pModel, m_CurrentChunk);
-            break;
-        case KEYFRAME_OBJECT_NAME:
-            m_CurrentChunk->bytesRead += GetString(strKeyFrameObject);
-            SetCurrentObject(pModel, strKeyFrameObject);
+            case KEYFRAME_MESH_INFO:
+                ProcessNextKeyFrameChunk(pModel, m_CurrentChunk);
+                break;
+            case KEYFRAME_OBJECT_NAME:
+                m_CurrentChunk->bytesRead += GetString(strKeyFrameObject);
+                SetCurrentObject(pModel, strKeyFrameObject);
 
-            m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
-            break;
-        case KEYFRAME_START_AND_END:
-            m_CurrentChunk->bytesRead += fread(&(pModel->numberOfFrames), 1, 4, m_FilePointer);
-            m_CurrentChunk->bytesRead += fread(&(pModel->numberOfFrames), 1, 4, m_FilePointer);
-            break;
-        case PIVOT:
-            m_CurrentChunk->bytesRead +=
-            fread(&(m_CurrentObject->vPivot), 1, sizeof(CVector3), m_FilePointer);
+                m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
+                break;
+            case KEYFRAME_START_AND_END:
+                m_CurrentChunk->bytesRead += fread(&(pModel->numberOfFrames), 1, 4, m_FilePointer);
+                m_CurrentChunk->bytesRead += fread(&(pModel->numberOfFrames), 1, 4, m_FilePointer);
+                break;
+            case PIVOT:
+                m_CurrentChunk->bytesRead +=
+                fread(&(m_CurrentObject->vPivot), 1, sizeof(CVector3), m_FilePointer);
 
-            temp = m_CurrentObject->vPivot.y;
-            m_CurrentObject->vPivot.y = m_CurrentObject->vPivot.z;
-            m_CurrentObject->vPivot.z = -temp;
-            break;
-        case POSITION_TRACK_TAG:
-            ReadKeyFramePositions(pModel, m_CurrentChunk);
-            break;
-        case ROTATION_TRACK_TAG:
-            ReadKeyFrameRotations(pModel, m_CurrentChunk);
-            break;
-        case SCALE_TRACK_TAG:
-            ReadKeyFrameScales(pModel, m_CurrentChunk);
-            break;
-        default:
-            m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
-            break;
+                temp = m_CurrentObject->vPivot.y;
+                m_CurrentObject->vPivot.y = m_CurrentObject->vPivot.z;
+                m_CurrentObject->vPivot.z = -temp;
+                break;
+            case POSITION_TRACK_TAG:
+                ReadKeyFramePositions(pModel, m_CurrentChunk);
+                break;
+            case ROTATION_TRACK_TAG:
+                ReadKeyFrameRotations(pModel, m_CurrentChunk);
+                break;
+            case SCALE_TRACK_TAG:
+                ReadKeyFrameScales(pModel, m_CurrentChunk);
+                break;
+            default:
+                m_CurrentChunk->bytesRead += fread(gBuffer, 1, m_CurrentChunk->length - m_CurrentChunk->bytesRead, m_FilePointer);
+                break;
         }
 
         pPreviousChunk->bytesRead += m_CurrentChunk->bytesRead;
@@ -312,10 +318,8 @@ int Loaders::t3DSLoader::GetString(char *pBuffer)
 
     fread(pBuffer, 1, 1, m_FilePointer);
 
-    while (*(pBuffer + index++) != 0) {
-
+    while (*(pBuffer + index++) != 0)
         fread(pBuffer + index, 1, 1, m_FilePointer);
-    }
 
     return strlen(pBuffer) + 1;
 }
@@ -356,9 +360,9 @@ void Loaders::t3DSLoader::ReadVertexIndices(t3DObject *pObject, tChunk *pPreviou
     pObject->pFaces = new tFace [pObject->numOfFaces];
     memset(pObject->pFaces, 0, sizeof(tFace) * pObject->numOfFaces);
 
-    for(int i = 0; i < pObject->numOfFaces; i++)
+    for (int i = 0; i < pObject->numOfFaces; i++)
     {
-        for(int j = 0; j < 4; j++)
+        for (int j = 0; j < 4; j++)
         {
             pPreviousChunk->bytesRead += fread(&index, 1, sizeof(index), m_FilePointer);
 
@@ -386,7 +390,7 @@ void Loaders::t3DSLoader::ReadVertices(t3DObject *pObject, tChunk *pPreviousChun
 
     pPreviousChunk->bytesRead += fread(pObject->pVerts, 1, pPreviousChunk->length - pPreviousChunk->bytesRead, m_FilePointer);
 
-    for(int i = 0; i < pObject->numOfVerts; i++)
+    for (int i = 0; i < pObject->numOfVerts; i++)
     {
         float fTempY = pObject->pVerts[i].y;
 
@@ -402,13 +406,13 @@ void Loaders::t3DSLoader::ReadObjectMaterial(t3DModel *pModel, t3DObject *pObjec
 
     pPreviousChunk->bytesRead += GetString(strMaterial);
 
-    for(int i = 0; i < pModel->numOfMaterials; i++)
+    for (int i = 0; i < pModel->numOfMaterials; i++)
     {
-        if(strcmp(strMaterial, pModel->pMaterials[i].strName) == 0)
+        if (strcmp(strMaterial, pModel->pMaterials[i].strName) == 0)
         {
             pObject->materialID = i;
 
-            if(strlen(pModel->pMaterials[i].strFile) > 0)
+            if (strlen(pModel->pMaterials[i].strFile) > 0)
                 pObject->bHasTexture = true;
             break;
         }
@@ -435,18 +439,17 @@ void Loaders::t3DSLoader::ReadKeyFramePositions(t3DModel *pModel, tChunk *pPrevi
 
     pPreviousChunk->bytesRead += fread(&ignored, 1, sizeof(short), m_FilePointer);
 
-    for(i = 0; i <= (pModel->numberOfFrames + 1); i++)
+    for (i = 0; i <= (pModel->numberOfFrames + 1); i++)
     {
         m_CurrentObject->vPosition.push_back(CVector3());
 
-        if(i < m_CurrentObject->positionFrames)
+        if (i < m_CurrentObject->positionFrames)
         {
             pPreviousChunk->bytesRead += fread(&frameNumber, 1, sizeof(short), m_FilePointer);
 
             pPreviousChunk->bytesRead += fread(&lunknown, 1, sizeof(long), m_FilePointer);
 
-            pPreviousChunk->bytesRead +=
-            fread(&(m_CurrentObject->vPosition[i]), 1, sizeof(CVector3), m_FilePointer);
+            pPreviousChunk->bytesRead += fread(&(m_CurrentObject->vPosition[i]), 1, sizeof(CVector3), m_FilePointer);
 
             float temp = m_CurrentObject->vPosition[i].y;
             m_CurrentObject->vPosition[i].y = m_CurrentObject->vPosition[i].z;
@@ -456,7 +459,7 @@ void Loaders::t3DSLoader::ReadKeyFramePositions(t3DModel *pModel, tChunk *pPrevi
             m_CurrentObject->vPosition[i] = m_CurrentObject->vPosition[m_CurrentObject->positionFrames - 1];
     }
 
-    for(i = 0; i < m_CurrentObject->numOfVerts; i++)
+    for (i = 0; i < m_CurrentObject->numOfVerts; i++)
     {
         m_CurrentObject->pVerts[i].x -= m_CurrentObject->vPosition[0].x + m_CurrentObject->vPivot.x;
         m_CurrentObject->pVerts[i].y -= m_CurrentObject->vPosition[0].y + m_CurrentObject->vPivot.y;
@@ -484,7 +487,7 @@ void Loaders::t3DSLoader::ReadKeyFrameRotations(t3DModel *pModel, tChunk *pPrevi
 
     pPreviousChunk->bytesRead += fread(&ignored, 1,  sizeof(short), m_FilePointer);
 
-    for(i = 0; i < m_CurrentObject->rotationFrames; i++)
+    for (i = 0; i < m_CurrentObject->rotationFrames; i++)
     {
         vRotation.push_back(CVector3());
 
@@ -519,9 +522,9 @@ void Loaders::t3DSLoader::ReadKeyFrameRotations(t3DModel *pModel, tChunk *pPrevi
 
     int currentKey = 1;
 
-    for(i = 1; i <= (pModel->numberOfFrames + 1); i++)
+    for (i = 1; i <= (pModel->numberOfFrames + 1); i++)
     {
-        if(currentKey < m_CurrentObject->rotationFrames)
+        if (currentKey < m_CurrentObject->rotationFrames)
         {
             int currentFrame = vFrameNumber[currentKey];
             int previousFrame = vFrameNumber[currentKey - 1];
@@ -532,7 +535,7 @@ void Loaders::t3DSLoader::ReadKeyFrameRotations(t3DModel *pModel, tChunk *pPrevi
             m_CurrentObject->vRotation.push_back(vRotation[currentKey]);
             m_CurrentObject->vRotDegree.push_back(rotDegree);
 
-            if(vFrameNumber[currentKey] <= i)
+            if (vFrameNumber[currentKey] <= i)
                 currentKey++;
         }
         else
@@ -559,18 +562,17 @@ void Loaders::t3DSLoader::ReadKeyFrameScales(t3DModel *pModel, tChunk *pPrevious
 
     pPreviousChunk->bytesRead += fread(&ignore, 1, sizeof(short), m_FilePointer);
 
-    for(i = 0; i <= (pModel->numberOfFrames + 1); i++)
+    for (i = 0; i <= (pModel->numberOfFrames + 1); i++)
     {
         m_CurrentObject->vScale.push_back(CVector3());
 
-        if(i < m_CurrentObject->scaleFrames)
+        if (i < m_CurrentObject->scaleFrames)
         {
             pPreviousChunk->bytesRead += fread(&frameNumber, 1, sizeof(short), m_FilePointer);
 
             pPreviousChunk->bytesRead += fread(&lunknown, 1, sizeof(long), m_FilePointer);
 
-            pPreviousChunk->bytesRead +=
-            fread(&(m_CurrentObject->vScale[i]), 1, sizeof(CVector3), m_FilePointer);
+            pPreviousChunk->bytesRead += fread(&(m_CurrentObject->vScale[i]), 1, sizeof(CVector3), m_FilePointer);
 
             float temp = m_CurrentObject->vScale[i].y;
             m_CurrentObject->vScale[i].y = m_CurrentObject->vScale[i].z;
@@ -583,15 +585,15 @@ void Loaders::t3DSLoader::ReadKeyFrameScales(t3DModel *pModel, tChunk *pPrevious
 
 void Loaders::t3DSLoader::SetCurrentObject(t3DModel *pModel, char *strObjectName)
 {
-    if(!strObjectName)
+    if (!strObjectName)
     {
         m_CurrentObject = NULL;
         return;
     }
 
-    for(int i = 0; i < pModel->numOfObjects; i++)
+    for (int i = 0; i < pModel->numOfObjects; i++)
     {
-        if(strcmp(pModel->pObject[i].strName, strObjectName) == 0)
+        if (strcmp(pModel->pObject[i].strName, strObjectName) == 0)
         {
             m_CurrentObject =&(pModel->pObject[i]);
             return;
@@ -607,18 +609,18 @@ void Loaders::t3DSLoader::ComputeNormals(t3DModel *pModel)
 {
     CVector3 vVector1, vVector2, vNormal, vPoly[3];
 
-    if(pModel->numOfObjects <= 0)
+    if (pModel->numOfObjects <= 0)
         return;
 
-    for(int index = 0; index < pModel->numOfObjects; index++)
+    for (int index = 0; index < pModel->numOfObjects; index++)
     {
         t3DObject *pObject = &(pModel->pObject[index]);
 
         CVector3 *pNormals        = new CVector3 [pObject->numOfFaces];
         CVector3 *pTempNormals    = new CVector3 [pObject->numOfFaces];
-        pObject->pNormals        = new CVector3 [pObject->numOfVerts];
+        pObject->pNormals         = new CVector3 [pObject->numOfVerts];
 
-        for(int i=0; i < pObject->numOfFaces; i++)
+        for (int i=0; i < pObject->numOfFaces; i++)
         {
             vPoly[0] = pObject->pVerts[pObject->pFaces[i].vertIndex[0]];
             vPoly[1] = pObject->pVerts[pObject->pFaces[i].vertIndex[1]];
@@ -629,7 +631,7 @@ void Loaders::t3DSLoader::ComputeNormals(t3DModel *pModel)
 
             vNormal  = Cross(vVector1, vVector2);
             pTempNormals[i] = vNormal;
-            vNormal  = Normalize(vNormal);
+            vNormal.unitMultiply(1);
 
             pNormals[i] = vNormal;
         }
@@ -646,14 +648,14 @@ void Loaders::t3DSLoader::ComputeNormals(t3DModel *pModel)
                     pObject->pFaces[j].vertIndex[1] == i ||
                     pObject->pFaces[j].vertIndex[2] == i)
                 {
-                    vSum = AddVector(vSum, pTempNormals[j]);
+                    vSum = vSum + pTempNormals[j];
                     shared++;
                 }
             }
 
             pObject->pNormals[i] = DivideVectorByScaler(vSum, float(-shared));
 
-            pObject->pNormals[i] = Normalize(pObject->pNormals[i]);
+            pObject->pNormals[i].unitMultiply(1);
 
             vSum = vZero;
             shared = 0;
@@ -716,9 +718,11 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
         for (uint32 a = 0; a <= maxFrame; a++)
         {
             glNewList(pModel->displayList + a,GL_COMPILE);
-            for(int i = 0; i < pModel->numOfObjects; i++)
+            for (int i = 0; i < pModel->numOfObjects; i++)
             {
-                if (pModel->pObject.size() <= 0) break;
+                if (pModel->pObject.size() <= 0)
+                    break;
+
                 t3DObject *pObject = &pModel->pObject[i];
 
                 glPushMatrix();
@@ -752,9 +756,9 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
 
                 glBegin(GL_TRIANGLES);
 
-                for(int j = 0; j < pObject->numOfFaces; j++)
+                for (int j = 0; j < pObject->numOfFaces; j++)
                 {
-                    for(int whichVertex = 0; whichVertex < 3; whichVertex++)
+                    for (int whichVertex = 0; whichVertex < 3; whichVertex++)
                     {
                         int index = pObject->pFaces[j].vertIndex[whichVertex];
 

@@ -77,9 +77,9 @@ class CustomAnimator
         CustomAnimator();
 
         bool HaveModelCustomAnim(uint32 id);
-        void AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame);
-        void AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* model, uint32 modelId, uint32 frame);
-        void AnimateModelObjectByFrame(t3DObject *pObject, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim);
+        void AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim);
 };
 
 #define sCustomAnimator Singleton<CustomAnimator>::instance()

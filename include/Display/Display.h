@@ -99,7 +99,6 @@ struct ModelDisplayListRecord: public DisplayListRecord
 
     uint32 modelId;
     uint32 AnimTicket;
-    //bool  collision; // NYI
     float  scale, rotate;
 };
 
@@ -153,9 +152,9 @@ class Display
                                           bool GLDisplayListOnly = false);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
-        void AnimateModelObject(t3DObject *pObject, ModelDisplayListRecord* pData);
-        void AnimateModelObjectByFrame(t3DObject *pObject, uint32 modelId, uint32 frame);
-        void AnimateModelObjectByFrame(t3DModel* model, t3DObject *pObject, uint32 modelId, uint32 frame);
+        void AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData);
+        void AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame);
+        void AnimateModelObjectByFrame(t3DModel* model, t3DObject *object, uint32 modelId, uint32 frame);
         void FlushModelDisplayList();
 
         // Vse co se tyce vykreslovani billboardu
