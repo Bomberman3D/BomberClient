@@ -47,33 +47,33 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
     m_mapSizeY = pMap->field[0].size();
 
     accessMatrixDyn.clear();
-    CoordPair tmp;
 
     // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
     // a nulami tam, kam nemuze
+    accessMatrixDyn.resize(m_mapSizeX);
     for (uint32 i = 0; i < m_mapSizeX; i++)
     {
+        accessMatrixDyn[i].resize(m_mapSizeY);
+
         for (uint32 j = 0; j < m_mapSizeY; j++)
         {
-            tmp = std::make_pair(i,j);
-
             // Pokud je nepristupne pole na souradnicich [x,y]
             if (pMap->field[i][j].type == TYPE_SOLID_BOX
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
             {
                 // Vynulujeme ho v hledaci mape
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
             else if (sGameplayMgr->WouldBeDangerousField(i,j))
             {
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
 
             // Pokud je pristupne, jednicku
-            accessMatrixDyn[tmp] = 1;
+            accessMatrixDyn[i][j] = 1;
         }
     }
 }
@@ -81,53 +81,53 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
 // Makra pro rekurzivni postup po poli
 // ve zkratce jen volaji dalsi zanoreni funkce Recursor a pri uspechu (true) zapisou bod do cesty
 // Nastaveni na 9 je zde jen kvuli pripadnemu debugu a vystupu
-#define RECURSE_RIGHT   if ((x+1) < m_mapSizeX && accessMatrixDyn[std::make_pair(x+1,y)] == 1) \
+#define RECURSE_RIGHT   if ((x+1) < m_mapSizeX && accessMatrixDyn[x+1][y] == 1) \
                         {                         \
                             if (Recursor(x+1, y)) \
                             {                     \
                                 p->x = x+1;       \
                                 p->y = y;         \
                                 p->flags = 0;     \
-                                accessMatrixDyn[std::make_pair(x+1,y)] = 9; \
+                                accessMatrixDyn[x+1][y] = 9; \
                                 m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
 
-#define RECURSE_DOWN    if ((y+1) < m_mapSizeY && accessMatrixDyn[std::make_pair(x,y+1)] == 1) \
+#define RECURSE_DOWN    if ((y+1) < m_mapSizeY && accessMatrixDyn[x][y+1] == 1) \
                         {                         \
                             if (Recursor(x, y+1)) \
                             {                     \
                                 p->x = x;         \
                                 p->y = y+1;       \
                                 p->flags = 0;     \
-                                accessMatrixDyn[std::make_pair(x,y+1)] = 9; \
+                                accessMatrixDyn[x][y+1] = 9; \
                                 m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
 
-#define RECURSE_LEFT    if (x > 0 && accessMatrixDyn[std::make_pair(x-1,y)] == 1) \
+#define RECURSE_LEFT    if (x > 0 && accessMatrixDyn[x-1][y] == 1) \
                         {                         \
                             if (Recursor(x-1, y)) \
                             {                     \
                                 p->x = x-1;       \
                                 p->y = y;         \
                                 p->flags = 0;     \
-                                accessMatrixDyn[std::make_pair(x-1,y)] = 9; \
+                                accessMatrixDyn[x-1][y] = 9; \
                                 m_path->push_back(*p); \
                                 return true;      \
                             }                     \
                         }
 
-#define RECURSE_UP      if (y > 0 && accessMatrixDyn[std::make_pair(x,y-1)] == 1) \
+#define RECURSE_UP      if (y > 0 && accessMatrixDyn[x][y-1] == 1) \
                         {                         \
                             if (Recursor(x, y-1)) \
                             {                     \
                                 p->x = x;         \
                                 p->y = y-1;       \
                                 p->flags = 0;     \
-                                accessMatrixDyn[std::make_pair(x,y-1)] = 9; \
+                                accessMatrixDyn[x][y-1] = 9; \
                                 m_path->push_back(*p); \
                                 return true;      \
                             }                     \
@@ -136,11 +136,11 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
 bool Pathfinder::Recursor(uint32 x, uint32 y)
 {
     // pozdeji zmenit na == 0, ted jen pro nazornost se budou nastavovat dvojky jako prosla cesta
-    if (accessMatrixDyn[std::make_pair(x,y)] != 1)
+    if (accessMatrixDyn[x][y] != 1)
         return false;
 
     // Automaticky nastavime pole jako "navstivene"
-    accessMatrixDyn[std::make_pair(x,y)] = 2;
+    accessMatrixDyn[x][y] = 2;
 
     // Overeni, zdali se jedna o cilove pole. Pokud ano, vratime true a cela rekurze se pote vrati a cesta se zapise
     if (x == m_destX && y == m_destY)
@@ -226,7 +226,7 @@ bool Pathfinder::Recursor(uint32 x, uint32 y)
 void Pathfinder::GeneratePath()
 {
     // Pokud stojime na nepristupnem poli, jsme uvezneni
-    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 0)
+    if (accessMatrixDyn[m_sourceX][m_sourceY] == 0)
         return;
 
     if (!Recursor(m_sourceX, m_sourceY))
@@ -286,39 +286,39 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
     m_mapSizeY = pMap->field[0].size();
 
     accessMatrixDyn.clear();
-    CoordPair tmp;
 
     // "Pristupova mapa" se naplni nulami tam, kde pathfinder muze hledat cestu
     // a trojkami tam, kam nemuze (jakekoliv pole s 1 je cilove)
+    accessMatrixDyn.resize(m_mapSizeX);
     for (uint32 i = 0; i < m_mapSizeX; i++)
     {
+        accessMatrixDyn[i].resize(m_mapSizeY);
+
         for (uint32 j = 0; j < m_mapSizeY; j++)
         {
-            tmp = std::make_pair(i,j);
-
             // Podminky na pristupnost / nepristupnost pole na souradnicich [x,y]
             if (i == sourceX && j == sourceY)
             {
                 // At stojime kdekoliv, vzdycky muzeme z toho mista odejit
                 // napriklad pokud nam pod zadek byla polozena bomba
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
             else if (pMap->field[i][j].type == TYPE_SOLID_BOX
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX))
             {
-                accessMatrixDyn[tmp] = 3;
+                accessMatrixDyn[i][j] = 3;
                 continue;
             }
             else if (sGameplayMgr->WouldBeDangerousField(i,j))
             {
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
 
             // Pokud je pristupne, jednicku
-            accessMatrixDyn[tmp] = 1;
+            accessMatrixDyn[i][j] = 1;
         }
     }
 }
@@ -326,53 +326,53 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
 // Makra pro rekurzivni postup po poli
 // ve zkratce jen volaji dalsi zanoreni funkce Recursor a pri uspechu (true) zapisou bod do cesty
 // Nastaveni na 9 je zde jen kvuli pripadnemu debugu a vystupu
-#define OOZ_RECURSE_RIGHT   if ((x+1) < m_mapSizeX && (accessMatrixDyn[std::make_pair(x+1,y)] == 0 || accessMatrixDyn[std::make_pair(x+1,y)] == 1)) \
+#define OOZ_RECURSE_RIGHT   if ((x+1) < m_mapSizeX && (accessMatrixDyn[x+1][y] == 0 || accessMatrixDyn[x+1][y] == 1)) \
                             {                         \
                                 if (Recursor(x+1, y)) \
                                 {                     \
                                     p->x = x+1;       \
                                     p->y = y;         \
                                     p->flags = 0;     \
-                                    accessMatrixDyn[std::make_pair(x+1,y)] = 9; \
+                                    accessMatrixDyn[x+1][y] = 9; \
                                     m_path->push_back(*p); \
                                     return true;      \
                                 }                     \
                             }
 
-#define OOZ_RECURSE_DOWN    if ((y+1) < m_mapSizeY && (accessMatrixDyn[std::make_pair(x,y+1)] == 0 || accessMatrixDyn[std::make_pair(x,y+1)] == 1)) \
+#define OOZ_RECURSE_DOWN    if ((y+1) < m_mapSizeY && (accessMatrixDyn[x][y+1] == 0 || accessMatrixDyn[x][y+1] == 1)) \
                             {                         \
                                 if (Recursor(x, y+1)) \
                                 {                     \
                                     p->x = x;         \
                                     p->y = y+1;       \
                                     p->flags = 0;     \
-                                    accessMatrixDyn[std::make_pair(x,y+1)] = 9; \
+                                    accessMatrixDyn[x][y+1] = 9; \
                                     m_path->push_back(*p); \
                                     return true;      \
                                 }                     \
                             }
 
-#define OOZ_RECURSE_LEFT    if (x > 0 && (accessMatrixDyn[std::make_pair(x-1,y)] == 0 || accessMatrixDyn[std::make_pair(x-1,y)] == 1)) \
+#define OOZ_RECURSE_LEFT    if (x > 0 && (accessMatrixDyn[x-1][y] == 0 || accessMatrixDyn[x-1][y] == 1)) \
                             {                         \
                                 if (Recursor(x-1, y)) \
                                 {                     \
                                     p->x = x-1;       \
                                     p->y = y;         \
                                     p->flags = 0;     \
-                                    accessMatrixDyn[std::make_pair(x-1,y)] = 9; \
+                                    accessMatrixDyn[x-1][y] = 9; \
                                     m_path->push_back(*p); \
                                     return true;      \
                                 }                     \
                             }
 
-#define OOZ_RECURSE_UP      if (y > 0 && (accessMatrixDyn[std::make_pair(x,y-1)] == 0 || accessMatrixDyn[std::make_pair(x,y-1)] == 1)) \
+#define OOZ_RECURSE_UP      if (y > 0 && (accessMatrixDyn[x][y-1] == 0 || accessMatrixDyn[x][y-1] == 1)) \
                             {                         \
                                 if (Recursor(x, y-1)) \
                                 {                     \
                                     p->x = x;         \
                                     p->y = y-1;       \
                                     p->flags = 0;     \
-                                    accessMatrixDyn[std::make_pair(x,y-1)] = 9; \
+                                    accessMatrixDyn[x][y-1] = 9; \
                                     m_path->push_back(*p); \
                                     return true;      \
                                 }                     \
@@ -381,15 +381,15 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
 bool OutOfZeroPathfinder::Recursor(uint32 x, uint32 y)
 {
     // trojky jsou jako pevna pole - nejde pres ne projit
-    if (accessMatrixDyn[std::make_pair(x,y)] == 2 || accessMatrixDyn[std::make_pair(x,y)] == 3)
+    if (accessMatrixDyn[x][y] == 2 || accessMatrixDyn[x][y] == 3)
         return false;
 
     // Overeni, zdali se jedna o cilove pole. Pokud ano, vratime true a cela rekurze se pote vrati a cesta se zapise
-    if (accessMatrixDyn[std::make_pair(x,y)] == 1)
+    if (accessMatrixDyn[x][y] == 1)
         return true;
 
     // Automaticky nastavime pole jako "navstivene"
-    accessMatrixDyn[std::make_pair(x,y)] = 2;
+    accessMatrixDyn[x][y] = 2;
 
     // Minimalizujeme pocet lokalnich promennych kvuli velikosti zasobniku
     PathNode* p = new PathNode;
@@ -405,7 +405,7 @@ bool OutOfZeroPathfinder::Recursor(uint32 x, uint32 y)
 void OutOfZeroPathfinder::GeneratePath()
 {
     // Pokud stojime na pristupnem poli, jsme v suchu
-    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 1)
+    if (accessMatrixDyn[m_sourceX][m_sourceY] == 1)
         return;
 
     if (!Recursor(m_sourceX, m_sourceY))
@@ -466,33 +466,33 @@ void RandomPathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 length)
     m_mapSizeY = pMap->field[0].size();
 
     accessMatrixDyn.clear();
-    CoordPair tmp;
 
     // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
     // a nulami tam, kam nemuze
+    accessMatrixDyn.resize(m_mapSizeX);
     for (uint32 i = 0; i < m_mapSizeX; i++)
     {
+        accessMatrixDyn[i].resize(m_mapSizeY);
+
         for (uint32 j = 0; j < m_mapSizeY; j++)
         {
-            tmp = std::make_pair(i,j);
-
             // Pokud je nepristupne pole na souradnicich [x,y]
             if (pMap->field[i][j].type == TYPE_SOLID_BOX
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
             {
                 // Vynulujeme ho v hledaci mape
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
             else if (sGameplayMgr->WouldBeDangerousField(i,j))
             {
-                accessMatrixDyn[tmp] = 0;
+                accessMatrixDyn[i][j] = 0;
                 continue;
             }
 
             // Pokud je pristupne, jednicku
-            accessMatrixDyn[tmp] = 1;
+            accessMatrixDyn[i][j] = 1;
         }
     }
 }
@@ -547,7 +547,7 @@ void RandomPathfinder::GeneratePath()
     m_curLength = 0;
 
     // Pokud stojime na nepristupnem poli, jsme uvezneni
-    if (accessMatrixDyn[std::make_pair(m_sourceX, m_sourceY)] == 0)
+    if (accessMatrixDyn[m_sourceX][m_sourceY] == 0)
         return;
 
     if (!Recursor(m_sourceX, m_sourceY))

@@ -26,7 +26,7 @@ class Pathfinder
 
         // Mapa, kde jsou same jednotky, vynuluji se pouze nepristupna mista (bomby, krabice,..)
         // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
-        std::map<CoordPair, int8> accessMatrixDyn;
+        std::vector<std::vector<int8>> accessMatrixDyn;
 
     private:
         Path* m_path;
@@ -52,7 +52,7 @@ class OutOfZeroPathfinder
 
         // Mapa, kde jsou same jednotky, vynuluji se pouze nepristupna mista (bomby, krabice,..)
         // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
-        std::map<CoordPair, int8> accessMatrixDyn;
+        std::vector<std::vector<int8>> accessMatrixDyn;
 
     private:
         Path* m_path;
@@ -74,7 +74,7 @@ class RandomPathfinder
         void GeneratePath();
         bool Recursor(uint32 x, uint32 y);
 
-        std::map<CoordPair, int8> accessMatrixDyn;
+        std::vector<std::vector<int8>> accessMatrixDyn;
 
     private:
         Path* m_path;
