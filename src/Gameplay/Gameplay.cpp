@@ -56,34 +56,34 @@ void GameplayMgr::Update()
 
     if (!DangerousMap.empty() && !m_gamePaused)
     {
-        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end();)
+        DangerousField* temp = NULL;
+
+        for (uint32 i = 0; i < DangerousMap.size(); i++)
         {
-            if (!itr->second)
+            for (uint32 j = 0; j < DangerousMap[i].size(); j++)
             {
-                ++itr;
-                continue;
-            }
+                if (!DangerousMap[i][j])
+                    continue;
 
-            if (itr->second->activeSince + itr->second->activeTime < tnow)
-            {
-                itr = DangerousMap.erase(itr);
-                continue;
-            }
+                temp = DangerousMap[i][j];
 
-            if (itr->second->registered)
-            {
-                ++itr;
-                continue;
-            }
+                if (temp->activeSince + temp->activeTime < tnow)
+                {
+                    delete DangerousMap[i][j];
+                    DangerousMap[i][j] = NULL;
+                    continue;
+                }
 
-            if (itr->second->activeSince <= tnow)
-            {
-                itr->second->registered = true;
-                if (m_game)
-                    m_game->OnDangerousFieldActivate(itr->first.first, itr->first.second);
-            }
+                if (temp->registered)
+                    continue;
 
-            ++itr;
+                if (temp->activeSince <= tnow)
+                {
+                    temp->registered = true;
+                    if (m_game)
+                        m_game->OnDangerousFieldActivate(i, j);
+                }
+            }
         }
     }
 }
@@ -126,13 +126,29 @@ void GameplayMgr::OnGameInit()
 
     if (!DangerousMap.empty())
     {
-        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end();)
+        for (std::vector<std::vector<DangerousField*>>::iterator iter = DangerousMap.begin(); iter != DangerousMap.end();)
         {
-            delete (*itr).second;
-            itr = DangerousMap.erase(itr);
+            for (std::vector<DangerousField*>::iterator itr = (*iter).begin(); itr != (*iter).end();)
+            {
+                delete (*itr);
+                itr = (*iter).erase(itr);
+            }
+            iter = DangerousMap.erase(iter);
         }
 
         DangerousMap.clear();
+    }
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (pMap)
+    {
+        DangerousMap.resize(pMap->field.size());
+        for (uint32 i = 0; i < DangerousMap.size(); i++)
+        {
+            DangerousMap[i].resize(pMap->field[i].size());
+            for (uint32 j = 0; j < DangerousMap[i].size(); j++)
+                DangerousMap[i][j] = NULL;
+        }
     }
 
     if (m_game)
@@ -295,11 +311,16 @@ void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uin
 
 bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
 {
-    std::map<std::pair<uint32, uint32>, DangerousField*>::const_iterator itr = DangerousMap.find(std::make_pair(x,y));
-    if (itr == DangerousMap.end())
+    if (DangerousMap.size() < x)
+        return false;
+    if (DangerousMap[x].size() < y)
         return false;
 
-    if (itr->second->activeSince <= clock() && itr->second->activeSince+itr->second->activeTime >= clock())
+    // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
+    if (DangerousMap[x][y] == NULL)
+        return false;
+
+    if (DangerousMap[x][y]->activeSince <= clock() && DangerousMap[x][y]->activeSince+DangerousMap[x][y]->activeTime >= clock())
         return true;
 
     return false;
@@ -307,8 +328,13 @@ bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
 
 bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
 {
-    std::map<std::pair<uint32, uint32>, DangerousField*>::const_iterator itr = DangerousMap.find(std::make_pair(x,y));
-    if (itr == DangerousMap.end())
+    if (DangerousMap.size() < x)
+        return false;
+    if (DangerousMap[x].size() < y)
+        return false;
+
+    // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
+    if (DangerousMap[x][y] == NULL)
         return false;
 
     return true;
@@ -316,13 +342,18 @@ bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
 
 void GameplayMgr::SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong)
 {
+    if (x > DangerousMap.size())
+        return;
+    if (y > DangerousMap[x].size())
+        return;
+
     DangerousField* field = new DangerousField;
 
     field->activeSince = since;
     field->activeTime = howLong;
     field->registered = false;
 
-    DangerousMap[std::make_pair(x,y)] = field;
+    DangerousMap[x][y] = field;
 }
 
 void GameplayMgr::PlayerDied(uint32 x, uint32 y)
@@ -371,12 +402,18 @@ void GameplayMgr::UnpauseGame()
 
     if (!DangerousMap.empty())
     {
-        for (std::map<std::pair<uint32, uint32>, DangerousField*>::iterator itr = DangerousMap.begin(); itr != DangerousMap.end(); ++itr)
+        for (uint32 i = 0; i < DangerousMap.size(); i++)
         {
-            if ((*itr).second->registered)
-                (*itr).second->activeTime += diff;
-            else
-                (*itr).second->activeSince += diff;
+            for (uint32 j = 0; j < DangerousMap[i].size(); j++)
+            {
+                if (!DangerousMap[i][j])
+                    continue;
+
+                if (DangerousMap[i][j]->registered)
+                    DangerousMap[i][j]->activeTime += diff;
+                else
+                    DangerousMap[i][j]->activeSince += diff;
+            }
         }
     }
 

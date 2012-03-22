@@ -66,7 +66,7 @@ void Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32
                 accessMatrixDyn[i][j] = 0;
                 continue;
             }
-            else if (sGameplayMgr->WouldBeDangerousField(i,j))
+            else if (sGameplayMgr->WouldBeDangerousField(i,j) || sGameplayMgr->IsDangerousField(i,j))
             {
                 accessMatrixDyn[i][j] = 0;
                 continue;
@@ -614,18 +614,29 @@ void MovementHolder::Generator()
             uint32 my = ceil(m_src->pRecord->z);
             uint32 tx = ceil(pTarget->x);
             uint32 ty = ceil(pTarget->z);
-            Pathfinder p(&m_path);
+
+            Path* tmpPath = new Path;
+            Pathfinder p(tmpPath);
             p.Initialize(mx, my, tx, ty);
             p.GeneratePath();
 
-            // Musi byt vetsi nez 1, aby melo smysl se pohybovat
-            if (m_path.size() > 1)
+            // Pouze pokud existuje kratsi cesta k cili, pouzijeme ji
+            if (tmpPath->size() < m_path.size())
             {
-                m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
-                m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
-                m_currentPathNode = 0;
-                m_nodeStartTime = clock();
+                m_path.clear();
+                m_path.assign(tmpPath->begin(), tmpPath->end());
+
+                // Musi byt vetsi nez 1, aby melo smysl se pohybovat
+                if (m_path.size() > 1)
+                {
+                    m_nodeVector.x =  int32(m_path[1].x) - int32(m_path[0].x);
+                    m_nodeVector.y =  int32(m_path[1].y) - int32(m_path[0].y);
+                    m_currentPathNode = 0;
+                    m_nodeStartTime = clock();
+                }
             }
+            delete tmpPath;
+
             break;
         }
         case MOVEMENT_OUTOFZERO:

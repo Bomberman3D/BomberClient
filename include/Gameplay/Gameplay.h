@@ -145,7 +145,7 @@ class GameplayMgr
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;
-        std::map<std::pair<uint32, uint32>, DangerousField*> DangerousMap;
+        std::vector<std::vector<DangerousField*>> DangerousMap;
         std::vector<bool> m_moveElements;
         float m_moveAngle;
         bool m_movementBlocked;
