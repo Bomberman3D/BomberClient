@@ -29,6 +29,8 @@ enum BonusType
 struct BombRecord;
 class EnemyTemplate;
 
+typedef std::list<EnemyTemplate*> EnemyList;
+
 class GameTypeTemplate
 {
     public:
@@ -42,6 +44,8 @@ class GameTypeTemplate
         virtual void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) {};
         virtual void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY) {};
         virtual void OnDangerousFieldActivate(uint32 x, uint32 y) {};
+
+        virtual EnemyList* GetEnemies() { return NULL; };
 
         // Multiplayer funkce, prepsany jen v multiplayerovych potomkach
         //virtual void OnPlayerJoin( ... ) {};
@@ -71,8 +75,10 @@ class ClassicSingleGameType: public GameTypeTemplate
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
         void OnDangerousFieldActivate(uint32 x, uint32 y);
 
+        virtual EnemyList* GetEnemies() { return &m_enemies; };
+
     private:
-        std::list<EnemyTemplate*> m_enemies;
+        EnemyList m_enemies;
 
         uint32 m_playerX;
         uint32 m_playerY;

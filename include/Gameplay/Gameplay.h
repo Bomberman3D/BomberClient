@@ -135,6 +135,7 @@ class GameplayMgr
         void PauseGame();
         void UnpauseGame();
         bool IsGamePaused() { return m_gamePaused; };
+        EnemyList* GetEnemies() { if (m_game) return m_game->GetEnemies(); else return NULL; };
 
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
 

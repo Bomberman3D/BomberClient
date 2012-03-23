@@ -83,6 +83,8 @@ void GameStage::OnDraw(uint32 diff)
             uint32 mapsize_x = pMap->field.size();
             uint32 mapsize_y = pMap->field[0].size();
 
+            EnemyList* enemies = sGameplayMgr->GetEnemies();
+
             // Mapa bude mit vzdy (maximalne) 160 obrazovych bodu dlouhou jednu "hranu"
             // rozhodne se podle delsiho rozmeru
             // 8/20 je pomer, puvodne tedy "na mapu o sirce 20 poli bude 8 pixelove vykreslene pole"
@@ -119,13 +121,30 @@ void GameStage::OnDraw(uint32 diff)
                         }
                     }
                     sDisplay->Draw2D(textureId, 20+i*field_size, 20+j*field_size, field_size, field_size);
-
-                    // Pokud je na tomto miste hrac, vykreslit mu puntik :)
-                    if (i == bx && j == by)
-                        sDisplay->Draw2D(53, 20+i*field_size, 20+j*field_size, field_size, field_size);
                 }
             }
+
+            // Vykreslit hraci puntik
+            sDisplay->Draw2D(53, 20+bx*field_size, 20+by*field_size, field_size, field_size);
+
+            // A taky puntik pro vsechny nepratele :)
+            if (enemies && !enemies->empty())
+            {
+                for (EnemyList::iterator itr = enemies->begin(); itr != enemies->end(); ++itr)
+                    sDisplay->Draw2D(54, 20+ceil((*itr)->pRecord->x)*field_size, 20+ceil((*itr)->pRecord->z)*field_size, field_size, field_size);
+            }
         }
+
+        glLoadIdentity();
+
+        sDisplay->Draw2D(33, 240, 40 , 24, 24); // plamen
+        sDisplay->PrintText(MAIN_FONT, 290, 42, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", (sGameplayMgr->GetFlameReach()-1));
+
+        sDisplay->Draw2D(34, 240, 90 , 24, 24); // rychlost
+        sDisplay->PrintText(MAIN_FONT, 290, 92, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", uint32((sGameplayMgr->GetPlayerSpeedCoef()-1.0f)/0.2f));
+
+        sDisplay->Draw2D(35, 240, 140, 24, 24); // bomby
+        sDisplay->PrintText(MAIN_FONT, 290, 142, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", (sGameplayMgr->GetMaxBombs()-1));
 
         sDisplay->Setup3DMode();
     }
