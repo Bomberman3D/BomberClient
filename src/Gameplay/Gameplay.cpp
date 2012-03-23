@@ -60,7 +60,7 @@ void GameplayMgr::Update()
 
         for (uint32 i = 0; i < DangerousMap.size(); i++)
         {
-            for (uint32 j = 0; j < DangerousMap[i].size(); j++)
+            for (uint32 j = 0; j < DangerousMap[0].size(); j++)
             {
                 if (!DangerousMap[i][j])
                     continue;

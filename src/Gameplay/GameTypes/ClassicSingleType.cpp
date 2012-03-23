@@ -79,8 +79,6 @@ void ClassicSingleGameType::OnUpdate()
 {
     if (!m_enemies.empty())
     {
-        clock_t tnow = clock();
-
         for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end(); )
         {
             // Pokud neexistuje cil, vymazeme zaznam z vektoru

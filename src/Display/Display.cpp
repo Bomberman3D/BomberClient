@@ -858,6 +858,8 @@ void Display::DrawMap()
 
     // Konec vykresleni skyboxu
 
+    Map::Cell* tempField = NULL;
+
     for (uint32 w = 0; w < pMap->field.size(); w++)
     {
         for (uint32 h = 0; h < pMap->field[0].size(); h++)
@@ -866,10 +868,12 @@ void Display::DrawMap()
             y = 0;
             z = h;
 
-            BindTexture(pMap->field[w][h].texture);
+            tempField = &pMap->field[w][h];
+
+            BindTexture(tempField->texture);
 
             // Nejdrive staticke prvky
-            if (pMap->field[w][h].type == TYPE_GROUND || pMap->field[w][h].type == TYPE_STARTLOC)
+            if (tempField->type == TYPE_GROUND || tempField->type == TYPE_STARTLOC)
             {
                 glBegin(GL_POLYGON);
                     glNormal3f(0.0f,-1.0f, 0.0f);
@@ -879,9 +883,9 @@ void Display::DrawMap()
                     glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y, z  );
                 glEnd();
             }
-            else if (pMap->field[w][h].type == TYPE_SOLID_BOX)
+            else if (tempField->type == TYPE_SOLID_BOX)
             {
-                Storage::SolidBoxDataMap::const_iterator itr = sStorage->SolidBoxProp.find(pMap->field[w][h].texture);
+                Storage::SolidBoxDataMap::const_iterator itr = sStorage->SolidBoxProp.find(tempField->texture);
 
                 if (itr != sStorage->SolidBoxProp.end())
                 {
@@ -945,8 +949,8 @@ void Display::DrawMap()
                             glTexCoord2f(1.0f, 0.0f); glVertex3f(x-1, y, z  );
                         glEnd();
 
-                        if (!pMap->field[w][h].pRec)
-                            pMap->field[w][h].pRec = DrawModel(itr->second.model_id, w-0.5f, 0.0f, h-0.5f, ANIM_IDLE, 0.2f, 45.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE);
+                        if (!tempField->pRec)
+                            tempField->pRec = DrawModel(itr->second.model_id, w-0.5f, 0.0f, h-0.5f, ANIM_IDLE, 0.2f, 45.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE);
                     }
                 }
             }

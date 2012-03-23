@@ -66,8 +66,71 @@ void GameStage::OnDraw(uint32 diff)
     mousePos.x = sApplication->GetMouseX();
     mousePos.y = sApplication->GetMouseY();
 
+    // Hrajeme!
+    if (m_subStage == 0)
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        // Vykreslime minimapu do leveho horniho rohu
+        Map* pMap = (Map*)sMapManager->GetMap();
+        uint32 textureId = 0;
+        if (pMap && sGameplayMgr->GetPlayerRec())
+        {
+            uint32 bx = floor(sGameplayMgr->GetPlayerRec()->x)+1;
+            uint32 by = floor(sGameplayMgr->GetPlayerRec()->z)+1;
+
+            uint32 mapsize_x = pMap->field.size();
+            uint32 mapsize_y = pMap->field[0].size();
+
+            // Mapa bude mit vzdy (maximalne) 160 obrazovych bodu dlouhou jednu "hranu"
+            // rozhodne se podle delsiho rozmeru
+            // 8/20 je pomer, puvodne tedy "na mapu o sirce 20 poli bude 8 pixelove vykreslene pole"
+            float field_size = 0.0f;
+            if (mapsize_x < mapsize_y)
+                field_size = mapsize_x*8/20;
+            else
+                field_size = mapsize_y*8/20;
+
+            // Preklad na stred mapy a pootoceni tak, aby byla vzdy vuci hraci "rovne"
+            // cili aby smer "nahoru" na 2D ose fungoval jako smer "dopredu" v prostoru
+            glTranslatef(20+(mapsize_x*field_size)/2, 20+(mapsize_y*field_size)/2, 0.0f);
+            glRotatef(180.0f+sGameplayMgr->GetPlayerRec()->rotate-sDisplay->GetHorizontalAngleDeviation(), 0,0,1);
+            glTranslatef(-int32(20+(mapsize_x*field_size)/2), -int32(20+(mapsize_y*field_size)/2), 0.0f);
+
+            for (uint32 i = 0; i < mapsize_x; i++)
+            {
+                for (uint32 j = 0; j < mapsize_y; j++)
+                {
+                    // Nastaveni textury pro vykresleni
+                    if (pMap->IsDynamicRecordPresent(i, j, DYNAMIC_TYPE_BOX))
+                        textureId = 52;
+                    else
+                    {
+                        switch (pMap->field[i][j].type)
+                        {
+                            case TYPE_SOLID_BOX:
+                                textureId = 50;
+                                break;
+                            case TYPE_GROUND:
+                            default:
+                                textureId = 49;
+                                break;
+                        }
+                    }
+                    sDisplay->Draw2D(textureId, 20+i*field_size, 20+j*field_size, field_size, field_size);
+
+                    // Pokud je na tomto miste hrac, vykreslit mu puntik :)
+                    if (i == bx && j == by)
+                        sDisplay->Draw2D(53, 20+i*field_size, 20+j*field_size, field_size, field_size);
+                }
+            }
+        }
+
+        sDisplay->Setup3DMode();
+    }
     // Hra zapauzovana
-    if (m_subStage == 2)
+    else if (m_subStage == 2)
     {
         if (!sDisplay->IsIn2DMode())
             sDisplay->Setup2DMode();
