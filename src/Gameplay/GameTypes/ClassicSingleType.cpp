@@ -18,10 +18,10 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 
     for (uint32 i = 0; i < pMap->field.size(); i++)
     {
-        for (uint32 j = 0; j < pMap->field[i].size(); j++)
+        for (uint32 j = 0; j < pMap->field[0].size(); j++)
         {
             // Muzeme dat bednu jen na misto kde nebude stat hrac, ani pevny objekt mapy
-            if ((i > 2 || j > 2) && pMap->field[i][j].type == TYPE_GROUND)
+            if (pMap->field[i][j].type == TYPE_GROUND && !pMap->NearStartPos(i,j))
             {
                 // pri 10ti se deli dvema, pri 1 se deli 11ti, asi nejjednodussi
                 if ((rand()%(12-sGameplayMgr->GetSetting(SETTING_BOX_DENSITY))) == 0)
@@ -36,7 +36,7 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 
     for (uint32 i = 0; i < pMap->field.size(); i++)
     {
-        for (uint32 j = 0; j < pMap->field[i].size(); j++)
+        for (uint32 j = 0; j < pMap->field[0].size(); j++)
         {
             if (pMap->field[i][j].type == TYPE_STARTLOC)
             {

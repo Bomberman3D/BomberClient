@@ -258,3 +258,22 @@ void Map::DestroyAllDynamicRecords()
         }
     }
 }
+
+bool Map::NearStartPos(uint32 x, uint32 y)
+{
+    if (field.size() < 1 || field[0].size() < 1)
+        return false;
+
+    if (field[x][y].type == TYPE_STARTLOC)
+        return true;
+
+    if (x > 0 && y > 0 && x < field.size()-1 && y < field[0].size()-1)
+    {
+        for (int32 i = -1; i <= 1; i++)
+            for (int32 j = -1; j <= 1; j++)
+                if (field[x+i][y+j].type == TYPE_STARTLOC)
+                    return true;
+    }
+
+    return false;
+}
