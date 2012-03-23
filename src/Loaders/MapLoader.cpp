@@ -78,7 +78,7 @@ void MapManager::FillDynamicRecords()
 
     for (uint32 i = 0; i < pMap->dynfield.size(); i++)
     {
-        for (uint32 j = 0; j < pMap->dynfield[i].size(); j++)
+        for (uint32 j = 0; j < pMap->dynfield[0].size(); j++)
         {
             if (pMap->dynfield[i][j].size() > 0)
             {
@@ -218,9 +218,12 @@ bool Map::IsDynamicRecordPresent(uint32 x, uint32 y, int32 type)
     if (x > dynfield.size()-1 || y > dynfield[0].size()-1)
         return false;
 
+    if (type == -1 && !dynfield[x][y].empty())
+        return true;
+
     for (Map::DynamicCellSet::iterator itr = dynfield[x][y].begin(); itr != dynfield[x][y].end(); ++itr)
     {
-        if ((*itr).type == type || type == -1)
+        if ((*itr).type == type)
             return true;
     }
 
@@ -245,7 +248,7 @@ void Map::DestroyAllDynamicRecords()
 
     for (uint32 i = 0; i < dynfield.size(); i++)
     {
-        for (uint32 j = 0; j < dynfield[i].size(); j++)
+        for (uint32 j = 0; j < dynfield[0].size(); j++)
         {
             for (uint32 k = 0; k < dynfield[i][j].size(); k++)
             {

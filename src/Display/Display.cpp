@@ -170,6 +170,10 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 
 
 bool Display::BindTexture(uint32 textureId)
 {
+    // Pokud jiz je aktualne nabindovana, neni treba nic delat
+    if (textureId == m_boundTexture)
+        return true;
+
     // Pokud neni nactena, nacteme ji
     if (sStorage->Textures[textureId] == NULL)
     {
@@ -182,13 +186,12 @@ bool Display::BindTexture(uint32 textureId)
         return false;
     }
 
-    glEnable(GL_TEXTURE_2D);
-
-    // Pokud jiz je aktualne nabindovana, neni treba nic delat
-    if (textureId == m_boundTexture)
-        return true;
+    if (!glIsEnabled(GL_TEXTURE_2D))
+        glEnable(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, *(sStorage->Textures[textureId]));
+
+    m_boundTexture = textureId;
 
     return true;
 }
@@ -282,12 +285,6 @@ void Display::DrawModels()
 
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end();)
     {
-        if (!itr._Has_container())
-        {
-            ++itr;
-            continue;
-        }
-
         temp = *itr;
 
         if (!temp)
@@ -586,6 +583,17 @@ void Display::DrawBillboards()
     if (!BillboardDisplayList.empty())
         BillboardDisplayList.sort(BubbleSortDistance);
 
+    // Pruhledne objekty potrebuji mit zapnuty mod pro blending a mod one minus src alpha pro
+    // spravne vykresleni pruhlednosti
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Nechat depth test pro ted zapnuty, zpusobuje nepruhlednost
+    // vykreslenych spritu vuci jinym spritum
+    //glDisable(GL_DEPTH_TEST);
+
+    glColor3ub(255, 255, 255);
+
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end();)
     {
         temp = (*itr);
@@ -617,7 +625,6 @@ void Display::DrawBillboards()
         }
 
         glLoadIdentity();
-        glColor3ub(255, 255, 255);
 
         AdjustViewToTarget();
 
@@ -625,15 +632,6 @@ void Display::DrawBillboards()
             BindTexture(sAnimator->GetActualTexture(temp->AnimTicket));
         else
             BindTexture(temp->textureId);
-
-        // Pruhledne objekty potrebuji mit zapnuty mod pro blending a mod one minus src alpha pro
-        // spravne vykresleni pruhlednosti
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        // Nechat depth test pro ted zapnuty, zpusobuje nepruhlednost
-        // vykreslenych spritu vuci jinym spritum
-        //glDisable(GL_DEPTH_TEST);
 
         glTranslatef(temp->x, temp->y, temp->z);
         if (temp->billboard_y)
@@ -655,14 +653,14 @@ void Display::DrawBillboards()
             glEnd();
         }
 
-        // Nezapomeneme vypnout blending, jen jako slusnacci
-        glDisable(GL_BLEND);
-
-        // Netreba, viz. komentar vyse
-        //glEnable(GL_DEPTH_TEST);
-
         ++itr;
     }
+    // Nezapomeneme vypnout blending, jen jako slusnacci
+    glDisable(GL_BLEND);
+
+    // Netreba, viz. komentar vyse
+    //glEnable(GL_DEPTH_TEST);
+
     glDepthMask(GL_TRUE);
 
     if (lightingEnable)
