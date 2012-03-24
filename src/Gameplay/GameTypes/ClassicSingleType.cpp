@@ -261,7 +261,10 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
     if (pMap)
+    {
+        pMap->DestroyDynamicRecords(x, y, DYNAMIC_TYPE_BONUS);
         pMap->DestroyDynamicRecords(x, y, DYNAMIC_TYPE_BOX);
+    }
 
     // Pokud hrac stoji na nebezpecnem poli
     if (m_playerX == x && m_playerY == y)
