@@ -29,7 +29,7 @@ struct AnimationRecord
     bool   bothWay; // dovoluje animovat nejdriv k nejvyssimu a pak k nejnizsimu framu
 
     // Dynamicka data
-    uint32 passedInterval;
+    uint32 nextFrameTime;
     uint32 actualTextureId; // Kvuli rychlosti se bude uchovavat oboji
     uint32 actualFrame;
     bool   reversed;

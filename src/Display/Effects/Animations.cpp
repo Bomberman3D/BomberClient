@@ -18,13 +18,8 @@ void Animator::Update()
         return;
     }
 
-    // Nejdrive si musime vyridit diff pro update
-    if (m_lastUpdate == 0)
-        m_diff = 0;
-    else
-        m_diff = clock() - m_lastUpdate;
-
-    m_lastUpdate = clock();
+    clock_t tnow = clock();
+    uint32 totalTicksCount = 0;
 
     // Ted projdeme vsechny zaznamy o animaci a pripadne posuneme frame
 
@@ -38,23 +33,37 @@ void Animator::Update()
         if (temp->disabled)
             continue;
 
-        temp->passedInterval += m_diff;
-
         if (temp->animType == ANIM_TYPE_TEXTURE)
         {
-            if (temp->passedInterval >= sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval)
+            if (temp->nextFrameTime <= tnow)
             {
-                temp->passedInterval = 0;                          // Resetovat casovac
+                if (sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval > 0)
+                    totalTicksCount = 1 + ((tnow - temp->nextFrameTime)/sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval);
+                else
+                    totalTicksCount = 1;
+
+                // Nastavit casovac
+                temp->nextFrameTime = tnow + sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId][temp->actualFrame].interval;
 
                 if (temp->reversed)
                 {
                     if (temp->actualFrame >= temp->frameSkipSpeed)
-                        temp->actualFrame -= temp->frameSkipSpeed; // posunout frame zpet
+                    {
+                        if (temp->actualFrame > (totalTicksCount * temp->frameSkipSpeed))
+                            temp->actualFrame -= totalTicksCount * temp->frameSkipSpeed; // posunout frame zpet
+                        else
+                            temp->actualFrame = 0;
+                    }
                     else
                         temp->actualFrame = 0;
                 }
                 else
-                    temp->actualFrame += temp->frameSkipSpeed;     // posunout frame dopredu
+                {
+                    if ((temp->actualFrame + (totalTicksCount * temp->frameSkipSpeed)) < sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size())
+                        temp->actualFrame += totalTicksCount * temp->frameSkipSpeed;     // posunout frame dopredu
+                    else
+                        temp->actualFrame = sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size();
+                }
 
                 // Pokud jsme se dostali na konec, opakovat animaci
                 if (!temp->reversed && sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
@@ -78,19 +87,35 @@ void Animator::Update()
         // prakticky by nemel nastat pripad, kdy se animType rovna necemu jinemu, ale ja se radsi pojistim
         else if (temp->animType == ANIM_TYPE_MODEL)
         {
-            if (temp->passedInterval >= sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval)
+            if (temp->nextFrameTime <= tnow)
             {
-                temp->passedInterval = 0;                          // Resetovat casovac
+                if (sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval > 0)
+                    totalTicksCount = 1 + ((tnow - temp->nextFrameTime)/(sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval));
+                else
+                    totalTicksCount = 1;
+
+                // Nastavit casovac
+                temp->nextFrameTime = tnow + sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].interval;
 
                 if (temp->reversed)
                 {
                     if (temp->actualFrame >= temp->frameSkipSpeed)
-                        temp->actualFrame -= temp->frameSkipSpeed; // posunout frame zpet
+                    {
+                        if (temp->actualFrame - (totalTicksCount * temp->frameSkipSpeed) > sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst)
+                            temp->actualFrame -= totalTicksCount * temp->frameSkipSpeed; // posunout frame zpet
+                        else
+                            temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
+                    }
                     else
                         temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
                 }
                 else
-                    temp->actualFrame += temp->frameSkipSpeed;     // posunout frame
+                {
+                    if (temp->actualFrame + (totalTicksCount * temp->frameSkipSpeed) < sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast)
+                        temp->actualFrame += totalTicksCount * temp->frameSkipSpeed;     // posunout frame
+                    else
+                        temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast;
+                }
 
                 // Pokud jsme na poslednim framu animace, opakujeme
                 if (!temp->reversed && sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
@@ -209,7 +234,7 @@ uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 fr
     temp->animId          = animId;
     temp->actualTextureId = textureId;
     temp->actualFrame     = 0;
-    temp->passedInterval  = 0;
+    temp->nextFrameTime   = clock();
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
     temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
 
@@ -248,7 +273,7 @@ uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameS
     temp->animId          = animId;
     temp->actualTextureId = 0;
     temp->actualFrame     = sStorage->ModelAnimation[modelId].Anim[animId].frameFirst;
-    temp->passedInterval  = 0;
+    temp->nextFrameTime   = clock();
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
     temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
 
@@ -266,7 +291,7 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
 
     itr->second.animId         = animId;
     itr->second.actualFrame    = sStorage->ModelAnimation[itr->second.sourceId].Anim[animId].frameFirst + startFrame;
-    itr->second.passedInterval = 0;
+    itr->second.nextFrameTime  = clock();
     itr->second.bothWay        = (flags & ANIM_FLAG_BOTHWAY);
     if (frameSkipSpeed > 0)
         itr->second.frameSkipSpeed = frameSkipSpeed;
