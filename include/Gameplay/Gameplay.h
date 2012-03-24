@@ -41,6 +41,7 @@ struct DangerousField
     clock_t activeSince; // aktivni od [ms] - kvuli postupnemu dosahu plamene
     uint32  activeTime;  // [ms]
     bool    registered;  // byly uz provedeny veci "po aktivaci" ?
+    BombRecord* origin;  // bomba, od ktere vybuch jde - napr. kvuli predcasnym vybuchum
 };
 
 // Struktura pro statistiky hrace v dane hre
@@ -123,7 +124,7 @@ class GameplayMgr
 
         bool IsDangerousField(uint32 x, uint32 y);
         bool WouldBeDangerousField(uint32 x, uint32 y);
-        void SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong);
+        void SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t since, uint32 howLong);
 
         void PlayerDied(uint32 x, uint32 y);
         void UpdatePlayerMoveAngle();
@@ -146,7 +147,7 @@ class GameplayMgr
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;
         std::list<BombRecord*> BombMap;
-        std::vector<std::vector<DangerousField*>> DangerousMap;
+        std::vector<std::vector<std::vector<DangerousField*>>> DangerousMap;
         std::vector<bool> m_moveElements;
         float m_moveAngle;
         bool m_movementBlocked;

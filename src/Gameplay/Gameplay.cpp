@@ -62,26 +62,29 @@ void GameplayMgr::Update()
         {
             for (uint32 j = 0; j < DangerousMap[0].size(); j++)
             {
-                if (!DangerousMap[i][j])
-                    continue;
-
-                temp = DangerousMap[i][j];
-
-                if (temp->activeSince + temp->activeTime < tnow)
+                for (uint32 k = 0; k < 4; k++)
                 {
-                    delete DangerousMap[i][j];
-                    DangerousMap[i][j] = NULL;
-                    continue;
-                }
+                    if (!DangerousMap[i][j][k])
+                        continue;
 
-                if (temp->registered)
-                    continue;
+                    temp = DangerousMap[i][j][k];
 
-                if (temp->activeSince <= tnow)
-                {
-                    temp->registered = true;
-                    if (m_game)
-                        m_game->OnDangerousFieldActivate(i, j);
+                    if (temp->activeSince + temp->activeTime < tnow)
+                    {
+                        delete DangerousMap[i][j][k];
+                        DangerousMap[i][j][k] = NULL;
+                        continue;
+                    }
+
+                    if (temp->registered)
+                        continue;
+
+                    if (temp->activeSince <= tnow)
+                    {
+                        temp->registered = true;
+                        if (m_game)
+                            m_game->OnDangerousFieldActivate(i, j);
+                    }
                 }
             }
         }
@@ -126,11 +129,16 @@ void GameplayMgr::OnGameInit()
 
     if (!DangerousMap.empty())
     {
-        for (std::vector<std::vector<DangerousField*>>::iterator iter = DangerousMap.begin(); iter != DangerousMap.end();)
+        for (std::vector<std::vector<std::vector<DangerousField*>>>::iterator iter = DangerousMap.begin(); iter != DangerousMap.end();)
         {
-            for (std::vector<DangerousField*>::iterator itr = (*iter).begin(); itr != (*iter).end();)
+            for (std::vector<std::vector<DangerousField*>>::iterator itr = (*iter).begin(); itr != (*iter).end();)
             {
-                delete (*itr);
+                for (uint32 i = 0; i < 4; i++)
+                {
+                    if ((*itr)[i] != NULL)
+                        delete (*itr)[i];
+                }
+                (*itr).clear();
                 itr = (*iter).erase(itr);
             }
             iter = DangerousMap.erase(iter);
@@ -147,7 +155,11 @@ void GameplayMgr::OnGameInit()
         {
             DangerousMap[i].resize(pMap->field[i].size());
             for (uint32 j = 0; j < DangerousMap[i].size(); j++)
-                DangerousMap[i][j] = NULL;
+            {
+                DangerousMap[i][j].resize(4);
+                for (uint32 k = 0; k < 4; k++)
+                    DangerousMap[i][j][k] = NULL;
+            }
         }
     }
 
@@ -286,17 +298,17 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
         // (v pripade true hodnoty bool promenne +1 / -1 proto, ze reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
         clock_t tnow = clock();
 
-        sGameplayMgr->SetDangerous(bomb->x, bomb->y, tnow+2500, 1500);
+        sGameplayMgr->SetDangerous(bomb->x, bomb->y, bomb, tnow+2500, 1500);
         for (uint32 i = 1; i <= bombreach; i++)
         {
             if (reach_x1 + (rx1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, bomb, tnow+i*100+2500, 1500);
             if (reach_x2 + (rx2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, bomb, tnow+i*100+2500, 1500);
             if (reach_y1 + (ry1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, bomb, tnow+i*100+2500, 1500);
             if (reach_y2 + (ry2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, bomb, tnow+i*100+2500, 1500);
         }
     }
 
@@ -316,12 +328,15 @@ bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
     if (DangerousMap[x].size() < y)
         return false;
 
-    // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
-    if (DangerousMap[x][y] == NULL)
-        return false;
+    for (uint32 k = 0; k < 4; k++)
+    {
+        // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
+        if (DangerousMap[x][y][k] == NULL)
+            continue;
 
-    if (DangerousMap[x][y]->activeSince <= clock() && DangerousMap[x][y]->activeSince+DangerousMap[x][y]->activeTime >= clock())
-        return true;
+        if (DangerousMap[x][y][k]->activeSince <= clock() && DangerousMap[x][y][k]->activeSince+DangerousMap[x][y][k]->activeTime >= clock())
+            return true;
+    }
 
     return false;
 }
@@ -333,27 +348,39 @@ bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
     if (DangerousMap[x].size() < y)
         return false;
 
-    // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
-    if (DangerousMap[x][y] == NULL)
-        return false;
+    for (uint32 k = 0; k < 4; k++)
+    {
+        // Pointer v mape se rovna NULLe, kdyz neni zaznamenana zadna vybusna aktivita
+        if (DangerousMap[x][y][k] != NULL)
+            return true;
+    }
 
-    return true;
+    return false;
 }
 
-void GameplayMgr::SetDangerous(uint32 x, uint32 y, clock_t since, uint32 howLong)
+void GameplayMgr::SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t since, uint32 howLong)
 {
     if (x > DangerousMap.size())
         return;
     if (y > DangerousMap[x].size())
         return;
 
-    DangerousField* field = new DangerousField;
+    for (uint32 k = 0; k < 4; k++)
+    {
+        // Musime najit volne misto na danem poli
+        if (DangerousMap[x][y][k] != NULL)
+            continue;
 
-    field->activeSince = since;
-    field->activeTime = howLong;
-    field->registered = false;
+        DangerousField* field = new DangerousField;
 
-    DangerousMap[x][y] = field;
+        field->activeSince = since;
+        field->activeTime = howLong;
+        field->registered = false;
+        field->origin = origin;
+
+        DangerousMap[x][y][k] = field;
+        break;
+    }
 }
 
 void GameplayMgr::PlayerDied(uint32 x, uint32 y)
@@ -406,13 +433,16 @@ void GameplayMgr::UnpauseGame()
         {
             for (uint32 j = 0; j < DangerousMap[i].size(); j++)
             {
-                if (!DangerousMap[i][j])
-                    continue;
+                for (uint32 k = 0; k < 4; k++)
+                {
+                    if (!DangerousMap[i][j][k])
+                        continue;
 
-                if (DangerousMap[i][j]->registered)
-                    DangerousMap[i][j]->activeTime += diff;
-                else
-                    DangerousMap[i][j]->activeSince += diff;
+                    if (DangerousMap[i][j][k]->registered)
+                        DangerousMap[i][j][k]->activeTime += diff;
+                    else
+                        DangerousMap[i][j][k]->activeSince += diff;
+                }
             }
         }
     }
