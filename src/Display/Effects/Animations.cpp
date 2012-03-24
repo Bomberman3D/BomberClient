@@ -101,7 +101,7 @@ void Animator::Update()
                 {
                     if (temp->actualFrame >= temp->frameSkipSpeed)
                     {
-                        if (temp->actualFrame - (totalTicksCount * temp->frameSkipSpeed) > sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst)
+                        if (int32(int32(temp->actualFrame) - int32((totalTicksCount * temp->frameSkipSpeed))) >= int32(sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst))
                             temp->actualFrame -= totalTicksCount * temp->frameSkipSpeed; // posunout frame zpet
                         else
                             temp->actualFrame = sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameFirst;
@@ -305,6 +305,9 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
 {
     // TODO: odebrat staticke zaznamy, nahradit necim dynamickym !!!
 
+    // Model bomby
+    if (id == 8)
+        return true;
     // Model hlavni postavy
     if (id == 9)
         return true;
@@ -361,6 +364,11 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
     if (!model || !object)
         return;
 
+    uint32 realFrame = frame;
+    if (object->vPosition.size() <= frame)
+        realFrame = 1;
+
+    // Model hrace - chuze
     if (modelId == 9 && anim == ANIM_WALK)
     {
         float wholePosMod = 1.0f-fabs((float(frame%50)/25.0f)-1.0f);
@@ -505,6 +513,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
             processed = true;
         }
     }
+    // Model hrace - zevleni
     else if (modelId == 9 && anim == ANIM_IDLE)
     {
         if (strcmp(object->strName, "LevaRuka") == 0 || strcmp(object->strName, "LevaDlan") == 0)
@@ -548,16 +557,40 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
             processed = true;
         }
     }
+    // Model bomby - tikani
+    else if (modelId == 8 && anim == ANIM_IDLE)
+    {
+        // Bomba se bude zmensovat a zvetsovat, jako v Dyna Blasterovi
+        // Pozdeji prybyde i particle emitter, ktery se bude pohybovat "po knotu"
+
+        t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Sphere01");
+        if (!pObj)
+            return;
+
+        CVector3 vPosition = object->vPosition[realFrame];
+        glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y, pObj->vPosition[realFrame].z);
+        CVector3 vScale = object->vScale[realFrame];
+        glScalef(vScale.x, vScale.y, vScale.z);
+
+        float scaleFrame = fabs(float(frame%100)-50.0f);
+        float scalingFactor = (1.0f + (scaleFrame/100.0f)*0.3f);
+        glScalef(scalingFactor, scalingFactor, scalingFactor);
+
+        glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
+        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+        processed = true;
+    }
 
     // Pokud se "nechytnul" ani jeden z nami deklarovanych objektu na danou animaci, vyuzijeme standardni postupy
     if (!processed)
     {
-        CVector3 vPosition = object->vPosition[frame];
+        CVector3 vPosition = object->vPosition[realFrame];
         glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-        CVector3 vScale = object->vScale[frame];
+        CVector3 vScale = object->vScale[realFrame];
         glScalef(vScale.x, vScale.y, vScale.z);
 
-        for (uint32 i = 1; i <= frame; i++)
+        for (uint32 i = 1; i <= realFrame; i++)
         {
             CVector3 vRotation = object->vRotation[i];
             float rotDegree = object->vRotDegree[i];
