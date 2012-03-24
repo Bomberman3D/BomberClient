@@ -109,6 +109,7 @@ class GameplayMgr
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
         bool AddBomb(uint32 x, uint32 y);
+        void PreBoomBomb(uint32 x, uint32 y);
 
         float GetPlayerSpeedCoef() { return m_plSpeedCoef; };
         uint32 GetFlameReach() { return m_plFlameReach; };

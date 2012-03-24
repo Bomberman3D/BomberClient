@@ -84,6 +84,8 @@ void GameplayMgr::Update()
                         temp->registered = true;
                         if (m_game)
                             m_game->OnDangerousFieldActivate(i, j);
+
+                        PreBoomBomb(i, j);
                     }
                 }
             }
@@ -313,6 +315,58 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     }
 
     return true;
+}
+
+void GameplayMgr::PreBoomBomb(uint32 x, uint32 y)
+{
+    if (BombMap.empty())
+        return;
+
+    // Projdeme vsechny bomby, a pokud na nejakou narazime, nechame ji predcasne vybouchnout
+    for (std::list<BombRecord*>::iterator itr = BombMap.begin(); itr != BombMap.end(); ++itr)
+    {
+        if (!(*itr))
+            continue;
+
+        // Pokud se bomba nachazi na nove nebezpecnem poli, boom
+        if ((*itr)->x == x && (*itr)->y == y)
+        {
+            // Najdeme zaznam v DangerousMap pro pole pod danou bombou
+            // jeho aktivacni cas bude zdrojovy pro vsechny ostatni
+            int32 timeToBomb = 0;
+            for (uint32 k = 0; k < 4; k++)
+            {
+                if (DangerousMap[x][y][k] == NULL)
+                    continue;
+                if (DangerousMap[x][y][k]->origin == (*itr))
+                    timeToBomb = DangerousMap[x][y][k]->activeSince - clock();
+            }
+
+            if (timeToBomb < 0)
+                return;
+
+            sTimer->RemoveTimerSetEventByTarget(&(*itr)->state);
+            (*itr)->state = 1;
+            // Projdeme tedy vsechna jeji nebezpecna pridruzena pole
+            // a zkratime jim cas aktivace na minimum
+            for (int32 i = int32(x - (*itr)->reach); i < int32(x + (*itr)->reach); i++)
+            {
+                for (int32 j = int32(y - (*itr)->reach); j < int32(y + (*itr)->reach); j++)
+                {
+                    if (i < 0 || j < 0 || i > DangerousMap.size() || j > DangerousMap[0].size())
+                        continue;
+
+                    for (uint32 k = 0; k < 4; k++)
+                    {
+                        if (DangerousMap[i][j][k] == NULL)
+                            continue;
+
+                        DangerousMap[i][j][k]->activeSince -= timeToBomb;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
