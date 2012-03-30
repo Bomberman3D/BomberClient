@@ -572,9 +572,9 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
         CVector3 vScale = object->vScale[realFrame];
         glScalef(vScale.x, vScale.y, vScale.z);
 
-        float scaleFrame = fabs(float(frame%100)-50.0f);
-        float scalingFactor = (1.0f + (scaleFrame/100.0f)*0.3f);
+        float scalingFactor = (1.0f + (frame/100.0f)*0.3f);
         glScalef(scalingFactor, scalingFactor, scalingFactor);
+        model->customScale[realFrame] = scalingFactor;
 
         glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
         glTranslatef(vPosition.x, vPosition.y, vPosition.z);

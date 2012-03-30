@@ -89,7 +89,9 @@ void MapManager::FillDynamicRecords()
                         case DYNAMIC_TYPE_BOMB:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(8, i-0.5f, 0.0f, j-0.5f, ANIM_NONE, 0.225f, 0.0f, true, true, 0, 8, ANIM_RESTRICTION_NOT_PAUSED));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(8, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.2f, 0.0f, true, true, 0, 8, ANIM_RESTRICTION_NOT_PAUSED));
+                                ((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special)->AddFeature(MF_TYPE_EMITTER, 17.4f, 18.539f, 21.02f, sParticleEmitterMgr->AddEmitter(
+                                    BillboardDisplayListRecord::Create(55, 0,0,0, 0.3f, 0.3f, true, true), 0,0,0,0.15f, 0.15f, 0.0f, 0.0f, 360.0f, 360.0f,    40, 5,   1.0f, 0.2f,   4,1,   0,0,100000));
                             }
                             break;
                         case DYNAMIC_TYPE_BOX:
