@@ -28,7 +28,6 @@ void ParticleEmitterMgr::Update()
         {
             if ((*itr)->m_template)
                 delete (*itr)->m_template;
-            delete (*itr);
             itr = Emitters.erase(itr);
         }
     }
@@ -110,6 +109,11 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     return pTemp;
 }
 
+void ParticleEmitterMgr::RemoveEmitter(Emitter* which)
+{
+    which->m_endTime = clock();
+}
+
 void ParticleEmitterMgr::FlushEmitters()
 {
     if (Emitters.empty())
@@ -143,56 +147,65 @@ bool Emitter::Update()
     if (m_emitting)
     {
         if (m_nextParticleTime <= tnow)
-        {
-            Particle* pNew = new Particle;
-            pNew->m_timeStart = tnow;
-
-            // Castice bude zit timeMed casu a nahodne + nebo - z celkove tolerance
-            // pokud timeTol == 0, tak samozrejme je cas konstantni
-            if (m_timeTol == 0)
-                pNew->m_timeMax = tnow + m_timeMed;
-            else
-                pNew->m_timeMax = tnow + m_timeMed + (rand()%(m_timeTol*2) - m_timeTol);
-
-            // Vypocitame nasobky uhlopricnych vektoru
-            /* Nasobky jednotlivych vektoru se nejdrive sectou, abychom dostali bod na obdelniku, ze ktereho
-            * budou castice vychazet, a nasledne se vektorove vynasobi, abychom dostali vektor kolmy na oba
-            * uhlopricne, cimz ziskame vektor trajektorie
-            * Delky nasobku vektoru se mohou rovnat dohromady pouze polovine delky jedne uhlopricky (pripadne minus polovine)
-            * protoze jedine tak dostaneme bod uvnitr obdelnika. Kdyby byly vetsi, dostali bychom se "ven"
-            */
-            float mult = frand(-1.0f,1.0f);
-            float othermult = frand(fabs(mult)-1.0f,1.0f-fabs(mult));
-
-            pNew->m_startX = m_centerX + mult*startVector[0].x + othermult*startVector[1].x;
-            pNew->m_startY = m_centerY + mult*startVector[0].y + othermult*startVector[1].y;
-            pNew->m_startZ = m_centerZ + mult*startVector[0].z + othermult*startVector[1].z;
-
-            // vzdycky je v pocatku kolmy na obdelnik emittovani
-            // pote se zapocita i nejaky nahodny uhel z rozmezi (angleMedX, angleMedY)
-            pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
-
-            // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
-            // vzdalenosti za 1 sekundu
-            pNew->trajVector.unitMultiply(m_speedMed + frand(-m_speedTol, m_speedTol));
-
-            if (m_template->m_type == DL_TYPE_BILLBOARD)
+            for (int cnt = 0; cnt <= ((tnow-m_nextParticleTime)/(m_nextParticleTime?m_nextParticleTime:1)); cnt++)
             {
-                BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
-                pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
-                                                         temp->billboard_x, temp->billboard_y, true);
-            }
-            else if (m_template->m_type == DL_TYPE_MODEL)
-            {
-                ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
-                pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
-            }
-            // hypoteticky jina moznost nastat nemuze
+                Particle* pNew = new Particle;
+                pNew->m_timeStart = tnow;
 
-            m_Particles.push_front(pNew);
+                // Castice bude zit timeMed casu a nahodne + nebo - z celkove tolerance
+                // pokud timeTol == 0, tak samozrejme je cas konstantni
+                if (m_timeTol == 0)
+                    pNew->m_timeMax = tnow + m_timeMed;
+                else
+                    pNew->m_timeMax = tnow + m_timeMed + (rand()%(m_timeTol*2) - m_timeTol);
 
-            m_nextParticleTime = tnow + m_particleTimeMed + (rand()%(m_particleTimeTol*2) - m_particleTimeTol);
-        }
+                // Vypocitame nasobky uhlopricnych vektoru
+                /* Nasobky jednotlivych vektoru se nejdrive sectou, abychom dostali bod na obdelniku, ze ktereho
+                * budou castice vychazet, a nasledne se vektorove vynasobi, abychom dostali vektor kolmy na oba
+                * uhlopricne, cimz ziskame vektor trajektorie
+                * Delky nasobku vektoru se mohou rovnat dohromady pouze polovine delky jedne uhlopricky (pripadne minus polovine)
+                * protoze jedine tak dostaneme bod uvnitr obdelnika. Kdyby byly vetsi, dostali bychom se "ven"
+                */
+                float mult = frand(-1.0f,1.0f);
+                float othermult = frand(fabs(mult)-1.0f,1.0f-fabs(mult));
+
+                pNew->m_startX = m_centerX + mult*startVector[0].x + othermult*startVector[1].x;
+                pNew->m_startY = m_centerY + mult*startVector[0].y + othermult*startVector[1].y;
+                pNew->m_startZ = m_centerZ + mult*startVector[0].z + othermult*startVector[1].z;
+
+                // vzdycky je v pocatku kolmy na obdelnik emittovani
+                // pote se zapocita i nejaky nahodny uhel z rozmezi (angleMedX, angleMedY)
+                pNew->trajVector = startVector[0].vectorMultiply(startVector[1]);
+
+                // Prevede na jednotkovy vektor a vynasobi ho nasi pozadovanou "rychlosti", cili
+                // vzdalenosti za 1 sekundu
+                pNew->trajVector.unitMultiply(m_speedMed + frand(-m_speedTol, m_speedTol));
+
+                // Nahodne pootocit okolo trech vektoru os (x,y a z)
+                if (m_angleTolX != 0.0f)
+                    pNew->trajVector.rotate(CVector3(1.0f, 0.0f, 0.0f), frand(-m_angleTolX, m_angleTolX)*PI/180.0f);
+                if (m_angleTolY != 0.0f)
+                    pNew->trajVector.rotate(CVector3(0.0f, 1.0f, 0.0f), frand(-m_angleTolY, m_angleTolY)*PI/180.0f);
+                if (m_angleTolZ != 0.0f)
+                    pNew->trajVector.rotate(CVector3(0.0f, 0.0f, 1.0f), frand(-m_angleTolZ, m_angleTolZ)*PI/180.0f);
+
+                if (m_template->m_type == DL_TYPE_BILLBOARD)
+                {
+                    BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
+                    pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
+                                                             temp->billboard_x, temp->billboard_y, true);
+                }
+                else if (m_template->m_type == DL_TYPE_MODEL)
+                {
+                    ModelDisplayListRecord* temp = (ModelDisplayListRecord*)m_template;
+                    pNew->m_record = sDisplay->DrawModel(temp->modelId, temp->x, temp->y, temp->z, (ModelAnimType)m_emitAnim, temp->scale, temp->rotate, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+                }
+                // hypoteticky jina moznost nastat nemuze
+
+                m_Particles.push_front(pNew);
+
+                m_nextParticleTime = tnow + m_particleTimeMed + (rand()%((m_particleTimeTol?m_particleTimeTol*2:1)) - m_particleTimeTol);
+            }
     }
 
     Particle* p = NULL;

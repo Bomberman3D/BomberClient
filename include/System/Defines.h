@@ -29,6 +29,14 @@ typedef GLuint GLDisplayList;
 #define HIPART64(a) uint32(((a & 0xFFFFFFFF00000000) >> 32))
 #define LOPART64(a) uint32((a & 0xFFFFFFFF))
 
+static float numBounds(float value)
+{
+    if (fabs(value) < (1 / 1000000.0f))
+        return 0;
+    else
+        return value;
+}
+
 struct CVector3
 {
     CVector3() {};
@@ -82,6 +90,24 @@ struct CVector3
         y = y - sec.y;
         z = z - sec.z;
         return (*this);
+    }
+    CVector3 operator*(float sec)
+    {
+        x = x * sec;
+        y = y * sec;
+        z = z * sec;
+        return (*this);
+    }
+    float operator*(const CVector3 &sec)
+    {
+        return numBounds((x*sec.x)+(y*sec.y)+(z*sec.z));
+    }
+
+    CVector3 rotate(CVector3 &axis, float angle)
+    {
+        CVector3 v = *this;
+
+        return ((v - axis * (axis * v)) * cos(angle)) + (axis.vectorMultiply(v) * sin(angle)) + (axis * (axis * v));
     }
 };
 

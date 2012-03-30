@@ -69,6 +69,7 @@ class ParticleEmitterMgr
                             float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                             uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
                             uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration);
+        void RemoveEmitter(Emitter* which);
 
         void FlushEmitters();
         void PauseEmitters();
