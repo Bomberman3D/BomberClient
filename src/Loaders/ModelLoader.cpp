@@ -49,9 +49,12 @@ bool Loaders::t3DSLoader::Import3DS(t3DModel *pModel, char *strFileName)
 
     ProcessNextChunk(pModel, m_CurrentChunk);
 
-    pModel->currentScale = 1.0f;
-
     ResizeObjects(pModel);
+
+    pModel->customScale.clear();
+    pModel->customScale.resize(pModel->numberOfFrames);
+    for (int i = 0; i < pModel->numberOfFrames; i++)
+        pModel->customScale[i] = 1.0f;
 
     ComputeNormals(pModel);
 

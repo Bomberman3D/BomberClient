@@ -122,11 +122,10 @@ struct t3DModel
 
     vector<tMaterialInfo> pMaterials;
     vector<t3DObject> pObject;
+    vector<float> customScale;
 
     CVector3 Maximum;
     CVector3 Minimum;
-
-    float currentScale;
 
     GLuint displayList;
     uint32 displayListSize;

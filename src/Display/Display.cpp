@@ -278,6 +278,47 @@ bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
     return false;
 }
 
+void ModelDisplayListRecord::AddFeature(ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
+{
+    if (!feature || type >= MF_TYPE_MAX)
+        return;
+
+    ModelFeature* ft = new ModelFeature;
+    ft->type = type;
+    ft->feature = feature;
+    ft->offset_x = offset_x;
+    ft->offset_y = offset_y;
+    ft->offset_z = offset_z;
+
+    features.push_back(ft);
+}
+
+void ModelDisplayListRecord::ClearFeatures()
+{
+    if (features.empty())
+        return;
+
+    for (FeatureList::iterator itr = features.begin(); itr != features.end(); ++itr)
+    {
+        switch ((*itr)->type)
+        {
+            case MF_TYPE_MODEL:
+                sDisplay->RemoveRecordFromDisplayList((*itr)->ToModel());
+                break;
+            case MF_TYPE_BILLBOARD:
+                sDisplay->RemoveRecordFromDisplayList((*itr)->ToBillboard());
+                break;
+            case MF_TYPE_EMITTER:
+                sParticleEmitterMgr->RemoveEmitter((*itr)->ToEmitter());
+                break;
+            default:
+                break;
+        }
+    }
+
+    features.clear();
+}
+
 void Display::DrawModels()
 {
     float x,y,z;
@@ -302,8 +343,12 @@ void Display::DrawModels()
             continue;
         }
 
+        t3DModel* pModel = sStorage->Models[temp->modelId];
+
         if (temp->remove)
         {
+            temp->ClearFeatures();
+
             if (temp->AnimTicket)
                 sAnimator->DestroyAnimTicket(temp->AnimTicket);
             if (temp)
@@ -315,6 +360,33 @@ void Display::DrawModels()
         x = temp->x;
         y = temp->y;
         z = temp->z;
+
+        if (!temp->features.empty())
+        {
+            for (FeatureList::iterator itr = temp->features.begin(); itr != temp->features.end(); ++itr)
+            {
+                switch ((*itr)->type)
+                {
+                    case MF_TYPE_MODEL:
+                        (*itr)->ToModel()->x = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToModel()->y = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToModel()->z = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        break;
+                    case MF_TYPE_BILLBOARD:
+                        (*itr)->ToBillboard()->x = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToBillboard()->y = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToBillboard()->z = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        break;
+                    case MF_TYPE_EMITTER:
+                        (*itr)->ToEmitter()->m_centerX = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToEmitter()->m_centerY = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        (*itr)->ToEmitter()->m_centerZ = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
 
         //if (pythagoras_c(fabs(fabs(x)-fabs(view_x)),fabs(fabs(z)-fabs(view_z))) > 2.0f)
         //{
@@ -345,8 +417,6 @@ void Display::DrawModels()
             ++itr;
             continue;
         }
-
-        t3DModel* pModel = sStorage->Models[temp->modelId];
 
         for (int i = 0; i < pModel->numOfObjects; i++)
         {

@@ -6,6 +6,13 @@
 #include <Storage.h>
 #include <Config.h>
 
+struct DisplayListRecord;
+struct ModelDisplayListRecord;
+struct BillboardDisplayListRecord;
+
+#include <Effects/Animations.h>
+#include <Effects/ParticleEmitter.h>
+
 #define WIDTH sConfig->WindowWidth
 #define HEIGHT sConfig->WindowHeight
 #define WIDTHPCT WIDTH/100
@@ -55,6 +62,56 @@ enum DisplayListType
     DL_TYPE_MAX
 };
 
+// typy doplnku modelu
+enum ModelFeatureType
+{
+    MF_TYPE_MODEL     = 0,
+    MF_TYPE_BILLBOARD = 1,
+    MF_TYPE_EMITTER   = 2,
+    MF_TYPE_MAX
+};
+
+struct ModelFeature
+{
+    ModelFeature()
+    {
+        type = MF_TYPE_MAX;
+        feature = NULL;
+
+        offset_x = 0.0f;
+        offset_y = 0.0f;
+        offset_z = 0.0f;
+    }
+
+    ModelFeatureType type;
+    void* feature;
+    float offset_x, offset_y, offset_z;
+
+    ModelDisplayListRecord* ToModel()
+    {
+        if (type == MF_TYPE_MODEL)
+            return (ModelDisplayListRecord*)feature;
+        else
+            return NULL;
+    }
+    BillboardDisplayListRecord* ToBillboard()
+    {
+        if (type == MF_TYPE_BILLBOARD)
+            return (BillboardDisplayListRecord*)feature;
+        else
+            return NULL;
+    }
+    Emitter* ToEmitter()
+    {
+        if (type == MF_TYPE_EMITTER)
+            return (Emitter*)feature;
+        else
+            return NULL;
+    }
+};
+
+typedef std::list<ModelFeature*> FeatureList;
+
 // animacni restrikce (napr. pri pauznuti hry, ..)
 enum AnimRestriction
 {
@@ -100,6 +157,10 @@ struct ModelDisplayListRecord: public DisplayListRecord
     uint32 modelId;
     uint32 AnimTicket;
     float  scale, rotate;
+    FeatureList features;
+
+    void AddFeature(ModelFeatureType type, float offset_x, float offset_y, float offset_z, void* feature);
+    void ClearFeatures();
 };
 
 struct BillboardDisplayListRecord: public DisplayListRecord
