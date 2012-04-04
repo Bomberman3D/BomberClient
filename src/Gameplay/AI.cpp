@@ -758,7 +758,7 @@ void MovementHolder::Mutate(MovementType moveType)
 
     // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 }
 
 bool MovementHolder::TryMutate(MovementType moveType)
@@ -779,7 +779,7 @@ bool MovementHolder::TryMutate(MovementType moveType)
 
         // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
         if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 
         return true;
     }
@@ -822,7 +822,7 @@ void MovementHolder::Update()
 
     // Opet zmena animace modelu na chuzi, tady se mi to taky nelibi, bude treba vymyslet nejake hezci umisteni
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 5);
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 
     float timePass = 500 * m_speedMod;
 
