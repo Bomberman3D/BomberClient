@@ -51,7 +51,7 @@ void ParticleEmitterMgr::UnpauseEmitters()
 Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
                                     float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                                     uint32 timeMed, uint32 timeTol, float speedMed, float speedTol,
-                                    uint32 particleTimeMed, uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration)
+                                    uint32 particleTimeMed, uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, uint8 animFlags, int32 duration)
 {
     if (!templ || templ->m_type == DL_TYPE_NONE)
         return NULL;
@@ -78,6 +78,7 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_emitting  = true;
     pTemp->m_emitAnim  = anim;
     pTemp->m_emitAnimFrameSkip = animFrameSkip;
+    pTemp->m_emitAnimFlags = animFlags;
 
     // Uhly angleX a angleY (angleMed+angleTol) budou prohozene, kvuli lepsi predstavivosti
     // angleX bude tedy uhel otoceni po ose Y, ale defakto "sirka" emitovani - proto osa X
@@ -193,7 +194,7 @@ bool Emitter::Update()
                 {
                     BillboardDisplayListRecord* temp = (BillboardDisplayListRecord*)m_template;
                     pNew->m_record = sDisplay->DrawBillboard(temp->textureId, temp->x, temp->y, temp->z, m_emitAnim, m_emitAnimFrameSkip, temp->scale_x, temp->scale_y,
-                                                             temp->billboard_x, temp->billboard_y, true);
+                                                             temp->billboard_x, temp->billboard_y, true, ANIM_RESTRICTION_NONE, m_emitAnimFlags);
                 }
                 else if (m_template->m_type == DL_TYPE_MODEL)
                 {

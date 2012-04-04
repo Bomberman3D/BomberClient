@@ -543,7 +543,7 @@ void Display::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint3
     }
 }
 
-BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest)
+BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest, uint8 animFlags)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
     assert(pNew != NULL);
@@ -553,7 +553,7 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     pNew->y = y;
     pNew->z = z;
     if (Animation != ANIM_NONE)
-        pNew->AnimTicket = sAnimator->GetTextureAnimTicket(textureId, Animation, animFrameSpeed);
+        pNew->AnimTicket = sAnimator->GetTextureAnimTicket(textureId, Animation, animFrameSpeed, animFlags);
     else
         pNew->AnimTicket = 0;
 

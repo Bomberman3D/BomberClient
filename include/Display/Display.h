@@ -224,7 +224,8 @@ class Display
                                                   uint32 Animation = ANIM_NONE, uint32 animFrameSpeed = 1,
                                                   float scale_x = 1.0f, float scale_y = 1.0f,
                                                   bool billboard_x = true, bool billboard_y = true,
-                                                  bool genGLDisplayList = false, AnimRestriction animRest = ANIM_RESTRICTION_NONE);
+                                                  bool genGLDisplayList = false, AnimRestriction animRest = ANIM_RESTRICTION_NONE,
+                                                  uint8 animFlags = 0);
         bool RemoveRecordFromDisplayList(BillboardDisplayListRecord* target);
         void DrawBillboards();
         void FlushBillboardDisplayList();

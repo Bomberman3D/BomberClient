@@ -62,11 +62,16 @@ void Animator::Update()
                     if ((temp->actualFrame + (totalTicksCount * temp->frameSkipSpeed)) < sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size())
                         temp->actualFrame += totalTicksCount * temp->frameSkipSpeed;     // posunout frame dopredu
                     else
-                        temp->actualFrame = sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size();
+                    {
+                        if (!(temp->animFlags & ANIM_FLAG_NOT_REPEAT))
+                            temp->actualFrame = sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size();
+                        else
+                            temp->actualFrame = sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size()-1;
+                    }
                 }
 
                 // Pokud jsme se dostali na konec, opakovat animaci
-                if (!temp->reversed && sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
+                if (!temp->reversed && !(temp->animFlags & ANIM_FLAG_NOT_REPEAT) && sStorage->TextureAnimation[temp->sourceId].AnimFrameData[temp->animId].size() <= temp->actualFrame)
                 {
                     if (temp->bothWay)
                     {
@@ -237,6 +242,7 @@ uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 fr
     temp->nextFrameTime   = clock();
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
     temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
+    temp->animFlags       = flags;
 
     if (flags & ANIM_FLAG_FORCE_LOADING)
     {

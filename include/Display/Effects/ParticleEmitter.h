@@ -46,6 +46,7 @@ struct Emitter
     bool m_emitting;            // aktivni? - nastavi se pri ukoncovani a dobihani castic
     uint32 m_emitAnim;          // animace castic
     uint32 m_emitAnimFrameSkip; // rychlost animace (skip framu) castic
+    uint8  m_emitAnimFlags;     // flagy k animaci
     // Nastaveno pri vytvoreni
     CVector3 startVector[2];    // Vektor pouzity k randomizaci startovni pozice (uhlopricky v startovnim obdelniku)
 
@@ -68,7 +69,7 @@ class ParticleEmitterMgr
         Emitter* AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
                             float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                             uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
-                            uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, int32 duration);
+                            uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, uint8 animFlags, int32 duration);
         void RemoveEmitter(Emitter* which);
 
         void FlushEmitters();
