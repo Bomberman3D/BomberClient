@@ -699,7 +699,10 @@ void Loaders::LoadModel(uint32 id)
 
     if (dest)
     {
-        GenDisplayLists(dest, id);
+        // Zkuseni programatori mi musi prominout - bomba je jedina vyjimka, kde potrebujeme dynamicky menit pocet vykreslovanych
+        // vertexu v realnem case - nebudu pridavat specialni sloupec do sqlite databazi kvuli jednomu modelu
+        if (id != 8)
+            GenDisplayLists(dest, id);
         sStorage->Models[id] = dest;
     }
 }

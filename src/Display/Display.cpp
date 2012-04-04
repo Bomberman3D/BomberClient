@@ -383,11 +383,11 @@ void Display::DrawModels()
         glRotatef(temp->rotate,0.0f,1.0f,0.0f);
 
         glScalef(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
+        glScalef(temp->scale, temp->scale, temp->scale);
 
         // Pokud mame vygenerovany GL display list pro dany model
         if (sStorage->Models[temp->modelId]->displayListSize != 0)
         {
-            glScalef(temp->scale, temp->scale, temp->scale);
             // Vykreslime to pomoci display listu
             glCallList(sStorage->Models[temp->modelId]->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
             // A nemusime se dale o nic starat
@@ -403,7 +403,7 @@ void Display::DrawModels()
             t3DObject *pObject = &pModel->pObject[i];
 
             glPushMatrix();
-            AnimateModelObject(pObject, temp);
+            AnimateModelObjectByFrame(pModel, pObject, temp->modelId, sAnimator->GetActualFrame(temp->AnimTicket));
 
             if (pObject->bHasTexture)
             {
@@ -427,6 +427,20 @@ void Display::DrawModels()
 
             for (int j = 0; j < pObject->numOfFaces; j++)
             {
+                // Hack pro model bomby
+                // Pouze u bomby potrebujeme dynamicky "skryvat" nektere vertexy
+                // neni vyhodne implementovat cely system pro to
+                if (temp->modelId == 8)
+                {
+                    if (strcmp(pObject->strName, "Cylinder03") == 0
+                        || strcmp(pObject->strName, "Cylinder01") == 0
+                        || strcmp(pObject->strName, "Cylinder02") == 0)
+                    {
+                        if (j > (pObject->numOfFaces - float(temp->CustomFrame) / 2.3f))
+                            continue;
+                    }
+                }
+
                 for (int whichVertex = 0; whichVertex < 3; whichVertex++)
                 {
                     int index = pObject->pFaces[j].vertIndex[whichVertex];

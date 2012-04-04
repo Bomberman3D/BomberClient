@@ -562,7 +562,6 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
     else if (modelId == 8 && anim == ANIM_IDLE)
     {
         // Bomba se bude zmensovat a zvetsovat, jako v Dyna Blasterovi
-        // Pozdeji prybyde i particle emitter, ktery se bude pohybovat "po knotu"
 
         t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Sphere01");
         if (!pObj)
@@ -611,6 +610,23 @@ void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
 
     if (!pModel)
         return;
+
+    // Tikajici bomba - posunovani emitteru
+    if (record->modelId == 8 && sAnimator->GetAnimId(record->AnimTicket) == ANIM_IDLE)
+    {
+        int32 delta = abs(int(sAnimator->GetActualFrame(record->AnimTicket)) - int((record->CustomFrame % 100)));
+        record->CustomFrame += delta;
+
+        for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end(); ++itr)
+        {
+            if ((*itr)->type == MF_TYPE_EMITTER)
+            {
+                (*itr)->offset_x -= 0.0037f*delta;
+                (*itr)->offset_y += 0.0015f*delta;
+                (*itr)->offset_z -= 0.0042f*delta;
+            }
+        }
+    }
 
     // Posunuti vsech model featur podle nadrazeneho modelu
     for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end(); ++itr)
