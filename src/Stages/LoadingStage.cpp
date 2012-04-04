@@ -60,6 +60,11 @@ void LoadingStage::OnEnter()
 
     for (uint32 i = 0; i < 6; i++)
         PreLoad(LOAD_TEXTURE, sStorage->SkyboxData[skybox].box_textures[i]);
+
+    // Prednacist i castice vybuchu - abychom zamezili probliknuti bile textury
+    PreLoad(LOAD_TEXTURE, 31);
+    for (uint32 i = 57; i <= 60; i++)
+        PreLoad(LOAD_TEXTURE, i);
 }
 
 void LoadingStage::OnDraw(uint32 diff)

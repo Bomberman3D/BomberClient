@@ -99,7 +99,7 @@ void MapManager::FillDynamicRecords()
                         case DYNAMIC_TYPE_BOX:
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
-                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(7, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 6.0f, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED));
+                                pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(7, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 10.0f, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED));
                             }
                             break;
                         case DYNAMIC_TYPE_BONUS:
