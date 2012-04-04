@@ -156,6 +156,7 @@ struct ModelDisplayListRecord: public DisplayListRecord
 
     uint32 modelId;
     uint32 AnimTicket;
+    uint32 CustomFrame;
     float  scale, rotate;
     FeatureList features;
 

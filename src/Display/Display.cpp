@@ -225,6 +225,8 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     else
         pNew->AnimTicket = 0;
 
+    pNew->CustomFrame = 0;
+
     pNew->animRestriction = animRest;
 
     pNew->remove = false;
@@ -361,32 +363,7 @@ void Display::DrawModels()
         y = temp->y;
         z = temp->z;
 
-        if (!temp->features.empty())
-        {
-            for (FeatureList::iterator itr = temp->features.begin(); itr != temp->features.end(); ++itr)
-            {
-                switch ((*itr)->type)
-                {
-                    case MF_TYPE_MODEL:
-                        (*itr)->ToModel()->x = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToModel()->y = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToModel()->z = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        break;
-                    case MF_TYPE_BILLBOARD:
-                        (*itr)->ToBillboard()->x = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToBillboard()->y = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToBillboard()->z = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        break;
-                    case MF_TYPE_EMITTER:
-                        (*itr)->ToEmitter()->m_centerX = x + ((*itr)->offset_x * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToEmitter()->m_centerY = y + ((*itr)->offset_y * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        (*itr)->ToEmitter()->m_centerZ = z + ((*itr)->offset_z * MODEL_SCALE * temp->scale * pModel->customScale[sAnimator->GetActualFrame(temp->AnimTicket)]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        sCustomAnimator->AnimateModelFeatures(temp);
 
         //if (pythagoras_c(fabs(fabs(x)-fabs(view_x)),fabs(fabs(z)-fabs(view_z))) > 2.0f)
         //{

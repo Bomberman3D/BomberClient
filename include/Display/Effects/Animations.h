@@ -17,6 +17,7 @@ enum AnimFlags
 {
     ANIM_FLAG_BOTHWAY            = 0x01,
     ANIM_FLAG_FORCE_LOADING      = 0x02,
+    ANIM_FLAG_NOT_REPEAT         = 0x04,
 };
 
 struct AnimationRecord
@@ -27,6 +28,7 @@ struct AnimationRecord
     uint8  animType;
     uint32 frameSkipSpeed;
     bool   bothWay; // dovoluje animovat nejdriv k nejvyssimu a pak k nejnizsimu framu
+    uint8  animFlags;
 
     // Dynamicka data
     uint32 nextFrameTime;
@@ -80,6 +82,8 @@ class CustomAnimator
         void AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame);
         void AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame);
         void AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim);
+
+        void AnimateModelFeatures(ModelDisplayListRecord* record);
 };
 
 #define sCustomAnimator Singleton<CustomAnimator>::instance()

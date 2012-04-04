@@ -118,7 +118,7 @@ void Animator::Update()
                 }
 
                 // Pokud jsme na poslednim framu animace, opakujeme
-                if (!temp->reversed && sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
+                if (!temp->reversed && !(temp->animFlags & ANIM_FLAG_NOT_REPEAT) && sStorage->ModelAnimation[temp->sourceId].Anim[temp->animId].frameLast <= temp->actualFrame)
                 {
                     if (temp->bothWay)
                     {
@@ -276,6 +276,7 @@ uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameS
     temp->nextFrameTime   = clock();
     temp->frameSkipSpeed  = (frameSkipSpeed > 0) ? frameSkipSpeed : 1;
     temp->bothWay         = (flags & ANIM_FLAG_BOTHWAY);
+    temp->animFlags       = flags;
 
     return pos;
 }
@@ -597,6 +598,42 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
 
             if(rotDegree)
                 glRotatef(rotDegree, vRotation.x, vRotation.y, vRotation.z);
+        }
+    }
+}
+
+void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
+{
+    if (!record || record->features.empty())
+        return;
+
+    t3DModel* pModel = sStorage->Models[record->modelId];
+
+    if (!pModel)
+        return;
+
+    // Posunuti vsech model featur podle nadrazeneho modelu
+    for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end(); ++itr)
+    {
+        switch ((*itr)->type)
+        {
+            case MF_TYPE_MODEL:
+                (*itr)->ToModel()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToModel()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToModel()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                break;
+            case MF_TYPE_BILLBOARD:
+                (*itr)->ToBillboard()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToBillboard()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToBillboard()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                break;
+            case MF_TYPE_EMITTER:
+                (*itr)->ToEmitter()->m_centerX = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToEmitter()->m_centerY = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToEmitter()->m_centerZ = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                break;
+            default:
+                break;
         }
     }
 }
