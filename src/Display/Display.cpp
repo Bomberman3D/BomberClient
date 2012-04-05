@@ -353,8 +353,6 @@ void Display::DrawModels()
 
             if (temp->AnimTicket)
                 sAnimator->DestroyAnimTicket(temp->AnimTicket);
-            if (temp)
-                delete temp;
             itr = ModelDisplayList.erase(itr);
             continue;
         }

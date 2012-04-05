@@ -46,7 +46,7 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     EnemyTemplate* pEnemy = new EnemyTemplate;
-                    pEnemy->Init(1, i, j);
+                    pEnemy->Init(10, i, j);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);

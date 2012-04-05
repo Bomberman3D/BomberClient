@@ -74,7 +74,10 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     pTemp->m_particleTimeTol   = particleTimeTol;
     pTemp->m_speedMed  = speedMed;
     pTemp->m_speedTol  = speedTol;
-    pTemp->m_endTime   = clock()+duration;
+    if (duration < 0)
+        pTemp->m_endTime = 0;
+    else
+        pTemp->m_endTime   = clock()+duration;
     pTemp->m_emitting  = true;
     pTemp->m_emitAnim  = anim;
     pTemp->m_emitAnimFrameSkip = animFrameSkip;
@@ -134,7 +137,7 @@ bool Emitter::Update()
 {
     clock_t tnow = clock();
 
-    if (m_endTime <= tnow)
+    if (m_endTime > 0 && m_endTime <= tnow)
     {
         if (m_emitting)
             m_emitting = false;

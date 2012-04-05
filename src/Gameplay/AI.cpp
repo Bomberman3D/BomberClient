@@ -861,8 +861,31 @@ bool MovementHolder::HasPath()
 
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 {
+    float scale = 1.0f;
+    float height = 0.0f;
+    // Nastaveni atributu podle modelu
+    switch (modelId)
+    {
+        case 1:
+            scale = 0.2f;
+            break;
+        case 10:
+            scale = 0.8f;
+            height = 0.2f;
+            break;
+    }
+
     // Inicializace modelu a zaznamu modelu pro nepritele
-    pRecord = sDisplay->DrawModel(modelId, x-0.5f, 0.0f, y-0.5f, ANIM_IDLE, 0.20f, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    pRecord = sDisplay->DrawModel(modelId, x-0.5f, height, y-0.5f, ANIM_IDLE, scale, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+
+    // Rutiny po pridani (implicitni featury modelu,...)
+    switch (modelId)
+    {
+        case 10:
+            pRecord->AddFeature(MF_TYPE_EMITTER, 0.0f, 2.0f, 0.0f, sParticleEmitterMgr->AddEmitter(
+                BillboardDisplayListRecord::Create(61, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.3f, 0.3f, 270.0f, 0.0f, 0.0f, 0.0f,    120, 10,   0.9f, 0.05f,   10,1,   0,0, 0,-1));
+            break;
+    }
 }
 
 void EnemyTemplate::Update()
