@@ -81,3 +81,16 @@ ObjectModifierData* Storage::GetObjectModifierData(uint32 modelId, const char* o
 
     return &((*itr).second);
 }
+
+ModelModifierData* Storage::GetModelModifierData(uint32 modelId)
+{
+    // Neexistuje
+    if (ModelFilename.find(modelId) == ModelFilename.end())
+        return NULL;
+
+    ModelModifierMap::iterator itr = ModelModifiers.find(modelId);
+    if (itr == ModelModifiers.end())
+        return NULL;
+
+    return &((*itr).second);
+}

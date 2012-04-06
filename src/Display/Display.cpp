@@ -1251,15 +1251,23 @@ bool Display::ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListR
     if (!firstMod || !secondMod)
         return false;
 
+    float firstColMod = 1.0f;
+    float secondColMod = 1.0f;
+
+    if (ModelModifierData* mod = sStorage->GetModelModifierData(first->modelId))
+        firstColMod = mod->collision_dist_mod;
+    if (ModelModifierData* mod = sStorage->GetModelModifierData(second->modelId))
+        secondColMod = mod->collision_dist_mod;
+
     // Overit prolnuti na vsech osach
-    if (first->x + firstMod->Maximum.x * first->scale * MODEL_SCALE > second->x + secondMod->Minimum.x * second->scale * MODEL_SCALE
-        && first->x + firstMod->Minimum.x * first->scale * MODEL_SCALE < second->x + secondMod->Maximum.x * second->scale * MODEL_SCALE)
+    if (first->x + firstMod->Maximum.x * first->scale * MODEL_SCALE * firstColMod > second->x + secondMod->Minimum.x * second->scale * MODEL_SCALE * secondColMod
+        && first->x + firstMod->Minimum.x * first->scale * MODEL_SCALE * firstColMod < second->x + secondMod->Maximum.x * second->scale * MODEL_SCALE * secondColMod)
     {
-        if (first->y + firstMod->Maximum.y * first->scale * MODEL_SCALE > second->y + secondMod->Minimum.y * second->scale * MODEL_SCALE
-            && first->y + firstMod->Minimum.y * first->scale * MODEL_SCALE < second->y + secondMod->Maximum.y * second->scale * MODEL_SCALE)
+        if (first->y + firstMod->Maximum.y * first->scale * MODEL_SCALE * firstColMod > second->y + secondMod->Minimum.y * second->scale * MODEL_SCALE * secondColMod
+            && first->y + firstMod->Minimum.y * first->scale * MODEL_SCALE * firstColMod < second->y + secondMod->Maximum.y * second->scale * MODEL_SCALE * secondColMod)
         {
-            if (first->z + firstMod->Maximum.z * first->scale * MODEL_SCALE > second->z + secondMod->Minimum.z * second->scale * MODEL_SCALE
-                && first->z + firstMod->Minimum.z * first->scale * MODEL_SCALE < second->z + secondMod->Maximum.z * second->scale * MODEL_SCALE)
+            if (first->z + firstMod->Maximum.z * first->scale * MODEL_SCALE * firstColMod > second->z + secondMod->Minimum.z * second->scale * MODEL_SCALE * secondColMod
+                && first->z + firstMod->Minimum.z * first->scale * MODEL_SCALE * firstColMod < second->z + secondMod->Maximum.z * second->scale * MODEL_SCALE * secondColMod)
             {
                 return true;
             }

@@ -59,6 +59,11 @@ struct SolidBoxData
     uint32 model_id;
 };
 
+struct ModelModifierData
+{
+    float collision_dist_mod;
+};
+
 struct ObjectModifierData
 {
     float texture_repeat_x;
@@ -78,6 +83,7 @@ class Storage
         t3DObject* FindModelObjectInNonStored(t3DModel* model, const char* objectname);
         ModelAnimType GetAnimTypeForFrame(uint32 modelId, uint32 frame);
 
+        ModelModifierData* GetModelModifierData(uint32 modelId);
         ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);
 
         // StorageLoader.cpp
@@ -96,6 +102,7 @@ class Storage
         typedef std::map<uint32, Skybox>      SkyboxMap;
         typedef std::map<uint32, MapData>     MapDataMap;
         typedef std::map<uint32, SolidBoxData> SolidBoxDataMap;
+        typedef std::map<uint32, ModelModifierData> ModelModifierMap;
         typedef std::map<IDNamePair, ObjectModifierData> ObjectModifierMap;
 
         // Uloziste (externi, SQLite)
@@ -106,6 +113,7 @@ class Storage
         SkyboxMap SkyboxData;
         MapDataMap MapData;
         SolidBoxDataMap SolidBoxProp;
+        ModelModifierMap ModelModifiers;
         ObjectModifierMap ObjectModifiers;
 
         // Dynamicky ukladana data

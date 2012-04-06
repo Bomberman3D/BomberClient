@@ -121,6 +121,25 @@ bool Storage::LoadModelData()
     fprintf(stdout,"Nacteno %u dat animaci modelu\n",count);
     qry.free_result();
 
+    // Specialni modifikace pro modely
+
+    SQLiteQuery(&qry, "SELECT * FROM model_modifiers");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    count = 0;
+    id = 0;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+
+        ModelModifiers[id].collision_dist_mod = qry.getnum();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u modifikatoru modelu\n",count);
+    qry.free_result();
+
     // Specialni modifikace pro objekty
 
     SQLiteQuery(&qry, "SELECT * FROM object_modifiers");
