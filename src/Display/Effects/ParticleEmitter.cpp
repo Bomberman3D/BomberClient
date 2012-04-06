@@ -123,14 +123,11 @@ void ParticleEmitterMgr::FlushEmitters()
     if (Emitters.empty())
         return;
 
+    sDisplay->ClearAllModelFeaturesByType(MF_TYPE_EMITTER, true);
+
     // Prochazi vsechny emittery
-    for (EmitterList::iterator itr = Emitters.begin(); itr != Emitters.end();)
-    {
-        if ((*itr)->m_template)
-            delete (*itr)->m_template;
-        delete (*itr);
-        itr = Emitters.erase(itr);
-    }
+    for (EmitterList::iterator itr = Emitters.begin(); itr != Emitters.end(); ++itr)
+        RemoveEmitter(*itr);
 }
 
 bool Emitter::Update()
@@ -229,6 +226,7 @@ bool Emitter::Update()
         if (p->m_timeMax <= tnow)
         {
             p->m_record->remove = true;
+            (*itr) = NULL;
             itr = m_Particles.erase(itr);
             continue;
         }

@@ -69,7 +69,11 @@ void ClassicSingleGameType::OnGameLeave()
     {
         for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end(); )
         {
-            delete (*itr);
+            if ((*itr)->pRecord)
+            {
+                (*itr)->pRecord->remove = true;
+                (*itr)->pRecord = NULL;
+            }
             itr = m_enemies.erase(itr);
         }
     }
@@ -89,6 +93,9 @@ void ClassicSingleGameType::OnUpdate()
             }
 
             (*itr)->Update();
+
+            if ((*itr)->pRecord && sDisplay->ModelIntersection(sGameplayMgr->GetPlayerRec(), (*itr)->pRecord))
+                sGameplayMgr->PlayerDied();
 
             ++itr;
         }
@@ -219,7 +226,7 @@ void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32
     if (sGameplayMgr->IsDangerousField(newX, newY))
     {
         // Obsluha smrti - predame to zpet
-        sGameplayMgr->PlayerDied(newX, newY);
+        sGameplayMgr->PlayerDied();
     }
 
     Map* pMap = (Map*)sMapManager->GetMap();
@@ -270,7 +277,7 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
     if (m_playerX == x && m_playerY == y)
     {
         // GameplayMgr se postara o zbytek.. ouch!
-        sGameplayMgr->PlayerDied(x, y);
+        sGameplayMgr->PlayerDied();
     }
 
     // Projit vsechny nepratele, zdali nestoji na miste s ohnem

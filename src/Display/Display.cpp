@@ -280,9 +280,9 @@ bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
     return false;
 }
 
-void ModelDisplayListRecord::AddFeature(ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
+void Display::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
 {
-    if (!feature || type >= MF_TYPE_MAX)
+    if (!record || !feature || type >= MF_TYPE_MAX)
         return;
 
     ModelFeature* ft = new ModelFeature;
@@ -292,15 +292,15 @@ void ModelDisplayListRecord::AddFeature(ModelFeatureType type, float offset_x, f
     ft->offset_y = offset_y;
     ft->offset_z = offset_z;
 
-    features.push_back(ft);
+    record->features.push_back(ft);
 }
 
-void ModelDisplayListRecord::ClearFeatures()
+void Display::ClearModelFeatures(ModelDisplayListRecord* record)
 {
-    if (features.empty())
+    if (!record || record->features.empty())
         return;
 
-    for (FeatureList::iterator itr = features.begin(); itr != features.end(); ++itr)
+    for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end(); ++itr)
     {
         switch ((*itr)->type)
         {
@@ -316,9 +316,56 @@ void ModelDisplayListRecord::ClearFeatures()
             default:
                 break;
         }
+        (*itr) = NULL;
     }
 
-    features.clear();
+    record->features.clear();
+}
+
+void Display::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeatureType type, bool hard)
+{
+    if (!record || record->features.empty())
+        return;
+
+    for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end();)
+    {
+        if ((*itr)->type != type)
+        {
+            ++itr;
+            continue;
+        }
+
+        if (!hard)
+        {
+            switch ((*itr)->type)
+            {
+                case MF_TYPE_MODEL:
+                    sDisplay->RemoveRecordFromDisplayList((*itr)->ToModel());
+                    break;
+                case MF_TYPE_BILLBOARD:
+                    sDisplay->RemoveRecordFromDisplayList((*itr)->ToBillboard());
+                    break;
+                case MF_TYPE_EMITTER:
+                    sParticleEmitterMgr->RemoveEmitter((*itr)->ToEmitter());
+                    break;
+                default:
+                    break;
+            }
+        }
+        (*itr) = NULL;
+        itr = record->features.erase(itr);
+    }
+}
+
+void Display::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
+{
+    for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
+    {
+        if ((*itr)->features.empty())
+            continue;
+
+        ClearModelFeaturesByType((*itr), type, hard);
+    }
 }
 
 void Display::DrawModels()
@@ -349,10 +396,11 @@ void Display::DrawModels()
 
         if (temp->remove)
         {
-            temp->ClearFeatures();
+            ClearModelFeatures(temp);
 
             if (temp->AnimTicket)
                 sAnimator->DestroyAnimTicket(temp->AnimTicket);
+
             itr = ModelDisplayList.erase(itr);
             continue;
         }
@@ -669,8 +717,6 @@ void Display::DrawBillboards()
                 glDeleteLists(temp->displayList, temp->displayListSize);
             if (temp->AnimTicket)
                 sAnimator->DestroyAnimTicket(temp->AnimTicket);
-            if (temp)
-                delete temp;
             itr = BillboardDisplayList.erase(itr);
             continue;
         }
@@ -1191,4 +1237,34 @@ uint16 Display::CheckCollision(float newx, float newy, float newz)
     }
 
     return collision;
+}
+
+// Funkce slouzici pro detekci hranate kolize
+bool Display::ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListRecord* second)
+{
+    if (!first || !second)
+        return false;
+
+    t3DModel* firstMod = sStorage->Models[first->modelId];
+    t3DModel* secondMod = sStorage->Models[second->modelId];
+
+    if (!firstMod || !secondMod)
+        return false;
+
+    // Overit prolnuti na vsech osach
+    if (first->x + firstMod->Maximum.x * first->scale * MODEL_SCALE > second->x + secondMod->Minimum.x * second->scale * MODEL_SCALE
+        && first->x + firstMod->Minimum.x * first->scale * MODEL_SCALE < second->x + secondMod->Maximum.x * second->scale * MODEL_SCALE)
+    {
+        if (first->y + firstMod->Maximum.y * first->scale * MODEL_SCALE > second->y + secondMod->Minimum.y * second->scale * MODEL_SCALE
+            && first->y + firstMod->Minimum.y * first->scale * MODEL_SCALE < second->y + secondMod->Maximum.y * second->scale * MODEL_SCALE)
+        {
+            if (first->z + firstMod->Maximum.z * first->scale * MODEL_SCALE > second->z + secondMod->Minimum.z * second->scale * MODEL_SCALE
+                && first->z + firstMod->Minimum.z * first->scale * MODEL_SCALE < second->z + secondMod->Maximum.z * second->scale * MODEL_SCALE)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

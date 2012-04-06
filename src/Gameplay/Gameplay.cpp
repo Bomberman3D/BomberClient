@@ -102,6 +102,7 @@ void GameplayMgr::OnGameInit()
 
     m_plActiveBombs = 0;
     m_movementBlocked = false;
+    m_playerDead = false;
     m_gamePaused = false;
 
     m_moveElements.resize(MOVE_MAX);
@@ -152,12 +153,15 @@ void GameplayMgr::OnGameInit()
     Map* pMap = (Map*)sMapManager->GetMap();
     if (pMap)
     {
+        DangerousMap.clear();
         DangerousMap.resize(pMap->field.size());
         for (uint32 i = 0; i < DangerousMap.size(); i++)
         {
+            DangerousMap[i].clear();
             DangerousMap[i].resize(pMap->field[i].size());
             for (uint32 j = 0; j < DangerousMap[i].size(); j++)
             {
+                DangerousMap[i][j].clear();
                 DangerousMap[i][j].resize(4);
                 for (uint32 k = 0; k < 4; k++)
                     DangerousMap[i][j][k] = NULL;
@@ -437,9 +441,14 @@ void GameplayMgr::SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t s
     }
 }
 
-void GameplayMgr::PlayerDied(uint32 x, uint32 y)
+void GameplayMgr::PlayerDied()
 {
+    if (m_playerDead)
+        return;
+
     BlockMovement();
+
+    m_playerDead = true;
 
     if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
         sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);

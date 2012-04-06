@@ -58,6 +58,8 @@ bool Loaders::t3DSLoader::Import3DS(t3DModel *pModel, char *strFileName)
 
     ComputeNormals(pModel);
 
+    StoreMaximumMinimum(pModel);
+
     CleanUp();
 
     return true;
@@ -97,6 +99,33 @@ void Loaders::t3DSLoader::ResizeObjects(t3DModel* pModel)
             pModel->pObject[index].vScale[i].x -= nx;
             pModel->pObject[index].vScale[i].y -= ny;
             pModel->pObject[index].vScale[i].z -= nz;
+        }
+    }
+}
+
+void Loaders::t3DSLoader::StoreMaximumMinimum(t3DModel* pModel)
+{
+    if (pModel->numOfObjects <= 0)
+        return;
+
+    for (int index = 0; index < pModel->numOfObjects; index++)
+    {
+        for (int j = 0; j < pModel->pObject[index].numOfVerts; j++)
+        {
+            if (pModel->Maximum.x < pModel->pObject[index].pVerts[j].x)
+                pModel->Maximum.x = pModel->pObject[index].pVerts[j].x;
+            if (pModel->Minimum.x > pModel->pObject[index].pVerts[j].x)
+                pModel->Minimum.x = pModel->pObject[index].pVerts[j].x;
+
+            if (pModel->Maximum.y < pModel->pObject[index].pVerts[j].y)
+                pModel->Maximum.y = pModel->pObject[index].pVerts[j].y;
+            if (pModel->Minimum.y > pModel->pObject[index].pVerts[j].y)
+                pModel->Minimum.y = pModel->pObject[index].pVerts[j].y;
+
+            if (pModel->Maximum.z < pModel->pObject[index].pVerts[j].z)
+                pModel->Maximum.z = pModel->pObject[index].pVerts[j].z;
+            if (pModel->Minimum.z > pModel->pObject[index].pVerts[j].z)
+                pModel->Minimum.z = pModel->pObject[index].pVerts[j].z;
         }
     }
 }

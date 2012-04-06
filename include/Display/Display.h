@@ -159,9 +159,6 @@ struct ModelDisplayListRecord: public DisplayListRecord
     uint32 CustomFrame;
     float  scale, rotate;
     FeatureList features;
-
-    void AddFeature(ModelFeatureType type, float offset_x, float offset_y, float offset_z, void* feature);
-    void ClearFeatures();
 };
 
 struct BillboardDisplayListRecord: public DisplayListRecord
@@ -214,10 +211,15 @@ class Display
                                           bool GLDisplayListOnly = false);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
+        void AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void* feature);
+        void ClearModelFeatures(ModelDisplayListRecord* record);
+        void ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeatureType type, bool hard = false);
+        void ClearAllModelFeaturesByType(ModelFeatureType type, bool hard = false);
         void AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData);
         void AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame);
         void AnimateModelObjectByFrame(t3DModel* model, t3DObject *object, uint32 modelId, uint32 frame);
         void FlushModelDisplayList();
+        bool ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListRecord* second);
 
         // Vse co se tyce vykreslovani billboardu
         BillboardDisplayListRecord* DrawBillboard(uint32 textureId, float x, float y, float z,

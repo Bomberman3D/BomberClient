@@ -160,6 +160,7 @@ namespace Loaders
         void SetCurrentObject(t3DModel *pModel, char *strObjectName);
         void ResizeObjects(t3DModel *pModel);
         void ComputeNormals(t3DModel *pModel);
+        void StoreMaximumMinimum(t3DModel* pModel);
         void CleanUp();
 
         FILE *m_FilePointer;

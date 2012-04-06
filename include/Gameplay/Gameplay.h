@@ -127,7 +127,7 @@ class GameplayMgr
         bool WouldBeDangerousField(uint32 x, uint32 y);
         void SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t since, uint32 howLong);
 
-        void PlayerDied(uint32 x, uint32 y);
+        void PlayerDied();
         void UpdatePlayerMoveAngle();
         void UpdatePlayerMotion(uint32 diff);
         void SetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = true; };
@@ -152,6 +152,7 @@ class GameplayMgr
         std::vector<bool> m_moveElements;
         float m_moveAngle;
         bool m_movementBlocked;
+        bool m_playerDead;
         bool m_gamePaused;
         clock_t m_pauseTime;
 

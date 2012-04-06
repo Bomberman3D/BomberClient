@@ -882,7 +882,7 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
     switch (modelId)
     {
         case 10:
-            pRecord->AddFeature(MF_TYPE_EMITTER, 0.0f, 2.0f, 0.0f, sParticleEmitterMgr->AddEmitter(
+            sDisplay->AddModelFeature(pRecord, MF_TYPE_EMITTER, 0.0f, 2.0f, 0.0f, sParticleEmitterMgr->AddEmitter(
                 BillboardDisplayListRecord::Create(61, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.3f, 0.3f, 270.0f, 0.0f, 0.0f, 0.0f,    120, 10,   0.9f, 0.05f,   10,1,   0,0, 0,-1));
             break;
     }
