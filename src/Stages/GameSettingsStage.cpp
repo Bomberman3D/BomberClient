@@ -188,6 +188,39 @@ void GameSettingsStage::OnDraw(uint32 diff)
             case GAME_TYPE_SP_MEME:
             {
                 sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50, FONT_SIZE_N, 0, NOCOLOR, "Meme wars");
+
+                sDisplay->PrintText(FONT_ONE, 50, 150, FONT_SIZE_4, 0, NOCOLOR, "Poèet nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT));
+                sDisplay->Draw2D(43, 80, 180, 18, 20);
+                sDisplay->Draw2D(41, 140, 180, 18, 20);
+
+                uint32 spacing = 0;
+                uint32 leftspacing = 300;
+                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Intenzita beden");
+                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_BOX_DENSITY));
+                sDisplay->Draw2D(43, 80+leftspacing, 180+spacing, 18, 20);
+                sDisplay->Draw2D(41, 140+leftspacing, 180+spacing, 18, 20);
+
+                spacing = 80;
+                sDisplay->PrintText(FONT_ONE, 50, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Inteligence nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
+                sDisplay->Draw2D(43, 80, 180+spacing, 18, 20);
+                sDisplay->Draw2D(41, 140, 180+spacing, 18, 20);
+
+                sDisplay->PrintText(FONT_ONE, 50+leftspacing, 150+spacing, FONT_SIZE_3, 0, NOCOLOR, "Mapa");
+                std::string mapname = "! Neznámá mapa !";
+                if (sStorage->MapData.find(sGameplayMgr->GetSetting(SETTING_MAP_ID)) != sStorage->MapData.end())
+                    mapname = sStorage->MapData[sGameplayMgr->GetSetting(SETTING_MAP_ID)].mapname;
+                sDisplay->PrintText(MAIN_FONT, 105+leftspacing, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%s", mapname.c_str());
+                sDisplay->Draw2D(43, 80+leftspacing, 180+spacing, 18, 20);
+                sDisplay->Draw2D(41, 380+leftspacing, 180+spacing, 18, 20);
+
+                spacing = 2*80;
+                sDisplay->PrintText(FONT_ONE, 50, 150+spacing, FONT_SIZE_4, 0, NOCOLOR, "Rychlost nepøátel");
+                sDisplay->PrintText(MAIN_FONT, 105, 183+spacing, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED));
+                sDisplay->Draw2D(43, 80, 180+spacing, 18, 20);
+                sDisplay->Draw2D(41, 140, 180+spacing, 18, 20);
+                break;
                 break;
             }
         }

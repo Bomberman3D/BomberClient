@@ -109,7 +109,10 @@ void GameplayMgr::OnGameInit()
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
 
-    m_playerRec = sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    m_playerRec = m_game->SpawnNewPlayer();
+    if (!m_playerRec)
+        m_playerRec = sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+
     m_moveAngle = 0.0f;
     m_playerX = 0;
     m_playerY = 0;
@@ -195,6 +198,9 @@ void GameplayMgr::SetGameType(GameType type)
         case GAME_TYPE_SP_CLASSIC:
             m_game = new ClassicSingleGameType;
             break;
+        case GAME_TYPE_SP_MEME:
+            m_game = new MemeSingleGameType;
+            break;
         case GAME_TYPE_MP_CLASSIC:
             m_game = new ClassicMultiGameType;
             break;
@@ -230,6 +236,8 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 
     if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
         localPlayerStats.ClassicSingleStats.bombsPlanted += 1;
+    else if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_MEME)
+        localPlayerStats.MemeSingleStats.bombsPlanted += 1;
 
     Map* pMap = (Map*)sMapManager->GetMap();
     if (pMap)

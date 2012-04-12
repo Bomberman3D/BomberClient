@@ -37,6 +37,7 @@ class GameTypeTemplate
         GameTypeTemplate()
         {
         }
+        virtual ModelDisplayListRecord* SpawnNewPlayer() { return NULL; };
         virtual void OnGameInit(ModelDisplayListRecord* pPlayerRec) {};
         virtual void OnGameLeave() {};
         virtual void OnUpdate() {};
@@ -67,6 +68,32 @@ class ClassicSingleGameType: public GameTypeTemplate
         {
             m_type = GAME_TYPE_SP_CLASSIC;
         }
+        ModelDisplayListRecord* SpawnNewPlayer();
+        void OnGameInit(ModelDisplayListRecord* pPlayerRec);
+        void OnGameLeave();
+        void OnUpdate();
+        void OnBombBoom(BombRecord* bomb);
+        void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true);
+        void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
+        void OnDangerousFieldActivate(uint32 x, uint32 y);
+
+        virtual EnemyList* GetEnemies() { return &m_enemies; };
+
+    private:
+        EnemyList m_enemies;
+
+        uint32 m_playerX;
+        uint32 m_playerY;
+};
+
+class MemeSingleGameType: public GameTypeTemplate
+{
+    public:
+        MemeSingleGameType()
+        {
+            m_type = GAME_TYPE_SP_MEME;
+        }
+        ModelDisplayListRecord* SpawnNewPlayer();
         void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnGameLeave();
         void OnUpdate();

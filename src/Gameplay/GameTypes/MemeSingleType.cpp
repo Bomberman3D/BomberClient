@@ -4,12 +4,15 @@
 #include <Map.h>
 #include <Effects/ParticleEmitter.h>
 
-ModelDisplayListRecord* ClassicSingleGameType::SpawnNewPlayer()
+ModelDisplayListRecord* MemeSingleGameType::SpawnNewPlayer()
 {
-    return sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    ModelDisplayListRecord* tmp = sDisplay->DrawModel(11, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    sDisplay->AddModelFeature(tmp, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(65, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
+
+    return tmp;
 }
 
-void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
+void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap)
@@ -68,7 +71,7 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
     }
 }
 
-void ClassicSingleGameType::OnGameLeave()
+void MemeSingleGameType::OnGameLeave()
 {
     if (!m_enemies.empty())
     {
@@ -84,7 +87,7 @@ void ClassicSingleGameType::OnGameLeave()
     }
 }
 
-void ClassicSingleGameType::OnUpdate()
+void MemeSingleGameType::OnUpdate()
 {
     if (!m_enemies.empty())
     {
@@ -107,7 +110,7 @@ void ClassicSingleGameType::OnUpdate()
     }
 }
 
-void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
+void MemeSingleGameType::OnBombBoom(BombRecord* bomb)
 {
     if (!bomb)
         return;
@@ -201,7 +204,7 @@ void ClassicSingleGameType::OnBombBoom(BombRecord* bomb)
     }
 }
 
-void ClassicSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
+void MemeSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
 {
     BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
     sParticleEmitterMgr->AddEmitter(templ, x-0.5f, 0.0f, y-0.5f, 0.6f, 0.6f, 90.0f, 0.0f, 0, 0, 150, 30, 5.0f, 0.1f, 10, 5, 0, 0, 0, 1500);
@@ -221,9 +224,11 @@ void ClassicSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
             sMapManager->FillDynamicRecords();
         }
     }
+
+    sGameplayMgr->localPlayerStats.MemeSingleStats.boxesDestroyed += 1;
 }
 
-void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
+void MemeSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
 {
     m_playerX = newX;
     m_playerY = newY;
@@ -261,15 +266,13 @@ void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32
                         sGameplayMgr->SetMaxBombs(1, true);
                     break;
             }
-
-            sGameplayMgr->localPlayerStats.ClassicSingleStats.bonusesEarned += 1;
         }
     }
 
     pMap->DestroyDynamicRecords(newX, newY, DYNAMIC_TYPE_BONUS);
 }
 
-void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
+void MemeSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
     if (pMap)
@@ -294,7 +297,7 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
             (*itr)->SetDead(true);
             (*itr)->m_movement->Mutate(MOVEMENT_NONE);
 
-            sGameplayMgr->localPlayerStats.ClassicSingleStats.enemiesKilled += 1;
+            sGameplayMgr->localPlayerStats.MemeSingleStats.enemiesTrolled += 1;
 
             // TODO: animace smrti
 

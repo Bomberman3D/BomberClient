@@ -300,6 +300,10 @@
 						RelativePath="..\src\Gameplay\GameTypes\ClassicSingleType.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\Gameplay\GameTypes\MemeSingleType.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

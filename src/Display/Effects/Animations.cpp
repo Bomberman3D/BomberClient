@@ -315,8 +315,8 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
     // Model bomby
     if (id == 8)
         return true;
-    // Model hlavni postavy
-    if (id == 9)
+    // Model hlavni postavy + headless postavy (meme mod)
+    if (id == 9 || id == 11)
         return true;
 
     return false;
@@ -376,7 +376,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
         realFrame = 1;
 
     // Model hrace - chuze
-    if (modelId == 9 && anim == ANIM_WALK)
+    if ((modelId == 9 || modelId == 11) && anim == ANIM_WALK)
     {
         float wholePosMod = 1.0f-fabs((float(frame%50)/25.0f)-1.0f);
         wholePosMod = cos(wholePosMod*PI/2);
@@ -521,7 +521,7 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
         }
     }
     // Model hrace - zevleni
-    else if (modelId == 9 && anim == ANIM_IDLE)
+    else if ((modelId == 9 || modelId == 11) && anim == ANIM_IDLE)
     {
         if (strcmp(object->strName, "LevaRuka") == 0 || strcmp(object->strName, "LevaDlan") == 0)
         {
@@ -648,6 +648,9 @@ void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
                 (*itr)->ToBillboard()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
                 (*itr)->ToBillboard()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
                 (*itr)->ToBillboard()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+
+                if (record->modelId == 11 && sAnimator->GetAnimId(record->AnimTicket) == ANIM_WALK)
+                    (*itr)->ToBillboard()->y += (cos((1.0f-fabs((float(sAnimator->GetActualFrame(record->AnimTicket)%50)/25.0f)-1.0f))*PI/2))*0.1f;
                 break;
             case MF_TYPE_EMITTER:
                 (*itr)->ToEmitter()->m_centerX = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
