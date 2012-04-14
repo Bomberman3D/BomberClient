@@ -571,6 +571,55 @@ void RandomPathfinder::GeneratePath()
 
 /********************************************************************/
 /*                                                                  */
+/*               Random  Bare pathfinder                            */
+/*                                                                  */
+/********************************************************************/
+
+void RandomBarePathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 length)
+{
+    // Vstupni parametr length defaultne nastaven na 5
+
+    m_sourceX = sourceX;
+    m_sourceY = sourceY;
+    m_length = length;
+
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    // Naplneni pomocnych promennych
+    m_mapSizeX = pMap->field.size();
+    m_mapSizeY = pMap->field[0].size();
+
+    accessMatrixDyn.clear();
+
+    // "Pristupova mapa" se naplni jednickami tam, kde pathfinder muze hledat cestu
+    // a nulami tam, kam nemuze
+    accessMatrixDyn.resize(m_mapSizeX);
+    for (uint32 i = 0; i < m_mapSizeX; i++)
+    {
+        accessMatrixDyn[i].resize(m_mapSizeY);
+
+        for (uint32 j = 0; j < m_mapSizeY; j++)
+        {
+            // Pokud je nepristupne pole na souradnicich [x,y]
+            if (pMap->field[i][j].type == TYPE_SOLID_BOX
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX)
+                || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB))
+            {
+                // Vynulujeme ho v hledaci mape
+                accessMatrixDyn[i][j] = 0;
+                continue;
+            }
+
+            // Pokud je pristupne, jednicku
+            accessMatrixDyn[i][j] = 1;
+        }
+    }
+}
+
+/********************************************************************/
+/*                                                                  */
 /*               Movement holder class                              */
 /*                                                                  */
 /********************************************************************/
@@ -674,6 +723,23 @@ void MovementHolder::Generator()
             }
             break;
         }
+        case MOVEMENT_RANDOM_BARE:
+        {
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
+            RandomBarePathfinder p(&m_path);
+            p.Initialize(mx, my);
+            p.GeneratePath();
+
+            if (m_path.size() > 1)
+            {
+                m_nodeVector.x = int32(m_path[1].x) - int32(m_path[0].x);
+                m_nodeVector.y = int32(m_path[1].y) - int32(m_path[0].y);
+                m_currentPathNode = 0;
+                m_nodeStartTime = clock();
+            }
+            break;
+        }
     }
 }
 
@@ -724,6 +790,19 @@ bool MovementHolder::TryGenerator(MovementType moveType)
             uint32 mx = ceil(m_src->pRecord->x);
             uint32 my = ceil(m_src->pRecord->z);
             RandomPathfinder p(&m_tryPath);
+            p.Initialize(mx, my);
+            p.GeneratePath();
+
+            if (m_tryPath.size() > 1)
+                return true;
+
+            break;
+        }
+        case MOVEMENT_RANDOM_BARE:
+        {
+            uint32 mx = ceil(m_src->pRecord->x);
+            uint32 my = ceil(m_src->pRecord->z);
+            RandomBarePathfinder p(&m_tryPath);
             p.Initialize(mx, my);
             p.GeneratePath();
 
@@ -939,7 +1018,13 @@ void EnemyTemplate::Update()
                 {
                     // Pokud stale cesta neexistuje, jdeme tedy nahodne
                     if ((m_movement->GetMovementType() == MOVEMENT_TARGETTED || m_movement->GetMovementType() == MOVEMENT_OUTOFZERO) && !m_movement->HasPath())
-                        m_movement->TryMutate(MOVEMENT_RANDOM);
+                    {
+                        // 2 a vice se umi vyhybat nebezpecnym polim, nizsi do nich muzou vejit a "spachat sebevrazdu"
+                        if (m_AILevel < 2)
+                            m_movement->TryMutate(MOVEMENT_RANDOM_BARE);
+                        else
+                            m_movement->TryMutate(MOVEMENT_RANDOM);
+                    }
                 }
 
                 // AI urovne 1 a 2 budou daleko casteji pohybovat nahodne, cili posuneme update delay na "kazde tri pole"

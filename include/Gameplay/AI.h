@@ -28,7 +28,7 @@ class Pathfinder
         // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
         std::vector<std::vector<int8>> accessMatrixDyn;
 
-    private:
+    protected:
         Path* m_path;
 
         uint32 m_sourceX;
@@ -54,7 +54,7 @@ class OutOfZeroPathfinder
         // Nuluji se jeste k tomu jiz navstivena mista pathfinderem
         std::vector<std::vector<int8>> accessMatrixDyn;
 
-    private:
+    protected:
         Path* m_path;
 
         uint32 m_sourceX;
@@ -70,13 +70,13 @@ class RandomPathfinder
         RandomPathfinder(Path* path);
         ~RandomPathfinder();
 
-        void Initialize(uint32 sourceX, uint32 sourceY, uint32 length = 5);
+        virtual void Initialize(uint32 sourceX, uint32 sourceY, uint32 length = 5);
         void GeneratePath();
         bool Recursor(uint32 x, uint32 y);
 
         std::vector<std::vector<int8>> accessMatrixDyn;
 
-    private:
+    protected:
         Path* m_path;
 
         uint32 m_sourceX;
@@ -88,6 +88,14 @@ class RandomPathfinder
         uint32 m_mapSizeY;
 };
 
+class RandomBarePathfinder: public RandomPathfinder
+{
+    public:
+        RandomBarePathfinder(Path* path): RandomPathfinder(path) {};
+
+        void Initialize(uint32 sourceX, uint32 sourceY, uint32 length = 5);
+};
+
 // Cas na dalsi update pohyboveho generatoru [ms]
 #define HOLDER_UPDATE_DELAY 500
 
@@ -97,6 +105,7 @@ enum MovementType
     MOVEMENT_TARGETTED = 1,
     MOVEMENT_RANDOM    = 2,
     MOVEMENT_OUTOFZERO = 3,
+    MOVEMENT_RANDOM_BARE = 4,
     MOVEMENT_MAX,
 };
 
