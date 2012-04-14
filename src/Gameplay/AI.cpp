@@ -297,18 +297,16 @@ void OutOfZeroPathfinder::Initialize(uint32 sourceX, uint32 sourceY)
         for (uint32 j = 0; j < m_mapSizeY; j++)
         {
             // Podminky na pristupnost / nepristupnost pole na souradnicich [x,y]
-            if (i == sourceX && j == sourceY)
-            {
-                // At stojime kdekoliv, vzdycky muzeme z toho mista odejit
-                // napriklad pokud nam pod zadek byla polozena bomba
-                accessMatrixDyn[i][j] = 0;
-                continue;
-            }
-            else if (pMap->field[i][j].type == TYPE_SOLID_BOX
+            if (pMap->field[i][j].type == TYPE_SOLID_BOX
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOMB)
                 || pMap->IsDynamicRecordPresent(i,j,DYNAMIC_TYPE_BOX))
             {
-                accessMatrixDyn[i][j] = 3;
+                // At stojime kdekoliv, vzdycky muzeme z toho mista odejit
+                // napriklad pokud nam pod zadek byla polozena bomba
+                if (i == sourceX && j == sourceY)
+                    accessMatrixDyn[i][j] = 0;
+                else
+                    accessMatrixDyn[i][j] = 3;
                 continue;
             }
             else if (sGameplayMgr->WouldBeDangerousField(i,j))
@@ -1027,11 +1025,7 @@ void EnemyTemplate::Update()
                     }
                 }
 
-                // AI urovne 1 a 2 budou daleko casteji pohybovat nahodne, cili posuneme update delay na "kazde tri pole"
-                if (m_AILevel <= 2 && m_movement->GetMovementType() == MOVEMENT_RANDOM)
-                    m_nextMoveTypeUpdate = tnow + (3 * HOLDER_UPDATE_DELAY) * m_movement->GetSpeedMod();
-                else
-                    m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
+                m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
             }
 
             // A samotny update pohybu
