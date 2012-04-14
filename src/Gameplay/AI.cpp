@@ -955,6 +955,12 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
             scale = 0.8f;
             height = 0.2f;
             break;
+        case 11:
+            scale = 3.5f;
+            break;
+        case 12:
+            scale = 0.07f;
+            break;
     }
 
     // Inicializace modelu a zaznamu modelu pro nepritele
@@ -966,6 +972,9 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
         case 10:
             sDisplay->AddModelFeature(pRecord, MF_TYPE_EMITTER, 0.0f, 2.0f, 0.0f, sParticleEmitterMgr->AddEmitter(
                 BillboardDisplayListRecord::Create(61, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.3f, 0.3f, 270.0f, 0.0f, 0.0f, 0.0f,    120, 10,   0.9f, 0.05f,   10,1,   0,0, 0,-1));
+            break;
+        case 11: // Headless bomberman - pouze Meme mody
+            sDisplay->AddModelFeature(pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(65, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
             break;
     }
 }

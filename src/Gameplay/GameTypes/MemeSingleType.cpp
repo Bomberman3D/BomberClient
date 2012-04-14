@@ -42,6 +42,10 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 
     sMapManager->FillDynamicRecords();
 
+    // Pole vsech moznych modelu nepratel
+    uint32 EnemyModelMap[] = {11};
+    uint32 count = sizeof(EnemyModelMap)/sizeof(uint32);
+
     for (uint32 i = 0; i < pMap->field.size(); i++)
     {
         for (uint32 j = 0; j < pMap->field[0].size(); j++)
@@ -54,7 +58,7 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     EnemyTemplate* pEnemy = new EnemyTemplate;
-                    pEnemy->Init(10, i, j);
+                    pEnemy->Init(EnemyModelMap[(rand()%count)], i, j);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);
