@@ -365,7 +365,7 @@ void GameplayMgr::PreBoomBomb(uint32 x, uint32 y)
             {
                 for (int32 j = int32(y - (*itr)->reach); j < int32(y + (*itr)->reach); j++)
                 {
-                    if (i < 0 || j < 0 || i > DangerousMap.size() || j > DangerousMap[0].size())
+                    if (i < 0 || j < 0 || i >= DangerousMap.size() || j >= DangerousMap[0].size())
                         continue;
 
                     for (uint32 k = 0; k < 4; k++)

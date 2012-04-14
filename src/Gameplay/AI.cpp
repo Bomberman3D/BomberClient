@@ -825,10 +825,13 @@ void MovementHolder::Update()
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 
     float timePass = 500 * m_speedMod;
+    float timeDiff = tnow-m_nodeStartTime;
+    if (timeDiff > timePass)
+        timeDiff = timePass;
 
     // Posun modelu po vektoru pohybu
-    m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( float(tnow-m_nodeStartTime)/timePass ));
-    m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( float(tnow-m_nodeStartTime)/timePass ));
+    m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( timeDiff/timePass ));
+    m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( timeDiff/timePass ));
 
     // No a pokud jsme dosahli maximalniho bodu usecky urcene vektorem a delkou 1,
     // posuneme se na dalsi bod cesty
@@ -861,6 +864,8 @@ bool MovementHolder::HasPath()
 
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
 {
+    m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
+
     float scale = 1.0f;
     float height = 0.0f;
     // Nastaveni atributu podle modelu
@@ -904,21 +909,44 @@ void EnemyTemplate::Update()
             // Pokud uz je cas na update typu pohybu
             if (m_nextMoveTypeUpdate <= tnow)
             {
-                // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
-                if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                /*  Rozdeleni AI podle jeho urovne uvazovani
+                 *
+                 * level 1 = uplny blbec, jen se nahodne potlouka kolem
+                 * level 2 = trochu chytrejsi, hleda si cestu ven z nebezpecnych poli
+                 * level 3 = navic jeste hleda cestu k hraci pokud tim neohrozi sebe
+                 *
+                 *  Do budoucna:
+                 * level 4 = je schopny polozit bombu
+                 * level 5 = navic jeste spolupracuje s jinymi neprateli
+                 */
+
+                if (m_AILevel >= 3)
                 {
-                    if (!m_movement->TryMutate(MOVEMENT_TARGETTED))
+                    // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
+                    if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                    {
+                        if (!m_movement->TryMutate(MOVEMENT_TARGETTED))
+                            m_movement->TryMutate(MOVEMENT_OUTOFZERO);
+                    }
+                }
+                if (m_AILevel >= 2)
+                {
+                    // Pokud cesta neexistuje, muze to byt i tim, ze stojime na zablokovanem miste bombou nebo plamenem
+                    if (!m_movement->HasPath())
                         m_movement->TryMutate(MOVEMENT_OUTOFZERO);
                 }
-
-                // Pokud ne (cesta neexistuje), presedlame na nahodny pohyb
-                if (m_movement->GetMovementType() == MOVEMENT_TARGETTED && !m_movement->HasPath())
+                if (m_AILevel >= 1)
                 {
-                    if (!m_movement->TryMutate(MOVEMENT_RANDOM))
-                        m_movement->TryMutate(MOVEMENT_OUTOFZERO);
+                    // Pokud stale cesta neexistuje, jdeme tedy nahodne
+                    if ((m_movement->GetMovementType() == MOVEMENT_TARGETTED || m_movement->GetMovementType() == MOVEMENT_OUTOFZERO) && !m_movement->HasPath())
+                        m_movement->TryMutate(MOVEMENT_RANDOM);
                 }
 
-                m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
+                // AI urovne 1 a 2 budou daleko casteji pohybovat nahodne, cili posuneme update delay na "kazde tri pole"
+                if (m_AILevel <= 2 && m_movement->GetMovementType() == MOVEMENT_RANDOM)
+                    m_nextMoveTypeUpdate = tnow + (3 * HOLDER_UPDATE_DELAY) * m_movement->GetSpeedMod();
+                else
+                    m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
             }
 
             // A samotny update pohybu

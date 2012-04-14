@@ -139,7 +139,7 @@ class MovementHolder
 class EnemyTemplate
 {
     public:
-        EnemyTemplate() { pRecord = NULL; m_isDead = false; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; };
+        EnemyTemplate() { pRecord = NULL; m_isDead = false; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; m_AILevel = 1; };
         void Init(uint32 modelId, uint32 x, uint32 y);
         void Update();
 
@@ -153,6 +153,7 @@ class EnemyTemplate
     private:
         clock_t m_nextMoveTypeUpdate;
         bool m_isDead;
+        uint8 m_AILevel;
 };
 
 #endif
