@@ -94,3 +94,24 @@ ModelModifierData* Storage::GetModelModifierData(uint32 modelId)
 
     return &((*itr).second);
 }
+
+ObjectArtkitData* Storage::GetObjectArtkitData(uint32 modelId, const char* objectname, uint32 artkitId)
+{
+    // Neexistuje
+    if (ModelFilename.find(modelId) == ModelFilename.end())
+        return NULL;
+
+    IDNamePair index = std::make_pair(modelId, objectname);
+    ObjectArtkitMap::iterator itr = ObjectArtkits.find(index);
+    if (itr == ObjectArtkits.end())
+        return NULL;
+
+    if ((*itr).second.empty())
+        return NULL;
+
+    for (std::vector<ObjectArtkitData>::iterator iter = (*itr).second.begin(); iter != (*itr).second.end(); ++iter)
+        if ((*iter).artkit_id == artkitId)
+            return &(*iter);
+
+    return NULL;
+}

@@ -152,6 +152,7 @@ struct ModelDisplayListRecord: public DisplayListRecord
     {
         remove = false;
         AnimTicket = 0;
+        artkit = 0;
     }
 
     uint32 modelId;
@@ -159,6 +160,7 @@ struct ModelDisplayListRecord: public DisplayListRecord
     uint32 CustomFrame;
     float  scale, rotate;
     FeatureList features;
+    uint32 artkit;
 };
 
 struct BillboardDisplayListRecord: public DisplayListRecord
@@ -208,7 +210,7 @@ class Display
                                           float scale = 1.0f, float rotate = 0.0f,
                                           bool genGLDisplayList = false, bool animReverse = false,
                                           uint32 startFrame = 0, uint32 frameSkipSpeed = 0, AnimRestriction animRest = ANIM_RESTRICTION_NONE,
-                                          bool GLDisplayListOnly = false);
+                                          bool GLDisplayListOnly = false, uint32 artkit = 0);
         bool RemoveRecordFromDisplayList(ModelDisplayListRecord* target);
         void DrawModels();
         void AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void* feature);

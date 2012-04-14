@@ -208,7 +208,7 @@ void Display::Update(const uint32 diff)
     DrawBillboards();
 }
 
-ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest, bool GLDisplayListOnly)
+ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest, bool GLDisplayListOnly, uint32 artkit)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
@@ -232,6 +232,7 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->remove = false;
     pNew->scale = scale;
     pNew->rotate = rotate;
+    pNew->artkit = artkit;
 
     // Pokud potrebujeme vygenerovat displaylist, musime nacist i model a take pockat na jeho uplne nacteni
     if (sStorage->Models[modelId] == NULL)

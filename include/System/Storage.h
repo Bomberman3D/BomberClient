@@ -70,6 +70,13 @@ struct ObjectModifierData
     float texture_repeat_y;
 };
 
+struct ObjectArtkitData
+{
+    uint32 artkit_id;
+
+    uint8 colors[3]; // R, G, B
+};
+
 class Storage
 {
     public:
@@ -85,6 +92,7 @@ class Storage
 
         ModelModifierData* GetModelModifierData(uint32 modelId);
         ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);
+        ObjectArtkitData* GetObjectArtkitData(uint32 modelId, const char* objectname, uint32 artkitId);
 
         // StorageLoader.cpp
         bool LoadTextureData();
@@ -104,6 +112,7 @@ class Storage
         typedef std::map<uint32, SolidBoxData> SolidBoxDataMap;
         typedef std::map<uint32, ModelModifierData> ModelModifierMap;
         typedef std::map<IDNamePair, ObjectModifierData> ObjectModifierMap;
+        typedef std::map<IDNamePair, std::vector<ObjectArtkitData>> ObjectArtkitMap;
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
@@ -115,6 +124,7 @@ class Storage
         SolidBoxDataMap SolidBoxProp;
         ModelModifierMap ModelModifiers;
         ObjectModifierMap ObjectModifiers;
+        ObjectArtkitMap ObjectArtkits;
 
         // Dynamicky ukladana data
         // textury, modely a podobne

@@ -164,6 +164,35 @@ bool Storage::LoadModelData()
     fprintf(stdout,"Nacteno %u objektovych modifikatoru\n",count);
     qry.free_result();
 
+    // Artkity pro objekty ("barevne prevleky")
+
+    SQLiteQuery(&qry, "SELECT * FROM object_artkit");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    count = 0;
+    id = 0;
+    uint32 modelid = 0;
+    ObjectArtkitData tmp;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        modelid = qry.getval();
+        name = qry.getstr();
+        index = std::make_pair(modelid, name.c_str());
+
+        tmp.artkit_id = id;
+
+        for (uint32 i = 0; i < 3; i++)
+            tmp.colors[i] = qry.getnum();
+
+        ObjectArtkits[index].push_back(tmp);
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u artkitu pro modely\n",count);
+    qry.free_result();
+
     return true;
 }
 
