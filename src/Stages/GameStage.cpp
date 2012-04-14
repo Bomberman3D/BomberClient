@@ -107,8 +107,8 @@ void GameStage::OnDraw(uint32 diff)
                     // Nastaveni textury pro vykresleni
                     if (pMap->IsDynamicRecordPresent(i, j, DYNAMIC_TYPE_BOX))
                         textureId = 52;
-                    else if (sGameplayMgr->WouldBeDangerousField(i,j))
-                        textureId = 51;
+                    //else if (sGameplayMgr->WouldBeDangerousField(i,j))
+                    //    textureId = 51;
                     else
                     {
                         switch (pMap->field[i][j].type)
