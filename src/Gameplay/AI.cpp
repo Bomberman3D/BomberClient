@@ -939,12 +939,13 @@ bool MovementHolder::HasPath()
     return (m_path.size() > 1);
 }
 
-void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
+void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y, uint32 position)
 {
     m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
 
     float scale = 1.0f;
     float height = 0.0f;
+    uint32 artkit = 0;
     // Nastaveni atributu podle modelu
     switch (modelId)
     {
@@ -957,6 +958,11 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
             break;
         case 11:
             scale = 3.5f;
+            // Mame pouze 3 artkity pro tenhle model
+            if (position < 4)
+                artkit = position;
+            else
+                artkit = 3;
             break;
         case 12:
             scale = 0.07f;
@@ -964,7 +970,7 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y)
     }
 
     // Inicializace modelu a zaznamu modelu pro nepritele
-    pRecord = sDisplay->DrawModel(modelId, x-0.5f, height, y-0.5f, ANIM_IDLE, scale, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
+    pRecord = sDisplay->DrawModel(modelId, x-0.5f, height, y-0.5f, ANIM_IDLE, scale, 0.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED, false, artkit);
 
     // Rutiny po pridani (implicitni featury modelu,...)
     switch (modelId)

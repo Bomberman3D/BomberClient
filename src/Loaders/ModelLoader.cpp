@@ -755,16 +755,14 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
         sStorage->GetAllModelArtkitIds(modelId, &artkitIds);
         if (!artkitIds.empty())
         {
-            for (std::vector<uint32>::const_iterator itr = artkitIds.begin(); itr != artkitIds.end(); ++itr)
-                if ((*itr) > maxkit)
-                    maxkit = (*itr);
+            maxkit = artkitIds.size();
 
             pModel->displayListArtkit.resize(maxkit+1);
         }
 
         for (uint32 kit = 0; kit <= maxkit; kit++)
         {
-            if (kit != 0 && !artkitIds[kit])
+            if (kit != 0 && (artkitIds.size() <= kit || !artkitIds[kit]))
                 continue;
 
             if (kit != 0)

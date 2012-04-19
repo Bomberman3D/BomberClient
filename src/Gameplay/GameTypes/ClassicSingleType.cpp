@@ -43,6 +43,8 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
     uint32 EnemyModelMap[] = {10, 12};
     uint32 count = sizeof(EnemyModelMap)/sizeof(uint32);
 
+    uint32 enemycount = 0;
+
     for (uint32 i = 0; i < pMap->field.size(); i++)
     {
         for (uint32 j = 0; j < pMap->field[0].size(); j++)
@@ -55,7 +57,7 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     EnemyTemplate* pEnemy = new EnemyTemplate;
-                    pEnemy->Init(EnemyModelMap[(rand()%count)], i, j);
+                    pEnemy->Init(EnemyModelMap[(rand()%count)], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);
