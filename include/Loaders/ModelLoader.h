@@ -104,6 +104,7 @@ struct t3DModel
     {
         displayList = 0;
         displayListSize = 0;
+        displayListArtkit.clear();
         numOfObjects = 0;
         numOfMaterials = 0;
         numberOfFrames = 1;
@@ -129,6 +130,7 @@ struct t3DModel
 
     GLuint displayList;
     uint32 displayListSize;
+    std::vector<GLuint> displayListArtkit;
 };
 
 namespace Loaders

@@ -436,7 +436,10 @@ void Display::DrawModels()
         if (sStorage->Models[temp->modelId]->displayListSize != 0)
         {
             // Vykreslime to pomoci display listu
-            glCallList(sStorage->Models[temp->modelId]->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
+            if (temp->artkit > 0)
+                glCallList(sStorage->Models[temp->modelId]->displayListArtkit[temp->artkit] + sAnimator->GetActualFrame(temp->AnimTicket));
+            else
+                glCallList(sStorage->Models[temp->modelId]->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
             // A nemusime se dale o nic starat
             ++itr;
             continue;

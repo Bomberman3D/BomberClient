@@ -93,6 +93,7 @@ class Storage
         ModelModifierData* GetModelModifierData(uint32 modelId);
         ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);
         ObjectArtkitData* GetObjectArtkitData(uint32 modelId, const char* objectname, uint32 artkitId);
+        void GetAllModelArtkitIds(uint32 modelId, std::vector<uint32>* dest);
 
         // StorageLoader.cpp
         bool LoadTextureData();

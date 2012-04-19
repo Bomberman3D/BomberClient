@@ -750,90 +750,120 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
         pModel->displayList = glGenLists(maxFrame+1);
         pModel->displayListSize = maxFrame + 1;
 
-        for (uint32 a = 0; a <= maxFrame; a++)
+        uint32 maxkit = 0;
+        std::vector<uint32> artkitIds;
+        sStorage->GetAllModelArtkitIds(modelId, &artkitIds);
+        if (!artkitIds.empty())
         {
-            glNewList(pModel->displayList + a,GL_COMPILE);
-            for (int i = 0; i < pModel->numOfObjects; i++)
+            for (std::vector<uint32>::const_iterator itr = artkitIds.begin(); itr != artkitIds.end(); ++itr)
+                if ((*itr) > maxkit)
+                    maxkit = (*itr);
+
+            pModel->displayListArtkit.resize(maxkit+1);
+        }
+
+        for (uint32 kit = 0; kit <= maxkit; kit++)
+        {
+            if (kit != 0 && !artkitIds[kit])
+                continue;
+
+            if (kit != 0)
+                pModel->displayListArtkit[kit] = glGenLists(maxFrame+1);
+
+            for (uint32 a = 0; a <= maxFrame; a++)
             {
-                if (pModel->pObject.size() <= 0)
-                    break;
-
-                t3DObject *pObject = &pModel->pObject[i];
-
-                glPushMatrix();
-                sDisplay->AnimateModelObjectByFrame(pModel, pObject, modelId, a);
-
-                if (pObject->bHasTexture)
-                {
-                    glEnable(GL_TEXTURE_2D);
-                    glColor3ub(255, 255, 255);
-                    glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                }
+                if (kit == 0)
+                    glNewList(pModel->displayList + a,GL_COMPILE);
                 else
+                    glNewList(pModel->displayListArtkit[kit] + a,GL_COMPILE);
+
+                for (int i = 0; i < pModel->numOfObjects; i++)
                 {
-                    glDisable(GL_TEXTURE_2D);
-                    if (pModel->pMaterials.size() && pObject->materialID >= 0)
+                    if (pModel->pObject.size() <= 0)
+                        break;
+
+                    t3DObject *pObject = &pModel->pObject[i];
+
+                    glPushMatrix();
+                    sDisplay->AnimateModelObjectByFrame(pModel, pObject, modelId, a);
+
+                    if (pObject->bHasTexture)
                     {
-                        BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
-                        glColor3ub(pColor[0], pColor[1], pColor[2]);
+                        glEnable(GL_TEXTURE_2D);
+                        glColor3ub(255, 255, 255);
+                        glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                     }
-                }
-
-                /*
-                glShadeModel(GL_SMOOTH);
-                GLfloat mShininess[] = {2+4};
-                GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
-                */
-
-                glBegin(GL_TRIANGLES);
-
-                for (int j = 0; j < pObject->numOfFaces; j++)
-                {
-                    for (int whichVertex = 0; whichVertex < 3; whichVertex++)
+                    else
                     {
-                        int index = pObject->pFaces[j].vertIndex[whichVertex];
-
-                        if (pObject->pNormals)
+                        glDisable(GL_TEXTURE_2D);
+                        ObjectArtkitData* adata = sStorage->GetObjectArtkitData(modelId, pObject->strName, kit);
+                        if (adata)
                         {
-                            CVector3* pNormal = &pObject->pNormals[index];
-                            glNormal3f(pNormal->x, pNormal->y, pNormal->z);
+                            glColor3ub(adata->colors[0], adata->colors[1], adata->colors[2]);
                         }
-
-                        if (pObject->bHasTexture && pObject->pTexVerts != NULL)
+                        else if (pModel->pMaterials.size() && pObject->materialID >= 0)
                         {
-                            CVector2* pTexVert = &pObject->pTexVerts[index];
+                            BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
+                            glColor3ub(pColor[0], pColor[1], pColor[2]);
+                        }
+                    }
 
-                            // Pokud existuji modifiery pro opakovatelnost textur, nacteme je
-                            float mod_x = 1.0f, mod_y = 1.0f;
-                            if (pObject->strName)
+                    /*
+                    glShadeModel(GL_SMOOTH);
+                    GLfloat mShininess[] = {2+4};
+                    GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
+                    */
+
+                    glBegin(GL_TRIANGLES);
+
+                    for (int j = 0; j < pObject->numOfFaces; j++)
+                    {
+                        for (int whichVertex = 0; whichVertex < 3; whichVertex++)
+                        {
+                            int index = pObject->pFaces[j].vertIndex[whichVertex];
+
+                            if (pObject->pNormals)
                             {
-                                if (ObjectModifierData* pMod = sStorage->GetObjectModifierData(modelId, &(pObject->strName[0])))
-                                {
-                                    mod_x = pMod->texture_repeat_x;
-                                    mod_y = pMod->texture_repeat_y;
-                                }
+                                CVector3* pNormal = &pObject->pNormals[index];
+                                glNormal3f(pNormal->x, pNormal->y, pNormal->z);
                             }
 
-                            glTexCoord2f(pTexVert->x * mod_x, pTexVert->y * mod_y);
-                        }
+                            if (pObject->bHasTexture && pObject->pTexVerts != NULL)
+                            {
+                                CVector2* pTexVert = &pObject->pTexVerts[index];
 
-                        if (pObject->pVerts)
-                        {
-                            CVector3* pVert = &pObject->pVerts[index];
-                            glVertex3f(pVert->x, pVert->y, pVert->z);
+                                // Pokud existuji modifiery pro opakovatelnost textur, nacteme je
+                                float mod_x = 1.0f, mod_y = 1.0f;
+                                if (pObject->strName)
+                                {
+                                    if (ObjectModifierData* pMod = sStorage->GetObjectModifierData(modelId, &(pObject->strName[0])))
+                                    {
+                                        mod_x = pMod->texture_repeat_x;
+                                        mod_y = pMod->texture_repeat_y;
+                                    }
+                                }
+
+                                glTexCoord2f(pTexVert->x * mod_x, pTexVert->y * mod_y);
+                            }
+
+                            if (pObject->pVerts)
+                            {
+                                CVector3* pVert = &pObject->pVerts[index];
+                                glVertex3f(pVert->x, pVert->y, pVert->z);
+                            }
                         }
                     }
+
+                    glEnd();
+
+                    glPopMatrix();
                 }
-
-                glEnd();
-
-                glPopMatrix();
+                glEndList();
             }
-            glEndList();
         }
     }
 }

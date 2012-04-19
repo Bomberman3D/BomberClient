@@ -115,3 +115,22 @@ ObjectArtkitData* Storage::GetObjectArtkitData(uint32 modelId, const char* objec
 
     return NULL;
 }
+
+void Storage::GetAllModelArtkitIds(uint32 modelId, std::vector<uint32> *dest)
+{
+    dest->clear();
+
+    for (ObjectArtkitMap::iterator itr = ObjectArtkits.begin(); itr != ObjectArtkits.end(); itr++)
+    {
+        if ((*itr).first.first == modelId)
+        {
+            for (std::vector<ObjectArtkitData>::iterator iter = (*itr).second.begin(); iter != (*itr).second.end(); ++iter)
+            {
+                if (dest->size() <= (*iter).artkit_id)
+                    dest->resize((*iter).artkit_id+1);
+
+                (*dest)[(*iter).artkit_id] = 1;
+            }
+        }
+    }
+}
