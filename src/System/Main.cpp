@@ -444,7 +444,10 @@ bool Application::Init()
     i = setvbuf(stdout, NULL, _IONBF, 0);*/
 
     if (!sConfig->Load())
+    {
+        PMessageBox("Chyba", "Nelze naèíst configy!");
         return false;
+    }
 
     if (!CreateGLWindow("BomberEngine",sConfig->WindowWidth,sConfig->WindowHeight,sConfig->ColorDepth,sConfig->fullscreen,sConfig->RefreshRate))
         return false;

@@ -473,7 +473,7 @@ void Loaders::t3DSLoader::ReadKeyFramePositions(t3DModel *pModel, tChunk *pPrevi
 
     for (i = 0; i <= (pModel->numberOfFrames + 1); i++)
     {
-        m_CurrentObject->vPosition.push_back(CVector3());
+        m_CurrentObject->vPosition.resize(m_CurrentObject->vPosition.size()+1);//.push_back(CVector3());
 
         if (i < m_CurrentObject->positionFrames)
         {
@@ -548,14 +548,19 @@ void Loaders::t3DSLoader::ReadKeyFrameRotations(t3DModel *pModel, tChunk *pPrevi
         vRotation[i].x *= -1;
     }
 
-    m_CurrentObject->vRotation.push_back(vRotation[0]);
+    m_CurrentObject->vRotation.resize(m_CurrentObject->vRotation.size()+1);
+    m_CurrentObject->vRotation[m_CurrentObject->vRotation.size()-1] = vRotation[0];
 
-    m_CurrentObject->vRotDegree.push_back(vRotDegree[0]);
+    m_CurrentObject->vRotDegree.resize(m_CurrentObject->vRotDegree.size()+1);
+    m_CurrentObject->vRotDegree[m_CurrentObject->vRotDegree.size()-1] = vRotDegree[0];
 
     int currentKey = 1;
 
     for (i = 1; i <= (pModel->numberOfFrames + 1); i++)
     {
+        m_CurrentObject->vRotation.resize(i + 1);
+        m_CurrentObject->vRotDegree.resize(i + 1);
+
         if (currentKey < m_CurrentObject->rotationFrames)
         {
             int currentFrame = vFrameNumber[currentKey];
@@ -564,16 +569,16 @@ void Loaders::t3DSLoader::ReadKeyFrameRotations(t3DModel *pModel, tChunk *pPrevi
 
             float rotDegree = degree / (currentFrame - previousFrame);
 
-            m_CurrentObject->vRotation.push_back(vRotation[currentKey]);
-            m_CurrentObject->vRotDegree.push_back(rotDegree);
+            m_CurrentObject->vRotation[i] = vRotation[currentKey];
+            m_CurrentObject->vRotDegree[i] = rotDegree;
 
             if (vFrameNumber[currentKey] <= i)
                 currentKey++;
         }
         else
         {
-            m_CurrentObject->vRotation.push_back(vRotation[currentKey - 1]);
-            m_CurrentObject->vRotDegree.push_back(0.0f);
+            m_CurrentObject->vRotation[i] = vRotation[currentKey - 1];
+            m_CurrentObject->vRotDegree[i] = 0.0f;
         }
     }
 }
@@ -596,7 +601,7 @@ void Loaders::t3DSLoader::ReadKeyFrameScales(t3DModel *pModel, tChunk *pPrevious
 
     for (i = 0; i <= (pModel->numberOfFrames + 1); i++)
     {
-        m_CurrentObject->vScale.push_back(CVector3());
+        m_CurrentObject->vScale.resize(m_CurrentObject->vScale.size()+1);
 
         if (i < m_CurrentObject->scaleFrames)
         {

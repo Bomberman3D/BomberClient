@@ -5,6 +5,9 @@ SoundMgr::SoundMgr()
 {
     m_playlist.clear();
     m_playlistPos = 0;
+
+    m_audioMgr = NULL;
+    m_current = NULL;
 }
 
 SoundMgr::~SoundMgr()
