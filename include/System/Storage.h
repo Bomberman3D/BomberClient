@@ -77,6 +77,13 @@ struct ObjectArtkitData
     uint8 colors[3]; // R, G, B
 };
 
+struct MusicFileData
+{
+    std::string filename;
+    std::string author;
+    std::string description;
+};
+
 class Storage
 {
     public:
@@ -101,6 +108,7 @@ class Storage
         bool LoadSkyboxData();
         bool LoadMapData();
         bool LoadMapObjectData();
+        bool LoadMusicData();
 
         // Typedefs
         typedef std::pair<uint32, std::string> IDNamePair;
@@ -114,6 +122,7 @@ class Storage
         typedef std::map<uint32, ModelModifierData> ModelModifierMap;
         typedef std::map<IDNamePair, ObjectModifierData> ObjectModifierMap;
         typedef std::map<IDNamePair, std::vector<ObjectArtkitData>> ObjectArtkitMap;
+        typedef std::map<uint32, MusicFileData> MusicDataMap;
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
@@ -126,6 +135,7 @@ class Storage
         ModelModifierMap ModelModifiers;
         ObjectModifierMap ObjectModifiers;
         ObjectArtkitMap ObjectArtkits;
+        MusicDataMap MusicData;
 
         // Dynamicky ukladana data
         // textury, modely a podobne

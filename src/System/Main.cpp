@@ -13,6 +13,7 @@
 #include <Network.h>
 #include <Timer.h>
 #include <LoadingThread.h>
+#include <SoundMgr.h>
 
 #include <io.h>
 #include <stdlib.h>
@@ -458,6 +459,8 @@ bool Application::Init()
     //    boost::thread NetworkThread(runNetworkWorker);
 
     sApplication->ApplyRenderContext(RC_MAIN);
+
+    sSoundMgr->Initialize();
 
     m_currStage = new MenuStage;
     SetStage(STAGE_MENU);

@@ -43,5 +43,6 @@ using namespace std;
 #pragma warning (disable:4018) // signed/unsigned mismatch
 #pragma warning (disable:4244) // conversion from X to Y, possible loss of data
 #pragma warning (disable:4068) // unknown pragma
+#pragma warning (disable:4786) // "identifier was truncated.."
 
 #endif

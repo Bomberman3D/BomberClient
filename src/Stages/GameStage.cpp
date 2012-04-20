@@ -8,10 +8,13 @@
 #include <Map.h>
 #include <Gameplay.h>
 #include <Timer.h>
+#include <SoundMgr.h>
 
 void GameStage::OnEnter()
 {
     sGameplayMgr->OnGameInit();
+    sSoundMgr->InitMusicPlaylist();
+    sSoundMgr->MusicStart();
     m_subStage = 0;
 
     // Svetla
@@ -38,6 +41,7 @@ void GameStage::OnEnter()
 
 void GameStage::OnLeave()
 {
+    sSoundMgr->MusicStop();
     sGameplayMgr->OnGameLeave();
 
     glDisable(GL_LIGHTING);

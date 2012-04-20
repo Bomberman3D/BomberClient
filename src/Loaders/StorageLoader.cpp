@@ -269,3 +269,28 @@ bool Storage::LoadMapObjectData()
 
     return true;
 }
+
+bool Storage::LoadMusicData()
+{
+    Database* pDB = OpenDatabase("music.db3");
+    Query qry(*pDB);
+    SQLiteQuery(&qry, "SELECT * FROM music_filename");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    uint32 count = 0;
+    uint32 id;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        MusicData[id].filename = qry.getstr();
+        MusicData[id].author = qry.getstr();
+        MusicData[id].description = qry.getstr();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u dat hudby\n",count);
+    qry.free_result();
+
+    return true;
+}
