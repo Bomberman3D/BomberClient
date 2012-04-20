@@ -87,6 +87,7 @@ void Application::Update()
     sDisplay->Update(m_diff);
     m_currStage->OnDraw(m_diff);
     m_currStage->OnUpdate(m_diff);
+    sSoundMgr->Update();
     sTimer->Update();
 
     m_diff = uint32(clock() - m_lastUpdate);

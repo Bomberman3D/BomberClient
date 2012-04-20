@@ -26,7 +26,11 @@ class SoundMgr
         void MusicStart();
         void MusicStop();
         void MusicPause();
+        void MusicUnpause();
         bool IsMusicPlaying() { return m_playing; };
+        int32 GetCurrentMusicId() { if (!m_playlist.empty() && m_playlistPos < m_playlist.size()) return m_playlist[m_playlistPos]; else return -1; };
+
+        cAudio::IAudioSource* CreateMusicSource(std::string filename);
 
     private:
         cAudio::IAudioManager* m_audioMgr;
