@@ -244,6 +244,7 @@ class Display
 
         // Text
         void PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char* fmt, ...);
+        void PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 width, float scale, uint8 flags, uint32 color, const char* fmt, ...);
 
         // 2D funkce
         void Draw2D(uint32 textureId, float left, float top, float width, float height);

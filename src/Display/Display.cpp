@@ -168,6 +168,60 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 
         Setup3DMode();
 }
 
+void Display::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 width, float scale, uint8 flags, uint32 color, const char* fmt, ...)
+{
+    // Odstavcovy text
+
+    char text[2048];
+    va_list ap;
+
+    if (fmt == NULL)
+        return;
+
+    va_start(ap, fmt);
+      vsprintf(text, fmt, ap);
+    va_end(ap);
+
+    // Nejdriv zjistime rozmery pismen po obou osach, abychom mohli zjistit, kolik se jich vejde na radku a jak je posouvat dolu
+
+    float charsize_x = 10.0f;
+    if (font == FONT_ONE)
+        charsize_x = 36.0f;
+
+    float charsize_y = 16.0f;
+    if (font == FONT_ONE)
+        charsize_y = 64.0f;
+
+    charsize_x *= scale;
+    charsize_y *= scale;
+
+    // Na radku se jich vejde presne sirka delena sirkou znaku, zaokrouhleno dolu (oriznuta desetinna cast pomoci konverze)
+    uint32 perline = uint32(float(width) / float(charsize_x));
+    char* tmp = new char[perline+1];
+
+    // charcnt znaci pocet znaku k vykresleni - bude se dekrementovat tak dlouho, dokud nebude nulova, pote se cyklus ukonci
+    uint32 charcnt = strlen(text);
+    uint32 line = 0;
+    // Jeden pruchod cyklem = vykresleni jedne radky
+    while (charcnt > 0)
+    {
+        // Prekopirujeme presne znaky, co potrebujeme. text+offset posouva pointer na pamet, kde zacina v poradi prvni znak, ktery jsme jeste nevykreslili
+        strncpy(tmp, text+strlen(text)-charcnt, perline);
+        // Retezec musime zakoncit nulou
+        tmp[perline] = '\0';
+        PrintText(font, left, top+line*(charsize_y+2), scale, flags, color, tmp);
+
+        // Pricteme radku (abychom mohli zacit vykreslovat dalsi) a odecteme znaky k vykresleni
+        line++;
+        if (charcnt >= perline)
+            charcnt -= perline;
+        else
+            charcnt = 0;
+    }
+
+    // TODO: funkce word wrap, aneb zalamovani slov (podle mezer)
+}
+
 bool Display::BindTexture(uint32 textureId)
 {
     // Pokud jiz je aktualne nabindovana, neni treba nic delat

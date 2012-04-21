@@ -120,22 +120,22 @@ void GameSettingsStage::OnDraw(uint32 diff)
 
                 // TODO: funkce pro odstavcovy text a zalamovani
                 sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
-                sDisplay->PrintText(FONT_ONE, 100, 150, FONT_SIZE_4, 0, NOCOLOR, "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou.");
-                sDisplay->PrintText(FONT_ONE, 100, 170, FONT_SIZE_4, 0, NOCOLOR, "Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat");
-                sDisplay->PrintText(FONT_ONE, 100, 190, FONT_SIZE_4, 0, NOCOLOR, "všechny nepøátele v èasovém limitu.");
+                sDisplay->PrintParagraphText(FONT_ONE, 100, 150, WIDTH-100-100, FONT_SIZE_4, 0, NOCOLOR,
+                    "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou. Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat     " \
+                    "všechny nepøátele v èasovém limitu.");
                 break;
             case GAME_TYPE_SP_MEME:
                 sDisplay->PrintText(FONT_ONE, 140, 45, FONT_SIZE_3, 0, NOCOLOR, "Meme wars");
 
                 // TODO: funkce pro odstavcovy text a zalamovani
                 sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
-                sDisplay->PrintText(FONT_ONE, 100, 150, FONT_SIZE_4, 0, NOCOLOR, "Meme wars je typ hry inspirovaný internetovými meme postavièkami a");
-                sDisplay->PrintText(FONT_ONE, 100, 170, FONT_SIZE_4, 0, NOCOLOR, "srandièkami, jako napøíklad troll, nyan cat, rickroll, rage comics, pedobear,");
-                sDisplay->PrintText(FONT_ONE, 100, 190, FONT_SIZE_4, 0, NOCOLOR, "o rly?, a další. Úkolem je opìt znièit všechny nepøátele v èasovém limitu,");
-                sDisplay->PrintText(FONT_ONE, 100, 210, FONT_SIZE_4, 0, NOCOLOR, "ovšem za pomoci bonusù, které se v originální høe neobjevily. Co tøeba Nyan");
-                sDisplay->PrintText(FONT_ONE, 100, 230, FONT_SIZE_4, 0, NOCOLOR, "cat speed bonus?");
+                sDisplay->PrintParagraphText(FONT_ONE, 100, 150, WIDTH-100-100, FONT_SIZE_4, 0, NOCOLOR,
+                    "Meme wars je typ hry inspirovaný internetovými meme postavièkami a " \
+                    "srandièkami, jako napøíklad troll, nyan cat, rickroll, rage comics, pedobear, " \
+                    "o rly?, a další. Úkolem je opìt znièit všechny nepøátele v èasovém limitu, " \
+                    "ovšem za pomoci bonusù, které se v originální høe neobjevily. Co tøeba Nyan " \
+                    "cat speed bonus?");
 
-                sDisplay->PrintText(FONT_ONE, 100, 270, FONT_SIZE_4, 0, NOCOLOR, "NYI");
                 break;
             default:
                 break;
