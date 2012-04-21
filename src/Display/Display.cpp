@@ -289,6 +289,7 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     pNew->scale = scale;
     pNew->rotate = rotate;
     pNew->artkit = artkit;
+    pNew->insertionTime = clock();
 
     // Pokud potrebujeme vygenerovat displaylist, musime nacist i model a take pockat na jeho uplne nacteni
     if (sStorage->Models[modelId] == NULL)
@@ -669,6 +670,7 @@ BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, fl
     pNew->remove = false;
     pNew->scale_x = scale_x;
     pNew->scale_y = scale_y;
+    pNew->insertionTime = clock();
 
     pNew->billboard_x = billboard_x;
     pNew->billboard_y = billboard_y;

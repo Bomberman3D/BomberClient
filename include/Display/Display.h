@@ -136,6 +136,7 @@ struct DisplayListRecord
         m_type = type;
         displayList = 0;
         displayListSize = 0;
+        insertionTime = 0;
     }
 
     float  x, y, z;
@@ -144,6 +145,7 @@ struct DisplayListRecord
     GLDisplayList displayList;
     uint32 displayListSize;
     AnimRestriction animRestriction;
+    clock_t insertionTime;
 };
 
 struct ModelDisplayListRecord: public DisplayListRecord

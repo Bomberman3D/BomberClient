@@ -620,16 +620,16 @@ void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
     // Tikajici bomba - posunovani emitteru
     if (record->modelId == 8 && sAnimator->GetAnimId(record->AnimTicket) == ANIM_IDLE)
     {
-        int32 delta = abs(int(sAnimator->GetActualFrame(record->AnimTicket)) - int((record->CustomFrame % 100)));
-        record->CustomFrame += delta;
+        int32 delta = float(clock() - record->insertionTime)*1.3f;
+        record->CustomFrame = (delta);
 
         for (FeatureList::iterator itr = record->features.begin(); itr != record->features.end(); ++itr)
         {
             if ((*itr)->type == MF_TYPE_EMITTER)
             {
-                (*itr)->offset_x -= 0.0037f*delta;
-                (*itr)->offset_y += 0.0015f*delta;
-                (*itr)->offset_z -= 0.0042f*delta;
+                (*itr)->offset_x = 17.4f-0.0037f*delta;
+                (*itr)->offset_y = 18.539f+0.0015f*delta;
+                (*itr)->offset_z = 21.02f-0.0042f*delta;
             }
         }
     }
