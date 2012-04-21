@@ -201,6 +201,8 @@ void Display::Update(const uint32 diff)
     if (m_is2D)
         Setup3DMode();
 
+    m_boundTexture = 0;
+
     sAnimator->Update();
     sParticleEmitterMgr->Update();
 
@@ -460,6 +462,7 @@ void Display::DrawModels()
                 glEnable(GL_TEXTURE_2D);
                 glColor3ub(255, 255, 255);
                 glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
+                m_boundTexture = 0;
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             }
