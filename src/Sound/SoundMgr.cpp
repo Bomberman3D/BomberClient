@@ -8,6 +8,7 @@ SoundMgr::SoundMgr()
 
     m_audioMgr = NULL;
     m_current = NULL;
+    m_playing = false;
 }
 
 SoundMgr::~SoundMgr()
@@ -21,7 +22,9 @@ SoundMgr::~SoundMgr()
 void SoundMgr::Initialize()
 {
     m_audioMgr = cAudio::createAudioManager(true);
-    m_audioMgr->setMasterVolume(0.5f);
+
+    if (m_audioMgr)
+        m_audioMgr->setMasterVolume(0.5f);
 }
 
 void SoundMgr::Update()
@@ -39,6 +42,9 @@ void SoundMgr::Update()
         return;
     }
 
+    if (m_playlist.empty())
+        return;
+
     if (m_current)
     {
         // Pokud jeste muziku prehravame, neni co delat
@@ -53,6 +59,9 @@ void SoundMgr::Update()
     // TODO: random prehravani
     if (m_playlistPos >= m_playlist.size())
         m_playlistPos = 0;
+
+    if (m_playlist[m_playlistPos] >= sStorage->MusicData.size())
+        return;
 
     // Vytvorime novy zdroj a nechame ho prehrat
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
