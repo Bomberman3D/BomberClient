@@ -193,11 +193,11 @@ struct BillboardDisplayListRecord: public DisplayListRecord
 #define CBLUE(x)  uint8(x >> 8)
 #define CALPHA(x) uint8(x)
 
-class Display
+class DisplayMgr
 {
     public:
-        Display();
-        ~Display();
+        DisplayMgr();
+        ~DisplayMgr();
 
         // Inicializace vseho mozneho
         void Initialize();
@@ -332,6 +332,6 @@ class Display
         uint32 m_boundTexture;
 };
 
-#define sDisplay Singleton<Display>::instance()
+#define sDisplay Singleton<DisplayMgr>::instance()
 
 #endif

@@ -6,7 +6,7 @@
 #include <Map.h>
 #include <LoadingThread.h>
 
-Display::Display()
+DisplayMgr::DisplayMgr()
 {
     ModelDisplayList.clear();
     BillboardDisplayList.clear();
@@ -19,13 +19,13 @@ Display::Display()
     m_ignoreTargetCollision = 0;
 }
 
-Display::~Display()
+DisplayMgr::~DisplayMgr()
 {
     for (uint8 i = 0; i < MAX_FONTS; i++)
         glDeleteLists(m_fontBase[i], 96);
 }
 
-void Display::Initialize()
+void DisplayMgr::Initialize()
 {
     m_viewX = 0.0f;
     m_viewY = 0.0f;
@@ -48,7 +48,7 @@ void Display::Initialize()
     m_is2D = false;
 }
 
-void Display::InitFont(uint8 font)
+void DisplayMgr::InitFont(uint8 font)
 {
     if (font >= MAX_FONTS)
         return;
@@ -98,7 +98,7 @@ void Display::InitFont(uint8 font)
 }
 
 //Vykresleni textu
-void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char *fmt, ...)
+void DisplayMgr::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char *fmt, ...)
 {
     if (font >= MAX_FONTS)
         return;
@@ -168,7 +168,7 @@ void Display::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 
         Setup3DMode();
 }
 
-void Display::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 width, float scale, uint8 flags, uint32 color, const char* fmt, ...)
+void DisplayMgr::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 width, float scale, uint8 flags, uint32 color, const char* fmt, ...)
 {
     // Odstavcovy text
 
@@ -222,7 +222,7 @@ void Display::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 wid
     // TODO: funkce word wrap, aneb zalamovani slov (podle mezer)
 }
 
-bool Display::BindTexture(uint32 textureId)
+bool DisplayMgr::BindTexture(uint32 textureId)
 {
     // Pokud jiz je aktualne nabindovana, neni treba nic delat
     if (textureId == m_boundTexture)
@@ -250,7 +250,7 @@ bool Display::BindTexture(uint32 textureId)
     return true;
 }
 
-void Display::Update(const uint32 diff)
+void DisplayMgr::Update(const uint32 diff)
 {
     if (m_is2D)
         Setup3DMode();
@@ -264,7 +264,7 @@ void Display::Update(const uint32 diff)
     DrawBillboards();
 }
 
-ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest, bool GLDisplayListOnly, uint32 artkit)
+ModelDisplayListRecord* DisplayMgr::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest, bool GLDisplayListOnly, uint32 artkit)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
     assert(pNew != NULL);
@@ -304,7 +304,7 @@ ModelDisplayListRecord* Display::DrawModel(uint32 modelId, float x, float y, flo
     return pNew;
 }
 
-bool Display::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
+bool DisplayMgr::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
     {
@@ -321,7 +321,7 @@ bool Display::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
     return false;
 }
 
-bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
+bool DisplayMgr::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
 {
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
     {
@@ -338,7 +338,7 @@ bool Display::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
     return false;
 }
 
-void Display::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
+void DisplayMgr::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
 {
     if (!record || !feature || type >= MF_TYPE_MAX)
         return;
@@ -353,7 +353,7 @@ void Display::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType t
     record->features.push_back(ft);
 }
 
-void Display::ClearModelFeatures(ModelDisplayListRecord* record)
+void DisplayMgr::ClearModelFeatures(ModelDisplayListRecord* record)
 {
     if (!record || record->features.empty())
         return;
@@ -380,7 +380,7 @@ void Display::ClearModelFeatures(ModelDisplayListRecord* record)
     record->features.clear();
 }
 
-void Display::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeatureType type, bool hard)
+void DisplayMgr::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeatureType type, bool hard)
 {
     if (!record || record->features.empty())
         return;
@@ -415,7 +415,7 @@ void Display::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeat
     }
 }
 
-void Display::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
+void DisplayMgr::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
     {
@@ -426,7 +426,7 @@ void Display::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
     }
 }
 
-void Display::DrawModels()
+void DisplayMgr::DrawModels()
 {
     float x,y,z;
     ModelDisplayListRecord* temp = NULL;
@@ -585,13 +585,13 @@ void Display::DrawModels()
     glColor3ub(255, 255, 255);
 }
 
-void Display::FlushModelDisplayList()
+void DisplayMgr::FlushModelDisplayList()
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
         (*itr)->remove = true;
 }
 
-void Display::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData)
+void DisplayMgr::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData)
 {
     uint32 frame = sAnimator->GetActualFrame(pData->AnimTicket);
 
@@ -619,7 +619,7 @@ void Display::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pDat
     }
 }
 
-void Display::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, uint32 modelId, uint32 frame)
+void DisplayMgr::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, uint32 modelId, uint32 frame)
 {
     if (model && sCustomAnimator->HaveModelCustomAnim(modelId))
         sCustomAnimator->AnimateModelObjectByFrame(object, model, modelId, frame);
@@ -627,7 +627,7 @@ void Display::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, uint
         AnimateModelObjectByFrame(object, modelId, frame);
 }
 
-void Display::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint32 frame)
+void DisplayMgr::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint32 frame)
 {
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
     if (sCustomAnimator->HaveModelCustomAnim(modelId))
@@ -651,7 +651,7 @@ void Display::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint3
     }
 }
 
-BillboardDisplayListRecord* Display::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest, uint8 animFlags)
+BillboardDisplayListRecord* DisplayMgr::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest, uint8 animFlags)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
     assert(pNew != NULL);
@@ -741,7 +741,7 @@ bool BubbleSortDistance(BillboardDisplayListRecord* first, BillboardDisplayListR
     return false;
 }
 
-void Display::DrawBillboards()
+void DisplayMgr::DrawBillboards()
 {
     BillboardDisplayListRecord* temp = NULL;
 
@@ -841,13 +841,13 @@ void Display::DrawBillboards()
     glTranslatef(m_viewX, m_viewY, m_viewZ);
 }
 
-void Display::FlushBillboardDisplayList()
+void DisplayMgr::FlushBillboardDisplayList()
 {
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
         (*itr)->remove = true;
 }
 
-void Display::EnableRestrictedAnimations(AnimRestriction animRes)
+void DisplayMgr::EnableRestrictedAnimations(AnimRestriction animRes)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
         if ((*itr)->animRestriction == animRes)
@@ -858,7 +858,7 @@ void Display::EnableRestrictedAnimations(AnimRestriction animRes)
             sAnimator->EnableAnimation((*itr)->AnimTicket);
 }
 
-void Display::DisableRestrictedAnimations(AnimRestriction animRes)
+void DisplayMgr::DisableRestrictedAnimations(AnimRestriction animRes)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
         if ((*itr)->animRestriction == animRes)
@@ -869,7 +869,7 @@ void Display::DisableRestrictedAnimations(AnimRestriction animRes)
             sAnimator->DisableAnimation((*itr)->AnimTicket);
 }
 
-void Display::Setup2DMode()
+void DisplayMgr::Setup2DMode()
 {
     // Priprava a prechod do 2D projekce
     int vPort[4];
@@ -897,7 +897,7 @@ void Display::Setup2DMode()
     m_is2D = true;
 }
 
-void Display::Setup3DMode()
+void DisplayMgr::Setup3DMode()
 {
     // Prechod zpatky do 3D, vraceni matrixu do puvodnich parametru
     glPopAttrib();
@@ -914,7 +914,7 @@ void Display::Setup3DMode()
     m_is2D = false;
 }
 
-void Display::Draw2D(uint32 textureId, float left, float top, float width, float height)
+void DisplayMgr::Draw2D(uint32 textureId, float left, float top, float width, float height)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -931,7 +931,7 @@ void Display::Draw2D(uint32 textureId, float left, float top, float width, float
     glEnd();
 }
 
-void Display::DrawMap()
+void DisplayMgr::DrawMap()
 {
     Map* pMap = (Map*)sMapManager->GetMap();
     if (!pMap || pMap->field.size() < 1 || pMap->field[0].size() < 1)
@@ -1124,12 +1124,12 @@ void Display::DrawMap()
     }
 }
 
-void Display::SetTargetModel(ModelDisplayListRecord* pTarget)
+void DisplayMgr::SetTargetModel(ModelDisplayListRecord* pTarget)
 {
     m_targetmodel = pTarget;
 }
 
-void Display::AdjustViewToTarget()
+void DisplayMgr::AdjustViewToTarget()
 {
     if (m_targetmodel)
     {
@@ -1162,7 +1162,7 @@ void Display::AdjustViewToTarget()
     glTranslatef(m_viewX, m_viewY, m_viewZ);
 }
 
-uint16 Display::CheckCollision(float newx, float newy, float newz)
+uint16 DisplayMgr::CheckCollision(float newx, float newy, float newz)
 {
     const Map* pMap = sMapManager->GetMap();
     if (!pMap)
@@ -1303,7 +1303,7 @@ uint16 Display::CheckCollision(float newx, float newy, float newz)
 }
 
 // Funkce slouzici pro detekci hranate kolize
-bool Display::ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListRecord* second)
+bool DisplayMgr::ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListRecord* second)
 {
     if (!first || !second)
         return false;
