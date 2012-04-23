@@ -141,7 +141,10 @@ void GameSettingsStage::OnDraw(uint32 diff)
                 break;
         }
 
+        // Dalsi
         sDisplay->Draw2D(37, WIDTH-200, HEIGHT-100, 100, 50);
+        // Zpet
+        sDisplay->Draw2D(39, 100, HEIGHT-100, 100, 50);
     }
     else if (m_subStage == 101)
     {
@@ -226,7 +229,9 @@ void GameSettingsStage::OnDraw(uint32 diff)
         }
 
         // Tlacitko "Hrat"
-        sDisplay->Draw2D(20, WIDTH-200, HEIGHT-60, 200, 40);
+        sDisplay->Draw2D(20, WIDTH-200, HEIGHT-100, 200, 40);
+        // Zpet
+        sDisplay->Draw2D(39, 100, HEIGHT-100, 100, 50);
     }
 }
 
@@ -315,6 +320,12 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             // Dalsi staz - vyber podrobnosti
             m_subStage = 101;
         }
+        // Sipka pro vraceni
+        else if (x > 100 && x < 200 && y > HEIGHT-100 && y < HEIGHT-50)
+        {
+            sApplication->SetStage(STAGE_MENU);
+            return;
+        }
     }
     else if (m_subStage == 101)
     {
@@ -388,10 +399,16 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
                  sGameplayMgr->SetSetting(SETTING_ENEMY_SPEED, sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED) + 1);
         }
         // "Hrat"
-        else if (x > WIDTH-200 && x < WIDTH && y > HEIGHT-60 && y < HEIGHT-20)
+        else if (x > WIDTH-200 && x < WIDTH && y > HEIGHT-100 && y < HEIGHT-60)
         {
             sGameplayMgr->SetGameType(m_selectedMode);
             sApplication->SetStage(STAGE_LOADING, 1);
+        }
+        // Sipka pro vraceni
+        else if (x > 100 && x < 200 && y > HEIGHT-100 && y < HEIGHT-50)
+        {
+            m_subStage = 100;
+            return;
         }
     }
 }
