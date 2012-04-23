@@ -42,7 +42,7 @@ void GameplayMgr::Update()
                 continue;
             }
 
-            if ((*itr)->state == 1)
+            if ((*itr)->boomTime <= tnow)
             {
                 m_game->OnBombBoom(*itr);
                 m_plActiveBombs--;
@@ -227,11 +227,10 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     BombRecord* bomb = new BombRecord;
     bomb->x = x;
     bomb->y = y;
-    bomb->state = 0;
+    bomb->boomTime = clock() + 2500;
     bomb->reach = GetFlameReach();
     BombMap.push_back(bomb);
 
-    sTimer->AddTimedSetEvent(2500, &bomb->state, 1);
     m_plActiveBombs++;
 
     if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
@@ -357,8 +356,7 @@ void GameplayMgr::PreBoomBomb(uint32 x, uint32 y)
             if (timeToBomb < 0)
                 return;
 
-            sTimer->RemoveTimerSetEventByTarget(&(*itr)->state);
-            (*itr)->state = 1;
+            (*itr)->boomTime = clock();
             // Projdeme tedy vsechna jeji nebezpecna pridruzena pole
             // a zkratime jim cas aktivace na minimum
             for (int32 i = int32(x - (*itr)->reach); i < int32(x + (*itr)->reach); i++)

@@ -29,8 +29,8 @@ struct BombRecord
 {
     uint32 x;
     uint32 y;
-    uint32 state;
     uint32 reach;
+    clock_t boomTime;
     //pozdeji i data o vlastnikovi?
 };
 
