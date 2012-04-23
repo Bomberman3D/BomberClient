@@ -17,6 +17,7 @@ DisplayMgr::DisplayMgr()
         m_fontLoaded[i] = false;
 
     m_ignoreTargetCollision = 0;
+    m_is2D = false;
 }
 
 DisplayMgr::~DisplayMgr()
@@ -45,7 +46,8 @@ void DisplayMgr::Initialize()
 
     m_targetmodel = NULL;
 
-    m_is2D = false;
+    if (IsIn2DMode())
+        Setup3DMode();
 }
 
 void DisplayMgr::InitFont(uint8 font)
