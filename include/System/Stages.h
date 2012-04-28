@@ -69,6 +69,7 @@ class IntroOutroStage: public StageControl
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
     protected:
+        clock_t startTime;
 };
 
 class LoadingStage: public StageControl

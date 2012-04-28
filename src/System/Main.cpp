@@ -467,7 +467,7 @@ bool Application::Init()
     sSoundMgr->Initialize();
 
     m_currStage = new MenuStage;
-    SetStage(STAGE_MENU);
+    SetStage(STAGE_INTRO, 0); // Nasavit stage intro s parametrem 0, coz znaci uvodni prvotni intro
 
     return true;
 }
