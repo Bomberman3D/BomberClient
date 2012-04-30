@@ -12,6 +12,7 @@
 GameplayMgr::GameplayMgr()
 {
     m_game = NULL;
+    m_lastMovementUpdate = 0;
 
     m_settings.resize(SETTING_MAX);
     m_settings[SETTING_ENEMY_COUNT] = 4;
@@ -124,6 +125,8 @@ void GameplayMgr::OnGameInit()
     m_moveElements.resize(MOVE_MAX);
     for (uint8 i = 0; i < MOVE_MAX; i++)
         m_moveElements[i] = false;
+
+    m_lastMovementUpdate = clock();
 
     m_playerRec = m_game->SpawnNewPlayer();
     if (!m_playerRec)
@@ -602,78 +605,83 @@ void GameplayMgr::UpdatePlayerMotion(uint32 diff)
     if (m_movementBlocked)
         return;
 
-    // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
-    float dist = (float(diff)+1.0f)*0.002f*GetPlayerSpeedCoef();
-    float angle_rad = m_moveAngle;
-
-    bool move = false;
-
-    if (m_moveElements[MOVE_FORWARD])
+    if (m_lastMovementUpdate < clock())
     {
-        move = true;
+        // Za jednu milisekundu musime urazit 0.002 jednotky, tzn. 1s = 2 jednotky
+        float dist = (float(clock()-m_lastMovementUpdate)+1.0f)*0.002f*GetPlayerSpeedCoef();
+        float angle_rad = m_moveAngle;
 
-        if (m_moveElements[MOVE_LEFT])
-            angle_rad -= PI/4;
-        if (m_moveElements[MOVE_RIGHT])
-            angle_rad += PI/4;
-    }
-    else
-    {
-        if (m_moveElements[MOVE_BACKWARD])
+        m_lastMovementUpdate = clock();
+
+        bool move = false;
+
+        if (m_moveElements[MOVE_FORWARD])
         {
             move = true;
-            angle_rad -= PI;
 
             if (m_moveElements[MOVE_LEFT])
-                angle_rad += PI/4;
-            if (m_moveElements[MOVE_RIGHT])
                 angle_rad -= PI/4;
+            if (m_moveElements[MOVE_RIGHT])
+                angle_rad += PI/4;
         }
         else
         {
-            if (m_moveElements[MOVE_LEFT])
+            if (m_moveElements[MOVE_BACKWARD])
             {
                 move = true;
-                angle_rad -= PI/2;
+                angle_rad -= PI;
+
+                if (m_moveElements[MOVE_LEFT])
+                    angle_rad += PI/4;
+                if (m_moveElements[MOVE_RIGHT])
+                    angle_rad -= PI/4;
             }
-            if (m_moveElements[MOVE_RIGHT])
+            else
             {
-                move = true;
-                angle_rad += PI/2;
+                if (m_moveElements[MOVE_LEFT])
+                {
+                    move = true;
+                    angle_rad -= PI/2;
+                }
+                if (m_moveElements[MOVE_RIGHT])
+                {
+                    move = true;
+                    angle_rad += PI/2;
+                }
             }
         }
-    }
 
-    m_playerRec->rotate = (PI/2-angle_rad)*180.0f / PI;
-    sDisplay->DeviateHorizontalAngle(- (angle_rad - m_moveAngle)*180.0f/PI);
+        m_playerRec->rotate = (PI/2-angle_rad)*180.0f / PI;
+        sDisplay->DeviateHorizontalAngle(- (angle_rad - m_moveAngle)*180.0f/PI);
 
-    if (move)
-    {
-        if (sAnimator->GetAnimId(m_playerRec->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 25, 0);
+        if (move)
+        {
+            if (sAnimator->GetAnimId(m_playerRec->AnimTicket) != ANIM_WALK)
+                sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_WALK, 25, 0);
 
-        // Nejdrive se zkontroluje kolize na ose X
-        float newx = m_playerRec->x + dist*cos(angle_rad);
-        float newz = m_playerRec->z;
-        uint16 collision = sDisplay->CheckCollision(newx, 0.0f, newz);
+            // Nejdrive se zkontroluje kolize na ose X
+            float newx = m_playerRec->x + dist*cos(angle_rad);
+            float newz = m_playerRec->z;
+            uint16 collision = sDisplay->CheckCollision(newx, 0.0f, newz);
 
-        // Pokud na tehle ose nekolidujeme, muzeme se posunout
-        if (!(collision & AXIS_X))
-            m_playerRec->x = newx;
+            // Pokud na tehle ose nekolidujeme, muzeme se posunout
+            if (!(collision & AXIS_X))
+                m_playerRec->x = newx;
 
-        // Nasleduje posun po ose Z
-        newx = m_playerRec->x;
-        newz = m_playerRec->z + dist*sin(angle_rad);
-        collision = sDisplay->CheckCollision(newx, 0.0f, newz);
+            // Nasleduje posun po ose Z
+            newx = m_playerRec->x;
+            newz = m_playerRec->z + dist*sin(angle_rad);
+            collision = sDisplay->CheckCollision(newx, 0.0f, newz);
 
-        // A opet pokud nekolidujeme na dane ose, posuneme hrace
-        if (!(collision & AXIS_Z))
-            m_playerRec->z = newz;
-    }
-    else
-    {
-        if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
+            // A opet pokud nekolidujeme na dane ose, posuneme hrace
+            if (!(collision & AXIS_Z))
+                m_playerRec->z = newz;
+        }
+        else
+        {
+            if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
+                sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
+        }
     }
 
     // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci

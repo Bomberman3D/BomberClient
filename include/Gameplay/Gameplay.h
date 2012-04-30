@@ -192,6 +192,7 @@ class GameplayMgr
         std::list<BombRecord*> BombMap;
         std::vector<std::vector<std::vector<DangerousField*>>> DangerousMap;
         std::vector<bool> m_moveElements;
+        clock_t m_lastMovementUpdate;
         float m_moveAngle;
         bool m_movementBlocked;
         bool m_playerDead;
