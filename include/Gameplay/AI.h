@@ -261,6 +261,7 @@ class EnemyTemplate
         clock_t m_nextMoveTypeUpdate;
         bool m_isDead;
         uint8 m_AILevel;
+        uint32 m_enemyX, m_enemyY;
 };
 
 /** \fn EnemyTemplate::EnemyTemplate

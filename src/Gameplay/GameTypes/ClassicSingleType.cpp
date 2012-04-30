@@ -94,6 +94,7 @@ void ClassicSingleGameType::OnUpdate()
 {
     if (!m_enemies.empty())
     {
+        uint32 deadcount = 0;
         for (std::list<EnemyTemplate*>::iterator itr = m_enemies.begin(); itr != m_enemies.end(); )
         {
             // Pokud neexistuje cil, vymazeme zaznam z vektoru
@@ -105,11 +106,28 @@ void ClassicSingleGameType::OnUpdate()
 
             (*itr)->Update();
 
+            if ((*itr)->IsDead())
+                deadcount++;
+
             if ((*itr)->pRecord && sDisplay->ModelIntersection(sGameplayMgr->GetPlayerRec(), (*itr)->pRecord))
                 sGameplayMgr->PlayerDied();
 
             ++itr;
         }
+
+        if (deadcount >= m_enemies.size())
+        {
+            // Vyhra - zabiti vsichni nepratele
+            sGameplayMgr->PauseGame();
+            sApplication->SetStagePhase(5);
+        }
+    }
+    else
+    {
+        // Vyhra - zabiti vsichni nepratele
+        sGameplayMgr->PauseGame();
+        sApplication->SetStagePhase(5);
+        // TODO: jeste neco?
     }
 }
 
@@ -303,18 +321,8 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
             sGameplayMgr->localPlayerStats.ClassicSingleStats.enemiesKilled += 1;
 
             // TODO: animace smrti
-
-            itr = m_enemies.erase(itr);
             continue;
         }
         ++itr;
-    }
-
-    // Vyhra - zabiti vsichni nepratele
-    if (m_enemies.empty())
-    {
-        sGameplayMgr->PauseGame();
-        sApplication->SetStagePhase(5);
-        // TODO: jeste neco?
     }
 }

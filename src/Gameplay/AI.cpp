@@ -1030,6 +1030,31 @@ void EnemyTemplate::Update()
 
     if (!IsDead())
     {
+        uint32 mx = ceil(pRecord->x);
+        uint32 my = ceil(pRecord->z);
+
+        // Pokud jsme se posunuli na jine pole ve 2D mape, musime osetrit, zdali jsme nestoupnuli na nebezpecne pole
+        if (mx != m_enemyX || my != m_enemyY)
+        {
+            m_enemyX = mx;
+            m_enemyY = my;
+
+            if (sGameplayMgr->IsDangerousField(m_enemyX, m_enemyY))
+            {
+                SetDead(true);
+                if (m_movement)
+                    m_movement->Mutate(MOVEMENT_NONE);
+
+                // TODO: osetrit tohle metodou herniho typu!
+                if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
+                    sGameplayMgr->localPlayerStats.ClassicSingleStats.enemiesKilled += 1;
+                else if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_MEME)
+                    sGameplayMgr->localPlayerStats.MemeSingleStats.enemiesTrolled += 1;
+
+                return;
+            }
+        }
+
         if (m_movement)
         {
             // Pokud uz je cas na update typu pohybu
