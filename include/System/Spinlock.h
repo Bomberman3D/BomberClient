@@ -21,6 +21,9 @@ enum LockThread
     THREAD_MAX
 };
 
+/** \class SpinLock
+ *  \brief Manager spinlockoveho zamku sdilenych ulozist
+ */
 class SpinLock
 {
     public:

@@ -25,6 +25,9 @@ enum PlayerMoveElements
     MOVE_MAX
 };
 
+/** \struct BombRecord
+ *  \brief Strukura zaznamu bomby
+ */
 struct BombRecord
 {
     uint32 x;
@@ -50,8 +53,10 @@ struct BombRecord
  *  \brief Cas, kdy ma bomba vybouchnout [ms]
  */
 
-// Struktura pro "nebezpecne pole" :-)
-// jde v podstate jen o cas aktivace a deaktivace pro vymazani
+
+/** \struct DangerousField
+ *  \brief Struktura pro "nebezpecne pole"
+ */
 struct DangerousField
 {
     clock_t activeSince;
@@ -76,7 +81,9 @@ struct DangerousField
  *  \brief Zdrojovy zaznam bomby, dulezite napr. kvuli retezovym vybuchum
  */
 
-// Struktura pro statistiky hrace v dane hre
+/** \union PlayerStats
+ *  \brief Union struktur statistik hrace v dane hre
+ */
 typedef union
 {
     struct UniversalStatTemplate
@@ -120,6 +127,9 @@ static const char* PlayerStatsNames[GAME_TYPE_MAX][MAX_PLAYER_STATS] = {
     //{'\0','\0','\0'}
 };
 
+/** \class GameplayMgr
+ *  \brief Trida starajici se o herni principy a specificke mechanizmy
+ */
 class GameplayMgr
 {
     public:

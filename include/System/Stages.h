@@ -16,7 +16,9 @@ enum Stages
     STAGE_MAX
 };
 
-// Staging
+/** \class StageControl
+ *  \brief Predloha pro vsechny faze hry
+ */
 class StageControl
 {
     public:
@@ -80,6 +82,9 @@ class StageControl
  *  \brief Nastavi argument faze hry
  */
 
+/** \class MenuStage
+ *  \brief Faze hry - menu
+ */
 class MenuStage: public StageControl
 {
     public:
@@ -96,6 +101,9 @@ class MenuStage: public StageControl
     protected:
 };
 
+/** \class IntroOutroStage
+ *  \brief Faze hry - intro / outro
+ */
 class IntroOutroStage: public StageControl
 {
     public:
@@ -112,6 +120,9 @@ class IntroOutroStage: public StageControl
         clock_t startTime;
 };
 
+/** \class LoadingStage
+ *  \brief Faze hry - nacitani
+ */
 class LoadingStage: public StageControl
 {
     public:
@@ -143,6 +154,9 @@ class LoadingStage: public StageControl
  *  \brief Vraci zpatky procentuelni vyjadreni postupu v nacitani vseho, o co jsme zazadali funkci PreLoad
  */
 
+/** \class GameSettingsStage
+ *  \brief Faze hry - herni nastaveni
+ */
 class GameSettingsStage: public StageControl
 {
     public:
@@ -167,6 +181,9 @@ class GameSettingsStage: public StageControl
         GameType m_selectedMode;
 };
 
+/** \class OptionsStage
+ *  \brief Faze hry - nastaveni aplikace
+ */
 class OptionsStage: public StageControl
 {
     public:
@@ -182,6 +199,9 @@ class OptionsStage: public StageControl
     protected:
 };
 
+/** \class GameStage
+ *  \brief Faze hry - hlavni herni faze
+ */
 class GameStage: public StageControl
 {
     public:

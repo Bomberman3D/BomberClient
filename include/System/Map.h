@@ -25,7 +25,9 @@ enum DynamicFieldType
     DYNAMIC_TYPE_BONUS = 4,
 };
 
-// Vychozi chunk z mapy
+/** \struct Chunk
+ *  \brief Vychozi chunk ("bunka") mapy
+ */
 struct Chunk
 {
     uint32 x;
@@ -50,7 +52,9 @@ struct Chunk
  *  \brief ID textury daneho pole mapy
  */
 
-// Holder aktualni mapy s helper funkcemi
+/** \class Map
+ *  \brief Holder aktualni mapy s pomocnymi funkcemi
+ */
 class Map
 {
     public:
@@ -70,6 +74,9 @@ class Map
             m_mapName = "UNKNOWN MAP";
         }
 
+        /** \struct Map::Cell
+         *  \brief Jedna staticka bunka mapy
+         */
         struct Cell
         {
             uint32 type;
@@ -77,6 +84,9 @@ class Map
             DisplayListRecord* pRec;
         };
 
+        /** \struct Map::DynamicCell
+         *  \brief Jedna dynamicka bunka mapy
+         */
         struct DynamicCell
         {
             uint32 type;
@@ -141,6 +151,10 @@ class Map
  *  \brief Ukazatel na specialni featuru dane bunky, napriklad billboard bonusu, nebo model bomby
  */
 
+
+/** \class MapManager
+ *  \brief Trida starajici se o spravu mapy a dat s ni spojenych
+ */
 class MapManager
 {
     public:

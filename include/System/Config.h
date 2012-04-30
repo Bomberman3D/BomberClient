@@ -4,6 +4,9 @@
 #include <Global.h>
 #include <Singleton.h>
 
+/** \class Config
+ *  \brief Trida starajici se o externi nastaveni zakladnich parametru aplikace
+ */
 class Config
 {
     public:

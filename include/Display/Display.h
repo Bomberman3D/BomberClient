@@ -71,6 +71,9 @@ enum ModelFeatureType
     MF_TYPE_MAX
 };
 
+/** \struct ModelFeature
+ *  \brief Struktura zaznamu featury modelu
+ */
 struct ModelFeature
 {
     ModelFeature()
@@ -165,8 +168,9 @@ enum TextFlags
     TEXT_FLAG_CENTERED_Y    = 0x02,
 };
 
-// Zakladni struktura pro vsechny
-// vyuzitelne napriklad v particle emitter kodu - hybat muze jak modelem tak billboardem
+/** \struct DisplayListRecord
+ *  \brief Rodicovska trida vsech displaylist zaznamu
+ */
 struct DisplayListRecord
 {
     DisplayListRecord(uint32 type)
@@ -229,6 +233,10 @@ struct DisplayListRecord
  *  \brief Cas vlozeni. Slouzi jako orientacni hodnota a take k nekterym custom animacim
  */
 
+
+/** \struct ModelDisplayListRecord
+ *  \brief Struktura zaznamu displaylistu modelu
+ */
 struct ModelDisplayListRecord: public DisplayListRecord
 {
     ModelDisplayListRecord(): DisplayListRecord(DL_TYPE_MODEL)
@@ -269,6 +277,10 @@ struct ModelDisplayListRecord: public DisplayListRecord
  *  \brief ID barevne varianty modelu
  */
 
+
+/** \struct BillboardDisplayListRecord
+ *  \brief Struktura zaznamu displaylistu billboardu
+ */
 struct BillboardDisplayListRecord: public DisplayListRecord
 {
     BillboardDisplayListRecord(): DisplayListRecord(DL_TYPE_BILLBOARD)
@@ -322,6 +334,9 @@ struct BillboardDisplayListRecord: public DisplayListRecord
 #define CBLUE(x)  uint8(x >> 8)
 #define CALPHA(x) uint8(x)
 
+/** \class DisplayMgr
+ *  \brief Trida starajici se o zobrazeni, vykreslovani a spravu zobrazovaneho obsahu
+ */
 class DisplayMgr
 {
     public:

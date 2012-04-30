@@ -5,6 +5,9 @@
 #include <Map.h>
 #include <Gameplay.h>
 
+/** \struct PathNode
+ *  \brief Bod cesty (pole ve 2D mape)
+ */
 struct PathNode
 {
     uint32 x, y;
@@ -185,6 +188,9 @@ enum MovementType
     MOVEMENT_MAX,
 };
 
+/** \class MovementHolder
+ *  \brief Drzitel veskerych dat o pohybu nepritele
+ */
 class MovementHolder
 {
     public:
@@ -233,6 +239,10 @@ class MovementHolder
  *  \brief Vraci aktualni koeficient rychlosti pohybu
  */
 
+
+/** \class EnemyTemplate
+ *  \brief Predloha "umele inteligence" nepritele
+ */
 class EnemyTemplate
 {
     public:

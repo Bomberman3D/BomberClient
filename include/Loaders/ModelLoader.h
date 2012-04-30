@@ -38,6 +38,9 @@
 #define ROTATION_TRACK_TAG      0xB021
 #define SCALE_TRACK_TAG         0xB022
 
+/** \struct tChunk
+ *  \brief Hlavicka datove "bunky" souboru modelu
+ */
 struct tChunk
 {
     uint16 ID;
@@ -57,6 +60,10 @@ struct tChunk
  *  \brief Pocet bajtu, ktere jiz byly precteny (jakmile bytesRead == length, cte se dalsi chunk)
  */
 
+
+/** \struct tFace
+ *  \brief Struktura jedne steny objektu
+ */
 struct tFace
 {
     int32 vertIndex[3];
@@ -71,6 +78,10 @@ struct tFace
  *  \brief Index souradnic dane face
  */
 
+
+/** \struct tMaterialInfo
+ *  \brief Struktura s informacemi o materialu objektu
+ */
 struct tMaterialInfo
 {
     char   strName[255];
@@ -83,7 +94,9 @@ struct tMaterialInfo
     float  uOffset;
     float  vOffset;
 
-    // lesklost
+    /** \union tMaterialInfo::shininess
+     *  \brief Lesklost materialu
+     */
     union shininess
     {
         float fShininess[3];
@@ -139,6 +152,10 @@ struct tMaterialInfo
  *  \brief Lesklost materialu udavana v procentech
  */
 
+
+/** \struct t3DObject
+ *  \brief Struktura objektu modelu
+ */
 struct t3DObject
 {
     int32 numOfVerts;
@@ -238,6 +255,10 @@ struct t3DObject
  *  \brief Vsechny steny objektu
  */
 
+
+/** \struct t3DModel
+ *  \brief Struktura modelu
+ */
 struct t3DModel
 {
     t3DModel()

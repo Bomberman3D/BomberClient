@@ -31,6 +31,9 @@ class EnemyTemplate;
 
 typedef std::list<EnemyTemplate*> EnemyList;
 
+/** \class GameTypeTemplate
+ *  \brief Predloha pro vsechny herni typy, obsahuje jen prazdne prototypy virtualnich funkci
+ */
 class GameTypeTemplate
 {
     public:
@@ -107,6 +110,9 @@ class GameTypeTemplate
  *  \brief Vraci typ hry
  */
 
+/** \class ClassicSingleGameType
+ *  \brief Trida klasickeho herniho typu
+ */
 class ClassicSingleGameType: public GameTypeTemplate
 {
     public:
@@ -132,6 +138,9 @@ class ClassicSingleGameType: public GameTypeTemplate
         uint32 m_playerY;
 };
 
+/** \class MemeSingleGameType
+ *  \brief Trida herniho typu "Meme wars"
+ */
 class MemeSingleGameType: public GameTypeTemplate
 {
     public:
@@ -157,6 +166,9 @@ class MemeSingleGameType: public GameTypeTemplate
         uint32 m_playerY;
 };
 
+/** \class ClassicMultiGameType
+ *  \brief Trida klasickeho herniho typu hrana vice hraci pres sit
+ */
 class ClassicMultiGameType: public GameTypeTemplate
 {
     public:

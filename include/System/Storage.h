@@ -19,6 +19,9 @@ enum ModelAnimType
 
 // Definice jednotlivych ulozist
 
+/** \struct Skybox
+ *  \brief Struktura dat skyboxu
+ */
 struct Skybox
 {
     uint32 box_textures[6];
@@ -30,8 +33,15 @@ struct Skybox
  * V poradi: dolni, horni, zdani, predni, leva, prava
  */
 
+
+/** \struct ModelAnim
+ *  \brief Struktura animacnich dat modelu
+ */
 struct ModelAnim
 {
+    /** \struct ModelAnim::ModelAnimRecord
+     *  \brief Struktura zaznamu jedne animace modelu
+     */
     struct ModelAnimRecord
     {
         uint32 frameFirst;
@@ -52,8 +62,15 @@ struct ModelAnim
  *  \brief Interval do dalsiho snimku
  */
 
+
+/** \struct TextureAnim
+ *  \brief Struktura animacnich dat textur
+ */
 struct TextureAnim
 {
+    /** \struct FrameData
+     *  \brief Struktura zaznamu jedne animace textury
+     */
     struct FrameData
     {
         uint32 textureId;
@@ -75,6 +92,10 @@ struct TextureAnim
  *  \brief Vlastni data framu - pristupovani stylem AnimFrameData[animId][frame]
  */
 
+
+/** \struct MapData
+ *  \brief Struktura dat mapy
+ */
 struct MapData
 {
     std::string filename;
@@ -89,6 +110,10 @@ struct MapData
  *  \brief Jmeno mapy zobrazovane ve hre
  */
 
+
+/** \struct SolidBoxData
+ *  \brief Struktura dat pevnych objektu mapy
+ */
 struct SolidBoxData
 {
     uint32 texture_top;
@@ -108,6 +133,10 @@ struct SolidBoxData
  *  \brief Pokud je nastaveno (neni 0), pouzije se texture_top jako podklad a na nem se vykresli model s danym ID
  */
 
+
+/** \struct ModelModifierData
+ *  \brief Struktura modifikatoru pro modely
+ */
 struct ModelModifierData
 {
     float collision_dist_mod;
@@ -117,6 +146,10 @@ struct ModelModifierData
  *  \brief Koeficient kolizni vzdalenosti
  */
 
+
+/** \struct ObjectModifierData
+ *  \brief Struktura modifikatoru jednotlivych objektu
+ */
 struct ObjectModifierData
 {
     float texture_repeat_x;
@@ -131,6 +164,10 @@ struct ObjectModifierData
  *  \brief Koeficient opakovatelnosti textury po ose Y
  */
 
+
+/** \struct ObjectArtkitData
+ *  \brief Struktura vzhledu artkitu pro dany objekt
+ */
 struct ObjectArtkitData
 {
     uint32 artkit_id;
@@ -146,6 +183,10 @@ struct ObjectArtkitData
  *  \brief Barva daneho objektu (R, G, B) (objekt a model jsou identifikovany v poli tridy Storage)
  */
 
+
+/** \struct MusicFileData
+ *  \brief Struktura dat o hudebnich skladbach
+ */
 struct MusicFileData
 {
     std::string filename;
@@ -165,6 +206,10 @@ struct MusicFileData
  *  \brief Popis, obvykle jmeno skladby
  */
 
+
+/** \class Storage
+ *  \brief Trida uchovavajici veskera staticka data a cast dynamickych, stara se take o jejich nacteni
+ */
 class Storage
 {
     public:

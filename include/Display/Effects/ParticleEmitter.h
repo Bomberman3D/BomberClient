@@ -14,7 +14,9 @@ enum EmitterType
     EMITTER_MAX,
 };
 
-// Jedna castice
+/** \struct Particle
+ *  \brief Struktura zaznamu jedne castice
+ */
 struct Particle
 {
     DisplayListRecord* m_record;
@@ -55,7 +57,8 @@ struct Particle
 
 typedef std::list<Particle*> ParticleList;
 
-/** \brief Struktura zaznamu metace castic
+/** \struct Emitter
+ *  \brief Struktura zaznamu metace castic
  */
 struct Emitter
 {
@@ -187,6 +190,9 @@ struct Emitter
 
 typedef std::list<Emitter*> EmitterList;
 
+/** \class ParticleEmitterMgr
+ *  \brief Trida manageru metacu castic
+ */
 class ParticleEmitterMgr
 {
     public:

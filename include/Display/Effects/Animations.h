@@ -20,6 +20,9 @@ enum AnimFlags
     ANIM_FLAG_NOT_REPEAT         = 0x04,
 };
 
+/** \struct AnimationRecord
+ *  \brief Struktura zaznamu animacniho ticketu
+ */
 struct AnimationRecord
 {
     // Staticka data
@@ -82,6 +85,10 @@ struct AnimationRecord
  *  \brief Promenna urcujici, zdali animace bezi nebo je zastavena
  */
 
+
+/** \class Animator
+ *  \brief Trida starajici se o animaci textur a modelu
+ */
 class Animator
 {
     public:
@@ -117,6 +124,9 @@ class Animator
 
 #define sAnimator Singleton<Animator>::instance()
 
+/** \class CustomAnimator
+ *  \brief Trida urcena k matematicky predepsanym animacim objektu a modelu, ktere je nutne animovat variabilne k situaci
+ */
 class CustomAnimator
 {
     public:

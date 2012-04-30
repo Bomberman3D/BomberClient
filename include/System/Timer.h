@@ -4,6 +4,9 @@
 #include <Global.h>
 #include <Singleton.h>
 
+/** \struct TimerRecord
+ *  \brief Struktura zaznamu casovace
+ */
 struct TimerRecord
 {
     clock_t expireTime;
@@ -33,6 +36,10 @@ struct TimerRecord
  *  \brief Ukazatel na funkci, ktera se spusti po ubehnuti daneho casu
  */
 
+
+/** \struct TimerSetRecord
+ *  \brief Struktura zaznamu casovace s casovanym nastavenim prvku urcenym adresou
+ */
 struct TimerSetRecord
 {
     clock_t expireTime;
@@ -52,6 +59,10 @@ struct TimerSetRecord
  *  \brief Hodnota, na kterou se target nastavi
  */
 
+
+/** \struct Timer
+ *  \brief Trida casovace
+ */
 class Timer
 {
     public:

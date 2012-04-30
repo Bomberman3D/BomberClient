@@ -13,6 +13,9 @@
 
 typedef std::vector<uint32> PlaylistVector;
 
+/** \class SoundMgr
+ *  \brief Trida starajici se o zvuk, hudbu a veskere rutiny s tim spojene
+ */
 class SoundMgr
 {
     public:

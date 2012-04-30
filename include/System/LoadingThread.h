@@ -12,6 +12,9 @@ enum LoadType
     LOAD_MAX     = 2
 };
 
+/** \struct LoadRecord
+ *  \brief Zaznam v poli zdroju k nacteni
+ */
 struct LoadRecord
 {
     LoadType type;
@@ -33,6 +36,9 @@ struct LoadRecord
 
 typedef std::pair<LoadType, uint32> LoadPair;
 
+/** \class LoaderWorker
+ *  \brief Hlavni nacitaci trida, starajici se o nacteni zdroju a spousteni / zastavovani nacitaciho vlakna
+ */
 class LoaderWorker
 {
     public:
