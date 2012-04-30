@@ -34,15 +34,47 @@ struct BombRecord
     //pozdeji i data o vlastnikovi?
 };
 
+/** \var BombRecord::x
+ *  \brief Xova pozice bomby v 2D mape
+ */
+
+/** \var BombRecord::y
+ *  \brief Yova pozice bomby v 2D mape
+ */
+
+/** \var BombRecord::reach
+ *  \brief Dosah bomby po vsech smerech
+ */
+
+/** \var BombRecord::boomTime
+ *  \brief Cas, kdy ma bomba vybouchnout [ms]
+ */
+
 // Struktura pro "nebezpecne pole" :-)
 // jde v podstate jen o cas aktivace a deaktivace pro vymazani
 struct DangerousField
 {
-    clock_t activeSince; // aktivni od [ms] - kvuli postupnemu dosahu plamene
-    uint32  activeTime;  // [ms]
-    bool    registered;  // byly uz provedeny veci "po aktivaci" ?
-    BombRecord* origin;  // bomba, od ktere vybuch jde - napr. kvuli predcasnym vybuchum
+    clock_t activeSince;
+    uint32  activeTime;
+    bool    registered;
+    BombRecord* origin;
 };
+
+/** \var DangerousField::activeSince
+ *  \brief Cas, odkdy je bomba aktivni (napr. kvuli posupnemu dosahu plamene) [ms]
+ */
+
+/** \var DangerousField::activeTime
+ *  \brief Cas, na jak dlouho je bomba aktivni [ms]
+ */
+
+/** \var DangerousField::registered
+ *  \brief Priznak provedeni veci "po aktivaci", napr. zniceni beden apod.
+ */
+
+/** \var DangerousField::origin
+ *  \brief Zdrojovy zaznam bomby, dulezite napr. kvuli retezovym vybuchum
+ */
 
 // Struktura pro statistiky hrace v dane hre
 typedef union
@@ -167,5 +199,77 @@ class GameplayMgr
 };
 
 #define sGameplayMgr Singleton<GameplayMgr>::instance()
+
+/** \fn GameplayMgr::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true)
+ *  \brief Vola se pri zniceni bedny na danych souradnicich - pouze vola metodu herniho typu
+ */
+
+/** \fn GameplayMgr::IsSingleGameType
+ *  \brief Vraci true, pokud se jedna o singleplayerovy mod hry
+ */
+
+/** \fn GameplayMgr::GetPlayerSpeedCoef
+ *  \brief Vraci koeficient rychlosti hrace
+ */
+
+/** \fn GameplayMgr::GetFlameReach
+ *  \brief Vraci pocet poli, jez zasahne vybuch bomby
+ */
+
+/** \fn GameplayMgr::GetMaxBombs
+ *  \brief Vraci pocet bomb, ktere muze mit hrac v jeden cas aktivni
+ */
+
+/** \fn GameplayMgr::SetPlayerSpeedCoef
+ *  \brief Nastavuje koeficient rychlosti hrace
+ */
+
+/** \fn GameplayMgr::SetFlameReach
+ *  \brief Nastavuje dosah bomby
+ */
+
+/** \fn GameplayMgr::SetMaxBombs
+ *  \brief Nastavuje maximalni pocet akivnich bomb
+ */
+
+/** \fn GameplayMgr::GetSetting
+ *  \brief Vraci hodnotu prvku herniho nastaveni
+ */
+
+/** \fn GameplayMgr::SetSetting
+ *  \brief Nastavi prvek herniho nastaveni
+ */
+
+/** \fn GameplayMgr::SettingsPointer
+ *  \brief Vraci ukazatel na vektor hernich nastaveni
+ */
+
+/** \fn GameplayMgr::SetMoveElement
+ *  \brief Nastavi prvek pohybu hrace (dopredu, dozadu, doleva, doprava)
+ */
+
+/** \fn GameplayMgr::UnsetMoveElement
+ *  \brief Odnastavu prvek pohybu hrace
+ */
+
+/** \fn GameplayMgr::BlockMovement
+ *  \brief Zablokuje pohyb hrace (pauza, umrti, ..)
+ */
+
+/** \fn GameplayMgr::UnblockMovement
+ *  \brief Povoli pohyb hraci
+ */
+
+/** \fn GameplayMgr::IsGamePaused
+ *  \brief Vraci true, pokud je hra zapauzovana
+ */
+
+/** \fn GameplayMgr::GetEnemies
+ *  \brief Vraci navratovou hodnotu stejnojmenne funkce herniho typu
+ */
+
+/** \fn GameplayMgr::GetPlayerRec
+ *  \brief Vraci zaznam v displaylistu modelu hrace
+ */
 
 #endif

@@ -25,8 +25,38 @@ struct Particle
                          // velikost vektoru urcuje vzdalenost kterou castice urazi za 1 sekundu
 };
 
+/** \var Particle::m_record
+ *  \brief Vlastni zaznam modelu nebo billboardu v displaylistu tridy DisplayMgr
+ */
+
+/** \var Particle::m_timeStart
+ *  \brief Cas, ve kterem byla castice vytvorena [ms]
+ */
+
+/** \var Particle::m_timeMax
+ *  \brief Cas, ve kterem bude castice znicena [ms]
+ */
+
+/** \var Particle::m_startX
+ *  \brief Pocatecni Xova souradnice
+ */
+
+/** \var Particle::m_startY
+ *  \brief Pocatecni Yova souradnice
+ */
+
+/** \var Particle::m_startZ
+ *  \brief Pocatecni Zova souradnice
+ */
+
+/** \var Particle::trajVector
+ *  \brief Smerovy vektor castice (vektor jeji trajektorie)
+ */
+
 typedef std::list<Particle*> ParticleList;
 
+/** \brief Struktura zaznamu metace castic
+ */
 struct Emitter
 {
     // Staticka data, nastavi se pri vytvoreni
@@ -34,29 +64,126 @@ struct Emitter
     DisplayListRecord* m_template;
     float m_centerX, m_centerY, m_centerZ;
     float m_width, m_height;
-    float m_angleMedX, m_angleMedY, m_angleMedZ; // Stredni hodnota uhlu
-    float m_angleTolX, m_angleTolY, m_angleTolZ; // +-uhel na kazde ose
-    uint32 m_timeMed;           // Stredni hodnota casu [ms]
-    uint32 m_timeTol;           // +-cas, ktery muze castice mit [ms]
-    uint32 m_particleTimeMed;   // cas na dalsi castici [ms]
-    uint32 m_particleTimeTol;   // +-cas na dalsi castici [ms]
-    float m_speedMed;           // vzdalenost za 1 sekundu
-    float m_speedTol;           // +-vzdalenost za 1 sekundu
-    clock_t m_endTime;          // zivotnost metace
-    bool m_emitting;            // aktivni? - nastavi se pri ukoncovani a dobihani castic
-    uint32 m_emitAnim;          // animace castic
-    uint32 m_emitAnimFrameSkip; // rychlost animace (skip framu) castic
-    uint8  m_emitAnimFlags;     // flagy k animaci
-    // Nastaveno pri vytvoreni
-    CVector3 startVector[2];    // Vektor pouzity k randomizaci startovni pozice (uhlopricky v startovnim obdelniku)
+    float m_angleMedX, m_angleMedY, m_angleMedZ;
+    float m_angleTolX, m_angleTolY, m_angleTolZ;
+    uint32 m_timeMed;
+    uint32 m_timeTol;
+    uint32 m_particleTimeMed;
+    uint32 m_particleTimeTol;
+    float m_speedMed;
+    float m_speedTol;
+    clock_t m_endTime;
+    bool m_emitting;
+    uint32 m_emitAnim;
+    uint32 m_emitAnimFrameSkip;
+    uint8  m_emitAnimFlags;
 
-    // Dynamicka data
-    ParticleList m_Particles;   // List vsech castic tohohle emitteru
-    clock_t m_nextParticleTime; // Cas dalsi castice [ms]
+    CVector3 startVector[2];
 
-    // Funkce volaná z ParticleEmitterMgr::Update
+    ParticleList m_Particles;
+    clock_t m_nextParticleTime;
+
     bool Update();
 };
+
+/** \fn Emitter::Update()
+ *  \brief Update funkce emitteru, stara se o posun castic, tvorbu novych a zahazovani starych
+ *
+ * Vraci false, pokud je nutne emitter zahodit (skoncila doba emittovani).
+ * Je volana z ParticleEmitterMgr::Update
+ */
+
+/** \var Emitter::m_type
+ *  \brief Typ emitteru (model / billboard)
+ */
+
+/** \var Emitter::m_template
+ *  \brief Predloha pro castici ve forme zaznamu displaylistu (predloha ale neni vlozena do displaylistu, jen ma formu jeho zaznamu)
+ */
+
+/** \var Emitter::m_centerX
+ *  \brief Xova souradnice stredu metani
+ */
+
+/** \var Emitter::m_centerY
+ *  \brief Yova souradnice stredu metani
+ */
+
+/** \var Emitter::m_centerZ
+ *  \brief Zova souradnice stredu metani
+ */
+
+/** \var Emitter::m_width
+ *  \brief Sirka emittovani
+ */
+
+/** \var Emitter::m_height
+ *  \brief Vyska emittovani
+ */
+
+/** \var Emitter::m_angleMedX
+ *  \brief Stredni hodnota uhlu po ose (platne pro vsechny 3 promenne tohoto typu)
+ */
+
+/** \var Emitter::m_angleTolX
+ *  \brief Povolena odchylka uhlu po ose (+/-) (platne pro vsechny 3 promenne tohoto typu)
+ */
+
+/** \var Emitter::m_timeMed
+ *  \brief Stredni hodnota casu jedne castice [ms]
+ */
+
+/** \var Emitter::m_timeTol
+ *  \brief Povolena odchylka casu jedne castice [ms]
+ */
+
+/** \var Emitter::m_particleTimeMed
+ *  \brief Stredni hodnota casu mezi casticemi [ms]
+ */
+
+/** \var Emitter::m_particleTimeTol
+ *  \brief Povolena odchylka casu mezi casticemi [ms]
+ */
+
+/** \var Emitter::m_speedMed
+ *  \brief Stredni hodnota rychlosti za 1 sekundu [j/s]
+ */
+
+/** \var Emitter::m_speedTol
+ *  \brief Povolena odchylka rychlosti za 1 sekundu [j/s]
+ */
+
+/** \var Emitter::m_endTime
+ *  \brief Cas konce metani daneho emitteru [ms]
+ */
+
+/** \var Emitter::m_emitting
+ *  \brief Priznak pro metani - pokud je false, netvori se dalsi castice
+ */
+
+/** \var Emitter::m_emitAnim
+ *  \brief Animace emittovanych castic
+ */
+
+/** \var Emitter::m_emitAnimFrameSkip
+ *  \brief Rychlost animace emittovanych castic
+ */
+
+/** \var Emitter::m_emitAnimFlags
+ *  \brief Priznaky pro animaci emittovanych castic
+ */
+
+/** \var Emitter::startVector
+ *  \brief Uhlopricne vektory obdelnika emittovani
+ */
+
+/** \var Emitter::m_Particles
+ *  \brief List vsech castic emitteru
+ */
+
+/** \var Emitter::m_nextParticleTime
+ *  \brief Cas na vypusteni dalsi castice [ms]
+ */
 
 typedef std::list<Emitter*> EmitterList;
 

@@ -4,11 +4,19 @@
 #include <Effects/ParticleEmitter.h>
 #include <Effects/Animations.h>
 
+/** \brief Konstruktor
+ *
+ * Opet jen nulovani
+ */
 ParticleEmitterMgr::ParticleEmitterMgr()
 {
     Emitters.clear();
 }
 
+/** \brief Update funkce pro vsechny emittery
+ *
+ * Je volana z DisplayMgr::Update, vola Emmiter::Update, ktery pokud vrati false, je odebran z listu emitteru a vymazan
+ */
 void ParticleEmitterMgr::Update()
 {
     if (m_pauseTime > 0)
@@ -33,11 +41,19 @@ void ParticleEmitterMgr::Update()
     }
 }
 
+/** \brief Zapauzovani emitteru
+ *
+ * Jen nastavi promennou m_pauseTime, ktera slouzi i jako priznak pro jejich update (nenulovost = neupdatovat)
+ */
 void ParticleEmitterMgr::PauseEmitters()
 {
     m_pauseTime = clock();
 }
 
+/** \brief Odpauzovani emitteru
+ *
+ * Posune casy vsech emitteru o dany cas, ktery uplynul od zapauzovani, a pak vynuluje m_pauseTime (to dovoli opet updatovat)
+ */
 void ParticleEmitterMgr::UnpauseEmitters()
 {
     clock_t diff = clock() - m_pauseTime;
@@ -48,6 +64,11 @@ void ParticleEmitterMgr::UnpauseEmitters()
         (*itr)->m_endTime += diff;
 }
 
+/** \brief Pridani emitteru
+ *
+ * Postara se o pridani emitteru na dane souradnice se zadanymi parametry.
+ * Zde se take pocitaji uhlopricne vektory nutne pro budouci metani
+ */
 Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
                                     float angleMedX, float angleMedY, float angleTolX, float angleTolY,
                                     uint32 timeMed, uint32 timeTol, float speedMed, float speedTol,
@@ -113,11 +134,19 @@ Emitter* ParticleEmitterMgr::AddEmitter(DisplayListRecord* templ, float centerX,
     return pTemp;
 }
 
+/** \brief Odebrani emitteru
+ *
+ * Nastavi pouze jeho konecny cas na aktualni, coz zapricini jeho okamzite ukonceni pri dalsim updatu
+ */
 void ParticleEmitterMgr::RemoveEmitter(Emitter* which)
 {
     which->m_endTime = clock();
 }
 
+/** \brief Vymazani vsech emitteru
+ *
+ * Vymaze vsechny emittery bezpecnou cestou, vcetne model featur
+ */
 void ParticleEmitterMgr::FlushEmitters()
 {
     if (Emitters.empty())

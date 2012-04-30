@@ -61,6 +61,52 @@ class GameTypeTemplate
         GameType m_type;
 };
 
+/** \fn GameTypeTemplate::GameTypeTemplate
+ *  \brief Konstruktor
+ *
+ * Prazdny
+ */
+
+/** \fn GameTypeTemplate::SpawnNewPlayer
+ *  \brief Postara se o pridani zaznamu do display listu pro noveho hrace
+ */
+
+/** \fn GameTypeTemplate::OnGameInit(ModelDisplayListRecord* pPlayerRec)
+ *  \brief Funkce volana pri inicializaci, zde se generuji pozice beden a tak podobne
+ */
+
+/** \fn GameTypeTemplate::OnGameLeave
+ *  \brief Funkce volana pri odchodu ze hry, casto jen cleanup
+ */
+
+/** \fn GameTypeTemplate::OnUpdate
+ *  \brief Funkce volana kazdy pruchod hernim cyklem z GameplayMgr::Update
+ */
+
+/** \fn GameTypeTemplate::OnBombBoom(BombRecord* bomb)
+ *  \brief Funkce volana pri vybuchu bomby
+ */
+
+/** \fn GameTypeTemplate::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true)
+ *  \brief Funkce volana pri zniceni bedny - zde se napriklad generuje vytvoreni bonusu na danych souradnicich
+ */
+
+/** \fn GameTypeTemplate::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
+ *  \brief Funkce volana pri prechodu hrace z jineho pole 2D mapy na nove
+ */
+
+/** \fn GameTypeTemplate::OnDangerousFieldActivate(uint32 x, uint32 y)
+ *  \brief Funkce volana pri aktivaci nebezpecneho pole
+ */
+
+/** \fn GameTypeTemplate::GetEnemies
+ *  \brief Vraci ukazatel na list nepratel na mape
+ */
+
+/** \fn GameTypeTemplate::GetType
+ *  \brief Vraci typ hry
+ */
+
 class ClassicSingleGameType: public GameTypeTemplate
 {
     public:

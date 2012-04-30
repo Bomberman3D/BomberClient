@@ -24,15 +24,33 @@ struct Skybox
     uint32 box_textures[6];
 };
 
+/** \var Skybox::box_textures
+ *  \brief Textury skyboxu
+ *
+ * V poradi: dolni, horni, zdani, predni, leva, prava
+ */
+
 struct ModelAnim
 {
-    struct
+    struct ModelAnimRecord
     {
         uint32 frameFirst;
         uint32 frameLast;
         uint32 interval;
     } Anim[MAX_ANIM];
 };
+
+/** \var ModelAnim::ModelAnimRecord::frameFirst
+ *  \brief Prvni snimek dane animace
+ */
+
+/** \var ModelAnim::ModelAnimRecord::frameLast
+ *  \brief Posledni snimek dane animace
+ */
+
+/** \var ModelAnim::ModelAnimRecord::interval
+ *  \brief Interval do dalsiho snimku
+ */
 
 struct TextureAnim
 {
@@ -42,15 +60,34 @@ struct TextureAnim
         uint32 interval;
     };
 
-    // Vlastni data framu - pristupovani stylem AnimFrameData[animId][frame]
     std::vector<std::vector<FrameData>> AnimFrameData;
 };
+
+/** \var TextureAnim::FrameData::textureId
+ *  \brief ID textury na danem snimku
+ */
+
+/** \var TextureAnim::FrameData::interval
+ *  \brief Interval do dalsiho snimku
+ */
+
+/** \var TextureAnim::AnimFrameData
+ *  \brief Vlastni data framu - pristupovani stylem AnimFrameData[animId][frame]
+ */
 
 struct MapData
 {
     std::string filename;
     std::string mapname;
 };
+
+/** \var MapData::filename
+ *  \brief Cesta k souboru mapy
+ */
+
+/** \var MapData::mapname
+ *  \brief Jmeno mapy zobrazovane ve hre
+ */
 
 struct SolidBoxData
 {
@@ -59,10 +96,26 @@ struct SolidBoxData
     uint32 model_id;
 };
 
+/** \var SolidBoxData::texture_top
+ *  \brief Horni textura pevne kostky
+ */
+
+/** \var SolidBoxData::texture_sides
+ *  \brief Bocni textury pevne kostky
+ */
+
+/** \var SolidBoxData::model_id
+ *  \brief Pokud je nastaveno (neni 0), pouzije se texture_top jako podklad a na nem se vykresli model s danym ID
+ */
+
 struct ModelModifierData
 {
     float collision_dist_mod;
 };
+
+/** \var ModelModifierData::collision_dist_mod
+ *  \brief Koeficient kolizni vzdalenosti
+ */
 
 struct ObjectModifierData
 {
@@ -70,12 +123,28 @@ struct ObjectModifierData
     float texture_repeat_y;
 };
 
+/** \var ObjectModifierData::texture_repeat_x
+ *  \brief Koeficient opakovatelnosti textury po ose X
+ */
+
+/** \var ObjectModifierData::texture_repeat_y
+ *  \brief Koeficient opakovatelnosti textury po ose Y
+ */
+
 struct ObjectArtkitData
 {
     uint32 artkit_id;
 
-    uint8 colors[3]; // R, G, B
+    uint8 colors[3];
 };
+
+/** \var ObjectArtkitData::artkit_id
+ *  \brief ID tohoto artkitu
+ */
+
+/** \var ObjectArtkitData::colors
+ *  \brief Barva daneho objektu (R, G, B) (objekt a model jsou identifikovany v poli tridy Storage)
+ */
 
 struct MusicFileData
 {
@@ -83,6 +152,18 @@ struct MusicFileData
     std::string author;
     std::string description;
 };
+
+/** \var MusicFileData::filename
+ *  \brief Cesta k souboru hudby
+ */
+
+/** \var MusicFileData::author
+ *  \brief Autor skladby
+ */
+
+/** \var MusicFileData::description
+ *  \brief Popis, obvykle jmeno skladby
+ */
 
 class Storage
 {
@@ -151,5 +232,61 @@ class Storage
 };
 
 #define sStorage Singleton<Storage>::instance()
+
+/** \var Storage::TextureFilename
+ *  \brief Mapa: ID textury - jmeno souboru s texturou
+ */
+
+/** \var Storage::ModelFilename
+ *  \brief Mapa: ID modelu - jmeno souboru s modelem
+ */
+
+/** \var Storage::ModelAnimation
+ *  \brief Mapa: ID modelu - pole s animacnimi daty, viz struktura ModelAnim
+ */
+
+/** \var Storage::TextureAnimation
+ *  \brief Mapa: ID textury - pole s animacnimi daty, viz strukura TextureAnim
+ */
+
+/** \var Storage::SkyboxData
+ *  \brief Mapa: ID skyboxu - pole s ID textur skyboxu, viz struktura Skybox
+ */
+
+/** \var Storage::MapData
+ *  \brief Mapa: ID mapy - struktura s detaily, viz struktura MapData
+ */
+
+/** \var Storage::SolidBoxProp
+ *  \brief Mapa: ID solidboxu - struktura s detaily, viz struktura SolidBoxData
+ */
+
+/** \var Storage::ModelModifiers
+ *  \brief Mapa: ID modelu - struktura s modifikatory, viz struktura ModelModifierData
+ */
+
+/** \var Storage::ObjectModifiers
+ *  \brief Mapa: par ID modelu, jmeno objektu - struktura s modifikatory, viz struktura ObjectModifierData
+ */
+
+/** \var Storage::ObjectArtkits
+ *  \brief Mapa: par ID modelu, jmeno objektu - pole s daty artkitu, viz struktura ObjectArtkitData
+ */
+
+/** \var Storage::MusicData
+ *  \brief Mapa: ID hudby - struktura s detaily, viz struktura MusicFileData
+ */
+
+/** \var Storage::Textures
+ *  \brief Dynamicke uloziste, mapa: ID textury - ukazatel do pameti na OpenGL ID textury (NULL pokud neni nactena)
+ */
+
+/** \var Storage::Models
+ *  \brief Dynamicke uloziste, mapa: ID modelu - ukazatel do pameti na nacteny model (NULL pokud neni nacten)
+ */
+
+/** \var Storage::MaterialTextures
+ *  \brief Dynamicke uloziste, mapa: par ID modelu, ID materialu - ukazatel do pameti na OpenGL ID textury (NULL pokud neni nactena)
+ */
 
 #endif

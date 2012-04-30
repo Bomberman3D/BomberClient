@@ -1,6 +1,10 @@
 #include <Global.h>
 #include <SoundMgr.h>
 
+/** \brief Konstruktor
+ *
+ * Pouze nulovani veskerych hodnot a ukazatelu
+ */
 SoundMgr::SoundMgr()
 {
     m_playlist.clear();
@@ -11,6 +15,10 @@ SoundMgr::SoundMgr()
     m_playing = false;
 }
 
+/** \brief Destruktor
+ *
+ * Uvolneni pameti, bezpecne zniceni audiomanageru
+ */
 SoundMgr::~SoundMgr()
 {
     if (m_audioMgr)
@@ -19,6 +27,10 @@ SoundMgr::~SoundMgr()
     cAudio::destroyAudioManager(m_audioMgr);
 }
 
+/** \brief Inicializace zvukoveho enginu
+ *
+ * Zde se vytvori audiomanager a nastavi se globalni hodnota hlasitosti
+ */
 void SoundMgr::Initialize()
 {
     m_audioMgr = cAudio::createAudioManager(true);
@@ -27,6 +39,10 @@ void SoundMgr::Initialize()
         m_audioMgr->setMasterVolume(0.5f);
 }
 
+/** \brief Update funkce
+ *
+ * Zde je obstaravano spousteni pisnicek a funkce playlistu
+ */
 void SoundMgr::Update()
 {
     if (!m_audioMgr)
@@ -70,6 +86,10 @@ void SoundMgr::Update()
         m_current->play2d(false);
 }
 
+/** \brief Inicializace a sestaveni playlistu
+ *
+ * Prozatim se berou vsechny hudebni skladby
+ */
 void SoundMgr::InitMusicPlaylist()
 {
     m_playlist.clear();
@@ -79,6 +99,8 @@ void SoundMgr::InitMusicPlaylist()
         m_playlist.push_back(itr->first);
 }
 
+/** \brief Postara se o spuseni hudby
+ */
 void SoundMgr::MusicStart()
 {
     if (!m_audioMgr || m_playlist.empty())
@@ -92,6 +114,8 @@ void SoundMgr::MusicStart()
         m_current->play2d(false);
 }
 
+/** \brief Postara se o zastaveni hudby
+ */
 void SoundMgr::MusicStop()
 {
     m_playing = false;
@@ -100,6 +124,8 @@ void SoundMgr::MusicStop()
         m_current->stop();
 }
 
+/** \brief Pauza hudby
+ */
 void SoundMgr::MusicPause()
 {
     m_playing = false;
@@ -108,6 +134,8 @@ void SoundMgr::MusicPause()
         m_current->pause();
 }
 
+/** \brief Odpauzovani hudby
+ */
 void SoundMgr::MusicUnpause()
 {
     m_playing = false;
@@ -116,6 +144,8 @@ void SoundMgr::MusicUnpause()
         m_current->play();
 }
 
+/** \brief Postara se o vytvoreni zdroje hudby (pro streamovani z disku)
+ */
 cAudio::IAudioSource* SoundMgr::CreateMusicSource(std::string filename)
 {
     std::stringstream tmpname;

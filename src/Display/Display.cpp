@@ -6,6 +6,10 @@
 #include <Map.h>
 #include <LoadingThread.h>
 
+/** \brief Konstruktor
+ *
+ * Nic jineho, nez same nulovani tu neni videt
+ */
 DisplayMgr::DisplayMgr()
 {
     ModelDisplayList.clear();
@@ -20,12 +24,20 @@ DisplayMgr::DisplayMgr()
     m_is2D = false;
 }
 
+/** \brief Destruktor
+ *
+ * Jedina zajimava vec zde je mazani OpenGL display listu pro fonty
+ */
 DisplayMgr::~DisplayMgr()
 {
     for (uint8 i = 0; i < MAX_FONTS; i++)
         glDeleteLists(m_fontBase[i], 96);
 }
 
+/** \brief Inicializace zobrazeni, reset do puvodnich hodnot
+ *
+ * Zajistuje vynulovani uplne vsech hodnot - pouziva se napriklad pri prechodech do jinych fazi hry
+ */
 void DisplayMgr::Initialize()
 {
     m_viewX = 0.0f;
@@ -50,6 +62,10 @@ void DisplayMgr::Initialize()
         Setup3DMode();
 }
 
+/** \brief Inicializace fontu
+ *
+ * Postara se o nacteni a pripravu fontu uvedeneho jako argument (viz enumerator Fonts)
+ */
 void DisplayMgr::InitFont(uint8 font)
 {
     if (font >= MAX_FONTS)
@@ -99,7 +115,10 @@ void DisplayMgr::InitFont(uint8 font)
     m_fontLoaded[font] = true;
 }
 
-//Vykresleni textu
+/** \brief Vykresleni textu
+ *
+ * Stara se o vykresleni textu podle zadanych parametru. Take je zde vyuzit zpusob formatovani, jako napriklad u funkci typu printf
+ */
 void DisplayMgr::PrintText(uint8 font, uint32 left, uint32 top, float scale, uint8 flags, uint32 color, const char *fmt, ...)
 {
     if (font >= MAX_FONTS)
@@ -170,6 +189,10 @@ void DisplayMgr::PrintText(uint8 font, uint32 left, uint32 top, float scale, uin
         Setup3DMode();
 }
 
+/** \brief Vykresleni odstavcoveho textu
+ *
+ * Podle zadanych parametru vykresli odstavcovy text. Zatim neni implementovana funkce "word wrap", cili se slova deli jak to vyjde na radku klidne v pulce slova
+ */
 void DisplayMgr::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 width, float scale, uint8 flags, uint32 color, const char* fmt, ...)
 {
     // Odstavcovy text
@@ -224,6 +247,11 @@ void DisplayMgr::PrintParagraphText(uint8 font, uint32 left, uint32 top, uint32 
     // TODO: funkce word wrap, aneb zalamovani slov (podle mezer)
 }
 
+/** \brief Nastaveni textury jako aktualni pro vykreslovani
+ *
+ * Obsahuje navic overeni, zdali textura neni uz nabindovana - to dokaze usetrit mnoho procesoroveho casu.
+ * Pokud neni textura nactena, vysle pozadavek do nacitaciho vlakna a vrati false ("textura nebyla nabindovana spravne")
+ */
 bool DisplayMgr::BindTexture(uint32 textureId)
 {
     // Pokud jiz je aktualne nabindovana, neni treba nic delat
@@ -252,6 +280,10 @@ bool DisplayMgr::BindTexture(uint32 textureId)
     return true;
 }
 
+/** \brief Hlavni update funkce volana z hlavniho cyklu aplikace
+ *
+ * Zde se provadi veskery update a vykresleni nasich model a billboard display listu. Zaroven dochazi k updatu animatoru a particle emitteru
+ */
 void DisplayMgr::Update(const uint32 diff)
 {
     if (m_is2D)
@@ -266,6 +298,11 @@ void DisplayMgr::Update(const uint32 diff)
     DrawBillboards();
 }
 
+/** \brief Prijima pozadavek na vykresleni modelu a zaradi ho do displaylistu
+ *
+ * Podle zadanych parametru vytvori zaznam displaylistu a vlozi ho tam. Pokud neni model nacteny, necha ho nacist.
+ * Jako navratovou hodnotu vraci ukazatel na onen zaznam.
+ */
 ModelDisplayListRecord* DisplayMgr::DrawModel(uint32 modelId, float x, float y, float z, ModelAnimType Animation, float scale, float rotate, bool genGLDisplayList, bool animReverse, uint32 startFrame, uint32 frameSkipSpeed, AnimRestriction animRest, bool GLDisplayListOnly, uint32 artkit)
 {
     ModelDisplayListRecord* pNew = new ModelDisplayListRecord;
@@ -306,6 +343,8 @@ ModelDisplayListRecord* DisplayMgr::DrawModel(uint32 modelId, float x, float y, 
     return pNew;
 }
 
+/** \brief Odstraneni zaznamu z display listu modelu
+ */
 bool DisplayMgr::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
@@ -323,6 +362,8 @@ bool DisplayMgr::RemoveRecordFromDisplayList(ModelDisplayListRecord* target)
     return false;
 }
 
+/** \brief Odstraneni zaznamu z display listu billboardu
+ */
 bool DisplayMgr::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
 {
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
@@ -340,6 +381,11 @@ bool DisplayMgr::RemoveRecordFromDisplayList(BillboardDisplayListRecord* target)
     return false;
 }
 
+/** \brief Pridani featury k modelu
+ *
+ * Postara se o pridani featury k danemu zaznamu podle zadanych parametru.
+ * Zde muze byt kriticke akorat predavani pointeru na featuru a nesouhlasnst jeho typu se vstupnim typem \a type
+ */
 void DisplayMgr::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureType type, float offset_x, float offset_y, float offset_z, void *feature)
 {
     if (!record || !feature || type >= MF_TYPE_MAX)
@@ -355,6 +401,10 @@ void DisplayMgr::AddModelFeature(ModelDisplayListRecord* record, ModelFeatureTyp
     record->features.push_back(ft);
 }
 
+/** \brief Odsrani vsechny featury modelu
+ *
+ * Bezpecne odebere featury daneho modelu
+ */
 void DisplayMgr::ClearModelFeatures(ModelDisplayListRecord* record)
 {
     if (!record || record->features.empty())
@@ -382,6 +432,11 @@ void DisplayMgr::ClearModelFeatures(ModelDisplayListRecord* record)
     record->features.clear();
 }
 
+/** \brief Odstrani ze zaznamu modelu featury daneho typu
+ *
+ * Bezpecne odebere vsechny featury daneho typu, a to bud lehce (\a hard == false), cili bez cisteho odebrani,
+ * nebo "tvrde", a sice je jen odebere z listu featur
+ */
 void DisplayMgr::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelFeatureType type, bool hard)
 {
     if (!record || record->features.empty())
@@ -417,6 +472,10 @@ void DisplayMgr::ClearModelFeaturesByType(ModelDisplayListRecord* record, ModelF
     }
 }
 
+/** \brief Vymazani vsech featur daneho typu od vsech modelu
+ *
+ * Opet existuje parametr \a hard pro styl odebrani
+ */
 void DisplayMgr::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
@@ -428,6 +487,11 @@ void DisplayMgr::ClearAllModelFeaturesByType(ModelFeatureType type, bool hard)
     }
 }
 
+/** \brief Vykresleni vsech modelu
+ *
+ * Projde display list modelu, zjisti co je treba vykreslit a pak to vykresli.
+ * Pokud je k dispozici OpenGL display list, vykresli pomoci nej.
+ */
 void DisplayMgr::DrawModels()
 {
     float x,y,z;
@@ -518,7 +582,7 @@ void DisplayMgr::DrawModels()
             {
                 glEnable(GL_TEXTURE_2D);
                 glColor3ub(255, 255, 255);
-                glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
+                glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].textureId);
                 m_boundTexture = 0;
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -587,12 +651,16 @@ void DisplayMgr::DrawModels()
     glColor3ub(255, 255, 255);
 }
 
+/** \brief Nastavi priznak pro vymazani vsech zaznamu modelu
+ */
 void DisplayMgr::FlushModelDisplayList()
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
         (*itr)->remove = true;
 }
 
+/** \brief Postara se o animaci objektu modelu
+ */
 void DisplayMgr::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* pData)
 {
     uint32 frame = sAnimator->GetActualFrame(pData->AnimTicket);
@@ -621,6 +689,8 @@ void DisplayMgr::AnimateModelObject(t3DObject *object, ModelDisplayListRecord* p
     }
 }
 
+/** \brief Postara se o animaci objektu modelu na danem snimku animace
+ */
 void DisplayMgr::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, uint32 modelId, uint32 frame)
 {
     if (model && sCustomAnimator->HaveModelCustomAnim(modelId))
@@ -629,6 +699,9 @@ void DisplayMgr::AnimateModelObjectByFrame(t3DModel* model, t3DObject* object, u
         AnimateModelObjectByFrame(object, modelId, frame);
 }
 
+/** \fn DisplayMgr::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint32 frame)
+ *  \brief Postara se o animaci objektu modelu na danem snimku animace
+ */
 void DisplayMgr::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, uint32 frame)
 {
     // Vlastni animace (nespecifikovana v souboru s modelem, treba skeletalni)
@@ -653,6 +726,11 @@ void DisplayMgr::AnimateModelObjectByFrame(t3DObject* object, uint32 modelId, ui
     }
 }
 
+/** \brief Prijima pozadavek na vykresleni billboardu a zaradi ho do displaylistu
+ *
+ * Vytvori zaznam dle zadanych parametru a vlozi ho do display listu pro billboardy.
+ * Jako navratovou hodnotu vraci ukazatel na onen zaznam
+ */
 BillboardDisplayListRecord* DisplayMgr::DrawBillboard(uint32 textureId, float x, float y, float z, uint32 Animation, uint32 animFrameSpeed, float scale_x, float scale_y, bool billboard_x, bool billboard_y, bool genGLDisplayList, AnimRestriction animRest, uint8 animFlags)
 {
     BillboardDisplayListRecord* pNew = new BillboardDisplayListRecord;
@@ -703,7 +781,6 @@ BillboardDisplayListRecord* DisplayMgr::DrawBillboard(uint32 textureId, float x,
     return pNew;
 }
 
-// Vytvoreni billboard display list zaznamu bez jeho zapsani do display listu
 BillboardDisplayListRecord* BillboardDisplayListRecord::Create(uint32 textureId, float x, float y, float z,
                                                                float scale_x, float scale_y,
                                                                bool billboard_x, bool billboard_y)
@@ -743,6 +820,10 @@ bool BubbleSortDistance(BillboardDisplayListRecord* first, BillboardDisplayListR
     return false;
 }
 
+/** \brief Funkce starajici se o vykresleni vsech billboardu v jejich displaylistu
+ *
+ * Zjisti, co je treba vykreslit a podle ulozenych zaznamu v displaylistu vykresli co je treba
+ */
 void DisplayMgr::DrawBillboards()
 {
     BillboardDisplayListRecord* temp = NULL;
@@ -843,12 +924,16 @@ void DisplayMgr::DrawBillboards()
     glTranslatef(m_viewX, m_viewY, m_viewZ);
 }
 
+/** \brief Postara se o nastaveni priznaku pro vymazani zaznamu z displaylistu billboardu
+ */
 void DisplayMgr::FlushBillboardDisplayList()
 {
     for (std::list<BillboardDisplayListRecord*>::iterator itr = BillboardDisplayList.begin(); itr != BillboardDisplayList.end(); ++itr)
         (*itr)->remove = true;
 }
 
+/** \brief Povoleni animaci se zadanou restrikci
+ */
 void DisplayMgr::EnableRestrictedAnimations(AnimRestriction animRes)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
@@ -860,6 +945,8 @@ void DisplayMgr::EnableRestrictedAnimations(AnimRestriction animRes)
             sAnimator->EnableAnimation((*itr)->AnimTicket);
 }
 
+/** \brief Pozastaveni animaci se zadanou restrikci
+ */
 void DisplayMgr::DisableRestrictedAnimations(AnimRestriction animRes)
 {
     for (std::list<ModelDisplayListRecord*>::iterator itr = ModelDisplayList.begin(); itr != ModelDisplayList.end(); ++itr)
@@ -871,6 +958,10 @@ void DisplayMgr::DisableRestrictedAnimations(AnimRestriction animRes)
             sAnimator->DisableAnimation((*itr)->AnimTicket);
 }
 
+/** \brief Prechod do 2D modu
+ *
+ * Postara se o veskere mozne rutiny, spojene s prechodem do 2D rezimu
+ */
 void DisplayMgr::Setup2DMode()
 {
     // Priprava a prechod do 2D projekce
@@ -899,6 +990,10 @@ void DisplayMgr::Setup2DMode()
     m_is2D = true;
 }
 
+/** \brief Prechod do 3D modu
+ *
+ * Vraci zpatky matrix a jina nastaveni pro projekci ve 3D rezimu
+ */
 void DisplayMgr::Setup3DMode()
 {
     // Prechod zpatky do 3D, vraceni matrixu do puvodnich parametru
@@ -916,6 +1011,10 @@ void DisplayMgr::Setup3DMode()
     m_is2D = false;
 }
 
+/** \brief Vykresleni textury do roviny
+ *
+ * Podle zadanych parametru okamzite vykresli zadanou texturu na zadane pozici, o zadane vysce a sirce
+ */
 void DisplayMgr::Draw2D(uint32 textureId, float left, float top, float width, float height)
 {
     glEnable(GL_BLEND);
@@ -933,6 +1032,10 @@ void DisplayMgr::Draw2D(uint32 textureId, float left, float top, float width, fl
     glEnd();
 }
 
+/** \brief Funkce starajici se o okamzite vykresleni mapy
+ *
+ * Okamzite vykresli mapu na absolutnich souradnicich, vcetne skyboxu
+ */
 void DisplayMgr::DrawMap()
 {
     Map* pMap = (Map*)sMapManager->GetMap();
@@ -1126,11 +1229,19 @@ void DisplayMgr::DrawMap()
     }
 }
 
+/** \brief Nastavi cilovy model, ke kteremu ma byt prizpusobena kamera
+ *
+ * Ukazatel neni overovan, proto musi byt predem zarucena validita
+ */
 void DisplayMgr::SetTargetModel(ModelDisplayListRecord* pTarget)
 {
     m_targetmodel = pTarget;
 }
 
+/** \brief Funkce starajici se o prizpusobeni pohledu na pozici sledovaneho modelu
+ *
+ * Pokud takovy model existuje, posune se na nej kamera, otoci se po smeru pripadne se i pootoci po ose X (3rd person)
+ */
 void DisplayMgr::AdjustViewToTarget()
 {
     if (m_targetmodel)
@@ -1164,6 +1275,10 @@ void DisplayMgr::AdjustViewToTarget()
     glTranslatef(m_viewX, m_viewY, m_viewZ);
 }
 
+/** \brief Funkce detekujici "hranatou kolizi"
+ *
+ * Detekuje hranatou kolizi s objekty mapy
+ */
 uint16 DisplayMgr::CheckCollision(float newx, float newy, float newz)
 {
     const Map* pMap = sMapManager->GetMap();
@@ -1304,7 +1419,8 @@ uint16 DisplayMgr::CheckCollision(float newx, float newy, float newz)
     return collision;
 }
 
-// Funkce slouzici pro detekci hranate kolize
+/** \brief Funkce detekujici "hranatou kolizi" dvou vstupnich modelu
+ */
 bool DisplayMgr::ModelIntersection(ModelDisplayListRecord* first, ModelDisplayListRecord* second)
 {
     if (!first || !second)

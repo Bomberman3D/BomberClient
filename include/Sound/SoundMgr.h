@@ -43,4 +43,12 @@ class SoundMgr
 
 #define sSoundMgr Singleton<SoundMgr>::instance()
 
+/** \fn SoundMgr::IsMusicPlaying
+ *  \brief Vraci true, pokud hraje hudba
+ */
+
+/** \fn SoundMgr::GetCurrentMusicId
+ *  \brief Zjisti ID aktualne prehravane hudby
+ */
+
 #endif

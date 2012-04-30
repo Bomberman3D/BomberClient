@@ -110,6 +110,44 @@ struct ModelFeature
     }
 };
 
+/** \var ModelFeature::type
+ *  \brief Urcuje typ featury modelu, viz enumerator ModelFeatureType
+ */
+
+/** \var ModelFeature::feature
+ *  \brief Ukazatel do pameti na zaznam featury. Cil ukazatele se lisi podle typu
+ */
+
+/** \var ModelFeature::offset_x
+ *  \brief Posunuti featury po ose X relativne od pozice modelu, ke kteremu patri
+ */
+
+/** \var ModelFeature::offset_y
+ *  \brief Posunuti featury po ose Y relativne od pozice modelu, ke kteremu patri
+ */
+
+/** \var ModelFeature::offset_z
+ *  \brief Posunuti featury po ose Z relativne od pozice modelu, ke kteremu patri
+ */
+
+/** \fn ModelFeature::ToModel
+ *  \brief Stara se o konverzi ukazatele *feature na displaylist record modelu
+ *
+ *  Vraci ukazatel na displaylist record modelu, pokud typ neodpovida, vraci NULL
+ */
+
+/** \fn ModelFeature::ToBillboard
+ *  \brief Stara se o konverzi ukazatele *feature na displaylist record billboardu
+ *
+ *  Vraci ukazatel na displaylist record billboardu, pokud typ neodpovida, vraci NULL
+ */
+
+/** \fn ModelFeature::ToEmitter
+ *  \brief Stara se o konverzi ukazatele *feature na ukazatel na emitter
+ *
+ *  Vraci ukazatel na emitter, pokud typ neodpovida, vraci NULL
+ */
+
 typedef std::list<ModelFeature*> FeatureList;
 
 // animacni restrikce (napr. pri pauznuti hry, ..)
@@ -144,9 +182,52 @@ struct DisplayListRecord
     bool   remove;
     GLDisplayList displayList;
     uint32 displayListSize;
+    uint32 AnimTicket;
     AnimRestriction animRestriction;
     clock_t insertionTime;
 };
+
+/** \var DisplayListRecord::x
+ *  \brief Pozice zaznamu na ose X
+ */
+
+/** \var DisplayListRecord::y
+ *  \brief Pozice zaznamu na ose Y
+ */
+
+/** \var DisplayListRecord::z
+ *  \brief Pozice zaznamu na ose Z
+ */
+
+/** \var DisplayListRecord::m_type
+ *  \brief Typ zaznamu (kvuli dedicnosti)
+ */
+
+/** \var DisplayListRecord::remove
+ *  \brief Priznak, zdali je zaznam urcen k vymazani.
+ *
+ * Nemuzeme mazat primo pri pozadavku, musime nechat update funkci (hlavni vlakno) vymazat zaznam, jinak muze dojit k nekonzistenci
+ */
+
+/** \var DisplayListRecord::displayList
+ *  \brief Generovany OpenGL display list (pokud je nutne generovat zvlast)
+ */
+
+/** \var DisplayListRecord::displayListSize
+ *  \brief Velikost OpenGL display listu, ktery mohl byt generovan zvlast. Zaroven slouzi jako priznak, jestli byl vubec vygenerovan (velikost 0 = nebyl)
+ */
+
+/** \var DisplayListRecord::AnimTicket
+ *  \brief Ulozeny ticket pro animace (podle toho se pote zvoli snimek animace a potazmo OpenGL display list, ktery se ma vykreslit)
+ */
+
+/** \var DisplayListRecord::animRestriction
+ *  \brief Restrikce pro animaci, diky ktere muzeme zastavit napriklad vsechny animace z dane skupiny najednou (napr. pauza hry = zastaveni animace vsech hernich objektu)
+ */
+
+/** \var DisplayListRecord::insertionTime
+ *  \brief Cas vlozeni. Slouzi jako orientacni hodnota a take k nekterym custom animacim
+ */
 
 struct ModelDisplayListRecord: public DisplayListRecord
 {
@@ -158,12 +239,35 @@ struct ModelDisplayListRecord: public DisplayListRecord
     }
 
     uint32 modelId;
-    uint32 AnimTicket;
     uint32 CustomFrame;
     float  scale, rotate;
     FeatureList features;
     uint32 artkit;
 };
+
+/** \var ModelDisplayListRecord::modelId
+ *  \brief ID zobrazovaneho modelu
+ */
+
+/** \var ModelDisplayListRecord::CustomFrame
+ *  \brief Slouzi k predavani udaju mezi jednotlivymi nezavislymi procedurami
+ */
+
+/** \var ModelDisplayListRecord::scale
+ *  \brief Vlastni zvetseni daneho modelu
+ */
+
+/** \var ModelDisplayListRecord::rotate
+ *  \brief Otoceni po vektoru osy Y (v OpenGL souradnem systemu, v matematice a deskriptivni geometrii by to byla osa Z)
+ */
+
+/** \var ModelDisplayListRecord::features
+ *  \brief List veskerych featur daneho zaznamu modelu
+ */
+
+/** \var ModelDisplayListRecord::artkit
+ *  \brief ID barevne varianty modelu
+ */
 
 struct BillboardDisplayListRecord: public DisplayListRecord
 {
@@ -178,10 +282,35 @@ struct BillboardDisplayListRecord: public DisplayListRecord
                                               bool billboard_x = true, bool billboard_y = true);
 
     uint32 textureId;
-    uint32 AnimTicket;
     float  scale_x, scale_y;
     bool   billboard_x, billboard_y;
 };
+
+/** \fn BillboardDisplayListRecord::Create
+ *  \brief Staticka metoda pro vytvoreni zaznamu, ale nevlozeni do samotneho listu k vykresleni
+ *
+ * Slouzi napriklad pri poskytovani predlohy pro castice pro emitter
+ */
+
+/** \var BillboardDisplayListRecord::textureId
+ *  \brief ID textury k vykresleni
+ */
+
+/** \var BillboardDisplayListRecord::scale_x
+ *  \brief Sirka vykresleneho zaznamu
+ */
+
+/** \var BillboardDisplayListRecord::scale_y
+ *  \brief Vyska vykresleneho zaznamu
+ */
+
+/** \var BillboardDisplayListRecord::billboard_x
+ *  \brief Priznak pro nataceni kolmo ke kamere po ose X
+ */
+
+/** \var BillboardDisplayListRecord::billboard_y
+ *  \brief Priznak pro nataceni kolmo ke kamere po ose Y
+ */
 
 #define COLOR(r,g,b) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(0)))
 #define COLORA(r,g,b,a) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(a)))
@@ -333,5 +462,21 @@ class DisplayMgr
 };
 
 #define sDisplay Singleton<DisplayMgr>::instance()
+
+/** \fn DisplayMgr::IsIn2DMode()
+ *  \brief Vraci true, pokud jsme ve 2D rezimu
+ */
+
+/** \fn DisplayMgr::DeviateHorizontalAngle(float angle)
+ *  \brief Postara se o nastaveni horizontalni odchylky uhlu (ve stupnich)
+ */
+
+/** \fn DisplayMgr::GetHorizontalAngleDeviation()
+ *  \brief Vraci hodnotu horizontalni odchylky uhlu
+ */
+
+/** \fn DisplayMgr::GetTargetModel()
+ *  \brief Vraci ukazatel na zaznam v display listu, ke kteremu je prizpusobovana kamera
+ */
 
 #endif

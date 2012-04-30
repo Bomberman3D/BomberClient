@@ -3,6 +3,8 @@
 #include "libsqlitewrapped.h"
 #include "sqlite3.h"
 
+/** \brief Poskytuje ukazatel na otevrenou SQLite databazi
+ */
 Database* OpenDatabase(const char* filename)
 {
     char path[2048];
@@ -12,6 +14,8 @@ Database* OpenDatabase(const char* filename)
     return pDB;
 }
 
+/** \brief Provede dotaz do dane databaze
+ */
 void SQLiteQuery(Query* q, const char* query, ... )
 {
     char tmp[2048];
@@ -24,6 +28,8 @@ void SQLiteQuery(Query* q, const char* query, ... )
     q->get_result(tmp);
 }
 
+/** \brief Nacteni dat textur
+ */
 bool Storage::LoadTextureData()
 {
     Database* pDB = OpenDatabase("texture.db3");
@@ -70,6 +76,8 @@ bool Storage::LoadTextureData()
     return true;
 }
 
+/** \brief Nacteni dat modelu (vcetne animaci, modifikatoru a tak podobne)
+ */
 bool Storage::LoadModelData()
 {
     Database* pDB = OpenDatabase("model.db3");
@@ -196,6 +204,8 @@ bool Storage::LoadModelData()
     return true;
 }
 
+/** \brief Nacteni data skyboxu map
+ */
 bool Storage::LoadSkyboxData()
 {
     Database* pDB = OpenDatabase("skybox.db3");
@@ -220,6 +230,8 @@ bool Storage::LoadSkyboxData()
     return true;
 }
 
+/** \brief Nacteni dat o mapach
+ */
 bool Storage::LoadMapData()
 {
     Database* pDB = OpenDatabase("map.db3");
@@ -244,6 +256,8 @@ bool Storage::LoadMapData()
     return true;
 }
 
+/** \brief Nacteni dat o objektech map
+ */
 bool Storage::LoadMapObjectData()
 {
     Database* pDB = OpenDatabase("mapobjects.db3");
@@ -270,6 +284,8 @@ bool Storage::LoadMapObjectData()
     return true;
 }
 
+/** \brief Nacteni dat o hudebnich skladbach
+ */
 bool Storage::LoadMusicData()
 {
     Database* pDB = OpenDatabase("music.db3");

@@ -19,6 +19,18 @@ struct LoadRecord
     uint8 priority;
 };
 
+/** \var LoadRecord::type
+ *  \brief Typ zaznamu, viz enumerator LoadType
+ */
+
+/** \var LoadRecord::sourceId
+ *  \brief ID zdrojoveho zaznamu k nacteni (model / textura)
+ */
+
+/** \var LoadRecord::priority
+ *  \brief Priorita nacitaneho zdroje
+ */
+
 typedef std::pair<LoadType, uint32> LoadPair;
 
 class LoaderWorker

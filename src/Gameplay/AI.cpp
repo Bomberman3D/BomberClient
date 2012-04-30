@@ -622,6 +622,11 @@ void RandomBarePathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 len
 /*                                                                  */
 /********************************************************************/
 
+
+/** \brief Konstruktor
+ *
+ * Pouze nulovani hodnot a cesty
+ */
 MovementHolder::MovementHolder(EnemyTemplate* src)
 {
     // Inicializace tridy starajici se o pohyb
@@ -636,10 +641,18 @@ MovementHolder::MovementHolder(EnemyTemplate* src)
     m_speedMod = 1.0f;
 }
 
+/** \brief Destruktor
+ *
+ * Prazdne
+ */
 MovementHolder::~MovementHolder()
 {
 }
 
+/** \brief Generovani cesty na jistotu
+ *
+ * Vygeneruje cestu za predem znameho predpokladu, ze existuje
+ */
 void MovementHolder::Generator()
 {
     // Generator slouzi k vygenerovani cesty, o ktere jsme si jisti, ze existuje,
@@ -741,11 +754,14 @@ void MovementHolder::Generator()
     }
 }
 
+/** \brief Generuje cestu i bez jistoty, ze existuje
+ *
+ * Slouzi k vygenerovani cesty k cili, ale do docasne vedlejsi mapy, 
+ * pote je overeno funkci TryMutate, zdali doslo k vygenerovani a pripadne se pouzije
+ * vygenerovana cesta
+ */
 bool MovementHolder::TryGenerator(MovementType moveType)
 {
-    // TryGenerator slouzi k vygenerovani cesty k cili, ale do docasne vedlejsi mapy
-    // pote je overeno funkci TryMutate, zdali doslo k vygenerovani a pripadne se pouzije
-    // vygenerovana cesta
     switch (moveType)
     {
         case MOVEMENT_TARGETTED:
@@ -814,11 +830,12 @@ bool MovementHolder::TryGenerator(MovementType moveType)
     return false;
 }
 
+/** \brief Nastaveni implicitniho generatoru cesty
+ *
+ * Pripadne se pouziva k nastaveni "na jistotu", nebo kdyz to jinak neni mozne
+ */
 void MovementHolder::Mutate(MovementType moveType)
 {
-    // Funkce mutate slouzi k nastaveni generatoru cesty "na jistotu"
-    // nebo k implicitnimu nastaveni
-
     if (moveType >= MOVEMENT_MAX)
         return;
 
@@ -838,11 +855,12 @@ void MovementHolder::Mutate(MovementType moveType)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 }
 
+/** \brief Pokusi se o zmenu movement generatoru, pokud existuje cesta
+ *
+ * Pokud existuje cesta, kterou by vygeneroval dany generator, aplikuje se. Jinak zustane stejny
+ */
 bool MovementHolder::TryMutate(MovementType moveType)
 {
-    // TryMutate overi, zdali existuje cesta pomoci generatoru, ktery byl zvolen,
-    // a pokud ano, pouzije se vygenerovana cesta a nastavi se typ pohybu
-
     if (TryGenerator(moveType))
     {
         m_moveType = moveType;
@@ -864,6 +882,10 @@ bool MovementHolder::TryMutate(MovementType moveType)
     return false;
 }
 
+/** \brief Update funkce
+ *
+ * Zde se ridi pohyb po vektoru "z pole na pole", zmena animace pri pohybu, prepocitavani cesty a tak dale.
+ */
 void MovementHolder::Update()
 {
     // Update movement holderu
@@ -934,11 +956,17 @@ void MovementHolder::Update()
     }
 }
 
+/** \brief Zjisteni, zdali existuje cesta
+ */
 bool MovementHolder::HasPath()
 {
     return (m_path.size() > 1);
 }
 
+/** \brief Inicializace nepritele
+ *
+ * Zde dojde k vytvoreni modelu, jeho featur, zvetseni/zmenseni a podobne. Zaroven se zde nastavuje uroven jeho inteligence pomoci udaju zadanych hracem
+ */
 void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y, uint32 position)
 {
     m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
@@ -985,6 +1013,12 @@ void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y, uint32 position)
     }
 }
 
+/** \brief Update funkce nepritele
+ *
+ * Pokud neni mrtvy, dojde ke zvoleni generatoru cesty podle dispozic, pokud je nutne obnovit cestu (vyprseni casovace)
+ *
+ * Funkce ve svem tele obsahuje blizsi popis AI levelu
+ */
 void EnemyTemplate::Update()
 {
     if (sGameplayMgr->IsSingleGameType() && sApplication->GetStagePhase() == 2)

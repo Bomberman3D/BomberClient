@@ -6,7 +6,10 @@
 
 #include <algorithm>
 
-//Nacte mapu ze souboru
+/** \brief Nacteni mapy ze souboru
+ *
+ * Pokud soubor existuje, nacte ho a rozparsuje podle nami znamych sablon
+ */
 bool MapManager::LoadMap(uint32 id)
 {
     SetMapData(id);
@@ -66,6 +69,10 @@ bool MapManager::LoadMap(uint32 id)
     return true;
 }
 
+/** \brief Pokud je nutne, naplni special featury vsech dynamickych poli
+ *
+ * Pouze prochazi vsechna dynamicka pole a pokud je nutne, vytvori jim specialni featuru
+ */
 void MapManager::FillDynamicRecords()
 {
     // Zkontrolovat validitu ukazatelu
@@ -123,6 +130,10 @@ void MapManager::FillDynamicRecords()
     }
 }
 
+/** \brief Nastaveni aktualni cesty k mape
+ *
+ * Pouze prida DATA_PATH na zacatek a nastavi cestu do promenne tridy
+ */
 void MapManager::SetMapFile(const char *filename)
 {
     char tmp[2048];
@@ -130,6 +141,8 @@ void MapManager::SetMapFile(const char *filename)
     MapFilename = tmp;
 }
 
+/** \brief Jen nastavi ID do dane mapy podle nasich databazi
+ */
 void MapManager::SetMapId(uint32 id)
 {
     if (!pMap)
@@ -140,6 +153,10 @@ void MapManager::SetMapId(uint32 id)
     pMap->mapId = id;
 }
 
+/** \brief Nastavi udaje o mape podle zadaneho ID
+ *
+ * Nacte si potrebne veci a zavola dve funkce pro nastaveni aktualniho ID mapy a cesty k mape
+ */
 void MapManager::SetMapData(uint32 id)
 {
     SetMapId(id);
@@ -147,6 +164,11 @@ void MapManager::SetMapData(uint32 id)
 }
 
 //////////////
+
+/** \brief Prida dynamickou bunku na dane pole se zadanymi parametry
+ *
+ * Pouze se stara o pridani zaznamu, pridani specialky je rizeno az zavolanim MapManager::FillDynamicRecords
+ */
 void Map::AddDynamicCell(uint32 x, uint32 y, uint32 type, uint32 state, uint32 misc, void* special)
 {
     if (x >= dynfield.size() || y >= dynfield[x].size())
@@ -165,6 +187,8 @@ void Map::AddDynamicCell(uint32 x, uint32 y, uint32 type, uint32 state, uint32 m
     }
 }
 
+/** \brief Vraci vsechna dynamicka pole na danych souradnicich
+ */
 Map::DynamicCellSet* Map::GetDynamicCellSet(uint32 x, uint32 y)
 {
     if (x >= dynfield.size() || y >= dynfield[x].size())
@@ -173,6 +197,10 @@ Map::DynamicCellSet* Map::GetDynamicCellSet(uint32 x, uint32 y)
     return &dynfield[x][y];
 }
 
+/** \brief Znici vsechny dynamicke zaznamy na danych souradnicich
+ *
+ * Bud znici vsechny zaznamy (\a type = -1) nebo jen urcity zadany typ
+ */
 void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
 {
     if (x >= dynfield.size() || y >= dynfield[x].size() || dynfield[x][y].empty())
@@ -217,6 +245,8 @@ void Map::DestroyDynamicRecords(uint32 x, uint32 y, int32 type)
             sGameplayMgr->OnBoxDestroy(x, y, true);
 }
 
+/** \brief Zjisti, zdali je na danych souradnicich pole zadaneho typu
+ */
 bool Map::IsDynamicRecordPresent(uint32 x, uint32 y, int32 type)
 {
     if (x > dynfield.size()-1 || y > dynfield[0].size()-1)
@@ -234,6 +264,8 @@ bool Map::IsDynamicRecordPresent(uint32 x, uint32 y, int32 type)
     return false;
 }
 
+/** \brief Vraci typ statickeho pole mapy na zadanych souradnicich
+ */
 uint32 Map::GetStaticRecord(uint32 x, uint32 y)
 {
     if (x > field.size()-1 || y > field[0].size()-1)
@@ -242,6 +274,8 @@ uint32 Map::GetStaticRecord(uint32 x, uint32 y)
     return field[x][y].type;
 }
 
+/** \brief Postara se o zniceni vsech dynamickych zaznamu na mape
+ */
 void Map::DestroyAllDynamicRecords()
 {
     if (dynfield.size() == 0)
@@ -263,6 +297,10 @@ void Map::DestroyAllDynamicRecords()
     }
 }
 
+/** \brief Vraci, zdali je pole danych souradnic blizko startovni pozice
+ *
+ * Hodi se napriklad pri zjistovani, jestli je mozne pole zaplnit znicitelnymi bednami
+ */
 bool Map::NearStartPos(uint32 x, uint32 y)
 {
     if (field.size() < 1 || field[0].size() < 1)

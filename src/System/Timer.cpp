@@ -1,11 +1,15 @@
 #include <Global.h>
 #include <Timer.h>
 
+/** \brief Inicializace casovace - pouze smazani vsech udalosti
+ */
 void Timer::Initialize()
 {
     TimedEvents.clear();
 }
 
+/** \brief Funkce zpracovavajici pozadavky o vlozeni zaznamu do pole casovace
+ */
 void Timer::AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32), uint32 param1, uint32 param2, uint32 param3)
 {
     TimerRecord temp;
@@ -17,6 +21,8 @@ void Timer::AddTimedEvent(uint32 time, void (*Handler)(uint32, uint32, uint32), 
     TimedEvents.push_back(temp);
 }
 
+/** \brief Funkce zpracovavajici pozadavky na vlozeni zaznamu do pole casovace na nastaveni cile v pameti na danou hodnotu
+ */
 void Timer::AddTimedSetEvent(uint32 time, uint32 *target, uint32 value)
 {
     TimerSetRecord temp;
@@ -26,6 +32,8 @@ void Timer::AddTimedSetEvent(uint32 time, uint32 *target, uint32 value)
     TimedSetEvents.push_back(temp);
 }
 
+/** \brief Postara se o vymazani casovaneho zaznamu, ktery byl urcen adresou prvku v pameti
+ */
 void Timer::RemoveTimerSetEventByTarget(uint32* target)
 {
     // THREAD UNSAFE !
@@ -42,6 +50,10 @@ void Timer::RemoveTimerSetEventByTarget(uint32* target)
     }
 }
 
+/** \brief Hlavni update funkce casovace
+ *
+ * Zde se projdou vsechny zaznamy casovace a pokud doslo k jejich vyprseni, provede se jejich handler, pripadne se nastavi prvek identifikovany pozici v pameti na danou hodnotu
+ */
 void Timer::Update()
 {
     if (m_pauseTime > 0)
@@ -80,11 +92,15 @@ void Timer::Update()
     }
 }
 
+/** \brief Funkce starajici se o pozastaveni casovacu
+ */
 void Timer::PauseTimers()
 {
     m_pauseTime = clock();
 }
 
+/** \brief Funkce starajici se o odpauzovani casovacu
+ */
 void Timer::UnpauseTimers()
 {
     clock_t diff = clock() - m_pauseTime;

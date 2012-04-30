@@ -40,6 +40,46 @@ class StageControl
         uint32 m_subStage;
 };
 
+/** \fn StageControl::OnEnter
+ *  \brief Funkce volana pri vstupu do herni faze
+ */
+
+/** \fn StageControl::OnLeave
+ *  \brief Funkce volana pri odchodu z herni faze
+ */
+
+/** \fn StageControl::OnDraw(uint32 diff)
+ *  \brief Funkce volana po vykresleni vseho tridou DisplayMgr
+ */
+
+/** \fn StageControl::OnBeforeDraw(uint32 diff)
+ *  \brief Funkce volana pred vykreslenim vseho jineho
+ */
+
+/** \fn StageControl::OnKeyStateChange(uint16 key, bool press)
+ *  \brief Funkce volana pri zmene stavu stisknuti klavesy \a key
+ */
+
+/** \fn StageControl::OnMouseButtonPress(uint32 x, uint32 y, bool left = true)
+ *  \brief Funkce volana pri stisku tlacitka mysi (leve / prave)
+ */
+
+/** \fn StageControl::OnUpdate(uint32 diff)
+ *  \brief Funkce volana kazdy pruchod hlavniho cyklu aplikace
+ */
+
+/** \fn StageControl::GetType
+ *  \brief Vrati fazi hry, ve ktere jsme
+ */
+
+/** \fn StageControl::GetSubStage
+ *  \brief Vraci argument faze hry
+ */
+
+/** \fn StageControl::SetSubStage(uint32 subStage)
+ *  \brief Nastavi argument faze hry
+ */
+
 class MenuStage: public StageControl
 {
     public:
@@ -90,6 +130,18 @@ class LoadingStage: public StageControl
         uint32 ImgAnimTicket;
         std::vector<LoadPair> m_toLoad;
 };
+
+/** \fn LoadingStage::PreLoad(LoadType type, uint32 sourceId)
+ *  \brief Postara se o nacteni daneho prvku pred prechodem do dalsi faze
+ */
+
+/** \fn LoadingStage::IsAllLoaded
+ *  \brief Overi, zdali bylo nacteno vse, co jsme zazadali u funkce PreLoad
+ */
+
+/** \fn LoadingStage::GetLoadingPercentage
+ *  \brief Vraci zpatky procentuelni vyjadreni postupu v nacitani vseho, o co jsme zazadali funkci PreLoad
+ */
 
 class GameSettingsStage: public StageControl
 {

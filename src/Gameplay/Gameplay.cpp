@@ -5,6 +5,10 @@
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
 
+/** \brief Konstruktor
+ *
+ * Jen a pouze nulovani
+ */
 GameplayMgr::GameplayMgr()
 {
     m_game = NULL;
@@ -19,12 +23,20 @@ GameplayMgr::GameplayMgr()
     memset(&localPlayerStats, 0, sizeof(PlayerStats::UniversalStatTemplate));
 }
 
+/** \brief Destruktor
+ *
+ * Pouze uvolneni aktivni hry
+ */
 GameplayMgr::~GameplayMgr()
 {
     if (m_game)
         delete m_game;
 }
 
+/** \brief Hlavni update funkce
+ *
+ * Volana z tridy herni faze
+ */
 void GameplayMgr::Update()
 {
     if (m_game)
@@ -93,6 +105,10 @@ void GameplayMgr::Update()
     }
 }
 
+/** \brief Inicializace hry a hernich principu
+ *
+ * Nulovani vychozich hodnot, vytvoreni zaznamu hrace, nulovani map bomb a nebezpecnych poli
+ */
 void GameplayMgr::OnGameInit()
 {
     // Vychozi hodnoty
@@ -176,12 +192,18 @@ void GameplayMgr::OnGameInit()
         m_game->OnGameInit(m_playerRec);
 }
 
+/** \brief Funkce slouzici k zavolani stejnojmenne metody herniho typu
+ */
 void GameplayMgr::OnGameLeave()
 {
     if (m_game)
         m_game->OnGameLeave();
 }
 
+/** \brief Nastaveni typu nove hry a herniho typu
+ *
+ * Zahodi stary herni typ a vytvori novy podle pozadavku
+ */
 void GameplayMgr::SetGameType(GameType type)
 {
     if (type == GAME_TYPE_MAX)
@@ -211,6 +233,8 @@ void GameplayMgr::SetGameType(GameType type)
     assert(m_game != NULL);
 }
 
+/** \brief Vraci zvoleny typ hry
+ */
 GameType GameplayMgr::GetGameType()
 {
     if (!m_game)
@@ -219,6 +243,10 @@ GameType GameplayMgr::GetGameType()
     return m_game->GetType();
 }
 
+/** \brief Funkce starajici se o pridani bomby
+ *
+ * Prida bombu na zadane souradnice ve 2D mape. Vypocita dosah, oznaci budouci nebezpecna pole a vlozi zaznam bomby do mapy
+ */
 bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 {
     if (m_plActiveBombs >= m_plMaxBombs)
@@ -328,6 +356,10 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     return true;
 }
 
+/** \brief Predcasny vybuch bomby
+ *
+ * Overi, zdali je pritomna bomba na zadanych souradnicich, a pokud ano, oznaci ji k predcasnemu vybuchu (zkrati cas vybuchu na minimum)
+ */
 void GameplayMgr::PreBoomBomb(uint32 x, uint32 y)
 {
     if (BombMap.empty())
@@ -379,12 +411,18 @@ void GameplayMgr::PreBoomBomb(uint32 x, uint32 y)
     }
 }
 
+/** \brief Funkce zpracovavajici udalost zmeny pole hrace
+ *
+ * Pouze vola metodu tridy herniho typu
+ */
 void GameplayMgr::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
 {
     if (m_game)
         m_game->OnPlayerFieldChange(oldX, oldY, newX, newY);
 }
 
+/** \brief Vraci, zdali zadane pole je nyni nebezpecne
+ */
 bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
 {
     if (DangerousMap.size() < x)
@@ -405,6 +443,8 @@ bool GameplayMgr::IsDangerousField(uint32 x, uint32 y)
     return false;
 }
 
+/** \brief Vraci, zdali zadane pole je nebo bude nebezpecne
+ */
 bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
 {
     if (DangerousMap.size() < x)
@@ -422,6 +462,8 @@ bool GameplayMgr::WouldBeDangerousField(uint32 x, uint32 y)
     return false;
 }
 
+/** \brief Oznaci dane pole jako nebezpecne (nebo jestli v budoucnu bude)
+ */
 void GameplayMgr::SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t since, uint32 howLong)
 {
     if (x > DangerousMap.size())
@@ -447,6 +489,8 @@ void GameplayMgr::SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t s
     }
 }
 
+/** \brief Funkce starajici se o potrebne rutiny pri splneni podminek smrti hrace
+ */
 void GameplayMgr::PlayerDied()
 {
     if (m_playerDead)
@@ -462,6 +506,10 @@ void GameplayMgr::PlayerDied()
     sApplication->SetStagePhase(3);
 }
 
+/** \brief Pauza hry
+ *
+ * Zastavi pohyb hrace, zapauzuje timery, emittery a pozastavi i animace, ktere je nutne zastavit
+ */
 void GameplayMgr::PauseGame()
 {
     if (IsGamePaused())
@@ -479,6 +527,10 @@ void GameplayMgr::PauseGame()
     }
 }
 
+/** \brief Odpauzovani hry
+ *
+ * Presne opacne procedury, nez v GameplayMgr::PauseGame
+ */
 void GameplayMgr::UnpauseGame()
 {
     if (!IsGamePaused())
@@ -521,6 +573,10 @@ void GameplayMgr::UnpauseGame()
     SetCursorPos(middleX, middleY);
 }
 
+/** \brief Natoceni hrace podle posunu mysi
+ *
+ * Jen zjisti pozici mysi, a pokud se nejak zmenila vuci stredu, pohne pohledem a mys vrati na puvodni misto
+ */
 void GameplayMgr::UpdatePlayerMoveAngle()
 {
     if (m_movementBlocked)
@@ -537,6 +593,10 @@ void GameplayMgr::UpdatePlayerMoveAngle()
         m_moveAngle += 0.0025f*(mousePos.x-middleX);
 }
 
+/** \brief Funkce starajici se o pohyb hrace
+ *
+ * Pohne hracem o predem stanoveny usek, jehoz delka se lisi podle ubehnuteho casu (diff od puvodniho update)
+ */
 void GameplayMgr::UpdatePlayerMotion(uint32 diff)
 {
     if (m_movementBlocked)

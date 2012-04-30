@@ -45,11 +45,31 @@ struct tChunk
     uint32 bytesRead;
 };
 
+/** \var tChunk::ID
+ *  \brief ID daneho nacteneho kusu modelu
+ */
+
+/** \var tChunk::length
+ *  \brief Delka dat, ktere nasleduji (v bajtech)
+ */
+
+/** \var tChunk::bytesRead
+ *  \brief Pocet bajtu, ktere jiz byly precteny (jakmile bytesRead == length, cte se dalsi chunk)
+ */
+
 struct tFace
 {
     int32 vertIndex[3];
     int32 coordIndex[3];
 };
+
+/** \var tFace::vertIndex
+ *  \brief Index vertexu dane face
+ */
+
+/** \var tFace::coordIndex
+ *  \brief Index souradnic dane face
+ */
 
 struct tMaterialInfo
 {
@@ -57,19 +77,67 @@ struct tMaterialInfo
     char   strFile[255];
     uint8  color[3];
     uint8  specularcolor[3];
-    uint32 texureId;
+    uint32 textureId;
     float  uTile;
     float  vTile;
     float  uOffset;
     float  vOffset;
 
     // lesklost
-    union
+    union shininess
     {
         float fShininess[3];
         uint8 uShininess[3];
     } shininess;
-} ;
+};
+
+/** \var tMaterialInfo::strName
+ *  \brief Jmeno materialu
+ */
+
+/** \var tMaterialInfo::strFile
+ *  \brief Jmeno souboru s texturou
+ */
+
+/** \var tMaterialInfo::color
+ *  \brief Barva materialu (R, G, B)
+ */
+
+/** \var tMaterialInfo::specularcolor
+ *  \brief Specularni (odleskova) barva daneho materialu (R, G, B)
+ */
+
+/** \var tMaterialInfo::textureId
+ *  \brief ID nactene OpenGL textury
+ */
+
+/** \var tMaterialInfo::uTile
+ *  \brief Nepouzivane
+ */
+
+/** \var tMaterialInfo::vTile
+ *  \brief Nepouzivane
+ */
+
+/** \var tMaterialInfo::uOffset
+ *  \brief Nepouzivane
+ */
+
+/** \var tMaterialInfo::vOffset
+ *  \brief Nepouzivane
+ */
+
+/** \var tMaterialInfo::shininess
+ *  \brief Lesklost materialu
+ */
+
+/** \var tMaterialInfo::shininess::uShininess
+ *  \brief Lesklost materialu udavana v 8bitovych bezznaminkovych cislech
+ */
+
+/** \var tMaterialInfo::shininess::fShininess
+ *  \brief Lesklost materialu udavana v procentech
+ */
 
 struct t3DObject
 {
@@ -98,6 +166,78 @@ struct t3DObject
     tFace *pFaces;
 };
 
+/** \var t3DObject::numOfVerts
+ *  \brief Pocet vertexu v danem objektu
+ */
+
+/** \var t3DObject::numOfFaces
+ *  \brief Pocet sten v danem objektu
+ */
+
+/** \var t3DObject::numTexVertex
+ *  \brief Pocet texturovych vertexu v danem objektu
+ */
+
+/** \var t3DObject::materialID
+ *  \brief ID materialu pouzivaneho na danem objektu
+ */
+
+/** \var t3DObject::bHasTexture
+ *  \brief Priznak, zdali je objekt texturovany
+ */
+
+/** \var t3DObject::strName
+ *  \brief Jmeno objektu
+ */
+
+/** \var t3DObject::positionFrames
+ *  \brief Pocet snimku animace, starajici se o zmenu pozice objektu
+ */
+
+/** \var t3DObject::rotationFrames
+ *  \brief Pocet snimku animace, starajici se o natoceni objektu
+ */
+
+/** \var t3DObject::scaleFrames
+ *  \brief Pocet snimku animace, starajici se o velikost objektu
+ */
+
+/** \var t3DObject::vPivot
+ *  \brief Pivot ("relativni stred otaceni") objektu
+ */
+
+/** \var t3DObject::vPosition
+ *  \brief Animacni data snimku menici pozici objektu
+ */
+
+/** \var t3DObject::vRotation
+ *  \brief Animacni data snimku menici natoceni objektu
+ */
+
+/** \var t3DObject::vScale
+ *  \brief Animacni data snimku menici velikost objektu
+ */
+
+/** \var t3DObject::vRotDegree
+ *  \brief Prepocitane hodnoty z vRotation z radianu na stupne
+ */
+
+/** \var t3DObject::pVerts
+ *  \brief Vsechny vertexy objektu
+ */
+
+/** \var t3DObject::pNormals
+ *  \brief Vsechny vertexove normaly objektu
+ */
+
+/** \var t3DObject::pTexVerts
+ *  \brief Vsechny texturove vertexy objektu
+ */
+
+/** \var t3DObject::pFaces
+ *  \brief Vsechny steny objektu
+ */
+
 struct t3DModel
 {
     t3DModel()
@@ -108,7 +248,6 @@ struct t3DModel
         numOfObjects = 0;
         numOfMaterials = 0;
         numberOfFrames = 1;
-        currentFrame = 1;
         pMaterials.clear();
         pObject.clear();
         Maximum.x = 0; Minimum.x = 0;
@@ -119,7 +258,6 @@ struct t3DModel
     int32 numOfMaterials;
 
     int32 numberOfFrames;
-    int32 currentFrame;
 
     vector<tMaterialInfo> pMaterials;
     vector<t3DObject> pObject;
@@ -132,6 +270,56 @@ struct t3DModel
     uint32 displayListSize;
     std::vector<GLuint> displayListArtkit;
 };
+
+/** \fn t3DModel::t3DModel
+ *  \brief Konstruktor
+ *
+ * Nulovani vsech promennych a ukazatelu
+ */
+
+/** \var t3DModel::numOfObjects
+ *  \brief Pocet objektu daneho modelu
+ */
+
+/** \var t3DModel::numOfMaterials
+ *  \brief Pocet materialu spojenych s danym modelem
+ */
+
+/** \var t3DModel::numberOfFrames
+ *  \brief Celkovy pocet snimku animace
+ */
+
+/** \var t3DModel::pMaterials
+ *  \brief Pole vsech materialu objektu
+ */
+
+/** \var t3DModel::pObject
+ *  \brief Pole vsech objektu
+ */
+
+/** \var t3DModel::customScale
+ *  \brief Vlastni velikost modelu generovana napriklad ve tride CustomAnimator
+ */
+
+/** \var t3DModel::Maximum
+ *  \brief Maximalni bod modelu (nemodifikovany globalnim a vlastnim modifikatorem velikosti)
+ */
+
+/** \var t3DModel::Minimum
+ *  \brief Minimalni bod modelu (nemodifikovany globalnim a vlastnim modifikatorem velikosti)
+ */
+
+/** \var t3DModel::displayList
+ *  \brief ID vygenerovaneho OpenGL display listu
+ */
+
+/** \var t3DModel::displayListSize
+ *  \brief Velikost vygenerovaneho OpenGL display listu, nebo 0 pokud neni vygenerovany
+ */
+
+/** \var t3DModel::displayListArtkit
+ *  \brief Pole vsech ID OpenGL displaylistu generovanych pro artkity
+ */
 
 namespace Loaders
 {

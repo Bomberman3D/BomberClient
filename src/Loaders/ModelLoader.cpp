@@ -727,7 +727,7 @@ void Loaders::LoadModel(uint32 id)
         {
             memset(path, 0, 2048);
             sprintf(path, "%s/%s", DATA_PATH, dest->pMaterials[i].strFile);
-            Loaders::LoadGLImage(&dest->pMaterials[i].texureId, path);
+            Loaders::LoadGLImage(&dest->pMaterials[i].textureId, path);
         }
     }
 
@@ -794,7 +794,7 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
                     {
                         glEnable(GL_TEXTURE_2D);
                         glColor3ub(255, 255, 255);
-                        glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].texureId);
+                        glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].textureId);
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                     }

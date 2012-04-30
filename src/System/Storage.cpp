@@ -1,10 +1,18 @@
 #include <Global.h>
 #include <Storage.h>
 
+/** \brief Konstruktor
+ *
+ * Prazdny
+ */
 Storage::Storage()
 {
 }
 
+/** \brief Stezejni funkce pro nacteni vsech SQLite ulozist
+ *
+ * Nacte postupne vsechna SQLite uloziste do internich map
+ */
 void Storage::Load()
 {
     LoadMapData();
@@ -17,6 +25,10 @@ void Storage::Load()
     PrepareDynamicStorages();
 }
 
+/** \brief Pripraveni dynamickych ulozist
+ *
+ * Vynuluje vsechny textury, modely a vymaze vsechny zaznamy o materialech - pouziva se jen pri startu a inicializaci
+ */
 void Storage::PrepareDynamicStorages()
 {
     // Vsechny ukazatele na ID textur vyNULLovat, kdyz je pointer NULL, znamena to, ze textura neni nactena
@@ -31,6 +43,10 @@ void Storage::PrepareDynamicStorages()
 
 // Prostor pro helper funkce
 
+/** \brief Vraci ukazatel na objekt podle zadaneho ID modelu a jmena objektu
+ *
+ * Pokud takovy objekt neexistuje, vraci NULL
+ */
 t3DObject* Storage::FindModelObject(uint32 modelId, const char *objectname)
 {
     if (!Models[modelId] || Models[modelId]->pObject.empty())
@@ -43,6 +59,10 @@ t3DObject* Storage::FindModelObject(uint32 modelId, const char *objectname)
     return NULL;
 }
 
+/** \brief Vraci ukazatel na objekt podle vstupniho modelu, ktery neni ulozeny v globalnim ulozisti, a podle jmena objektu
+ *
+ * Pokud takovy objekt neexistuje, vraci NULL
+ */
 t3DObject* Storage::FindModelObjectInNonStored(t3DModel* model, const char *objectname)
 {
     if (!model || model->pObject.empty())
@@ -55,6 +75,8 @@ t3DObject* Storage::FindModelObjectInNonStored(t3DModel* model, const char *obje
     return NULL;
 }
 
+/** \brief Zjisti interni typ animace modelu pro dany frame
+ */
 ModelAnimType Storage::GetAnimTypeForFrame(uint32 modelId, uint32 frame)
 {
     // Kdyz model nema definovanou animaci
@@ -69,6 +91,10 @@ ModelAnimType Storage::GetAnimTypeForFrame(uint32 modelId, uint32 frame)
     return ANIM_NONE;
 }
 
+/** \brief Vraci zaznam z mapy modifikatoru objektu
+ *
+ * Podle zadanych parametru najde potrebna data a vrati ukazatel na prvek mapy
+ */
 ObjectModifierData* Storage::GetObjectModifierData(uint32 modelId, const char* objectname)
 {
     // Neexistuje
@@ -83,6 +109,10 @@ ObjectModifierData* Storage::GetObjectModifierData(uint32 modelId, const char* o
     return &((*itr).second);
 }
 
+/** \brief Vraci zaznam z mapy modifikatoru modelu
+ *
+ * Podle zadaneho ID modelu najde potrebna data a vraci ukazatel na prvek mapy
+ */
 ModelModifierData* Storage::GetModelModifierData(uint32 modelId)
 {
     // Neexistuje
@@ -96,6 +126,10 @@ ModelModifierData* Storage::GetModelModifierData(uint32 modelId)
     return &((*itr).second);
 }
 
+/** \brief Podle zadanych udaju vraci data o artkitu objektu
+ *
+ * Pokud model, objekt nebo artkit neexistuje, vraci NULL
+ */
 ObjectArtkitData* Storage::GetObjectArtkitData(uint32 modelId, const char* objectname, uint32 artkitId)
 {
     // Neexistuje
@@ -117,6 +151,10 @@ ObjectArtkitData* Storage::GetObjectArtkitData(uint32 modelId, const char* objec
     return NULL;
 }
 
+/** \brief Vraci vsechna ID artkitu daneho modelu pro vsechny objekty
+ *
+ * Vysledkem je spojity list, kde jsou pritomny jen prvky, jejichz ID koresponduje s existujicim ID artkitu
+ */
 void Storage::GetAllModelArtkitIds(uint32 modelId, std::vector<uint32> *dest)
 {
     dest->clear();

@@ -34,6 +34,22 @@ struct Chunk
     uint16 texture;
 };
 
+/** \var Chunk::x
+ *  \brief Xova pozice precteneho chunku
+ */
+
+/** \var Chunk::y
+ *  \brief Yova pozice precteneho chunku
+ */
+
+/** \var Chunk::type
+ *  \brief Typ pole na mape na danych souradnicich
+ */
+
+/** \var Chunk::texture
+ *  \brief ID textury daneho pole mapy
+ */
+
 // Holder aktualni mapy s helper funkcemi
 class Map
 {
@@ -91,6 +107,40 @@ class Map
         DynamicMapField dynfield;
 };
 
+/** \fn Map::Map
+ *  \brief Konstruktor
+ *
+ * Pouze nulovani zaznamu
+ */
+
+/** \var Map::Cell::type
+ *  \brief Typ pole na staticke mape, viz enumerator FieldType
+ */
+
+/** \var Map::Cell::texture
+ *  \brief ID textury na danem poli mapy
+ */
+
+/** \var Map::Cell::pRec
+ *  \brief Ukazatel na pripadny zaznam v displaylistu (v pripade modelu na te pozici)
+ */
+
+/** \var Map::DynamicCell::type
+ *  \brief Typ dynamicke bunky, viz enumerator DynamicFieldType
+ */
+
+/** \var Map::DynamicCell::state
+ *  \brief Puvodne mineno pro stav vybuchle bomby apod., ted zatim bez vyuziti
+ */
+
+/** \var Map::DynamicCell::misc
+ *  \brief Urcuje casto typ dane dynamicke bunky, napriklad typ bonusu na tomto miste
+ */
+
+/** \var Map::DynamicCell::special
+ *  \brief Ukazatel na specialni featuru dane bunky, napriklad billboard bonusu, nebo model bomby
+ */
+
 class MapManager
 {
     public:
@@ -119,5 +169,21 @@ class MapManager
 };
 
 #define sMapManager Singleton<MapManager>::instance()
+
+/** \fn MapManager::MapManager
+ *  \brief Konstruktor
+ *
+ * Jen vynuluje aktualni mapu
+ */
+
+/** \fn MapManager::~MapManager
+ *  \brief Destruktor
+ *
+ * Pokud existuje mapa, uvolni ji
+ */
+
+/** \fn MapManager::GetMap
+ *  \brief Vraci ukazatel na aktualni mapu
+ */
 
 #endif

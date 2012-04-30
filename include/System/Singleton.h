@@ -1,5 +1,5 @@
 /**********************************
-*      Enigmatic Fate Engine      *
+*        Bomberman3D Engine       *
 *  Created by: Cmaranec (Kennny)  *
 **********************************/
 // Singleton definition
@@ -28,5 +28,23 @@ class Singleton
 };
 
 template <class T> T* Singleton<T>::m_instance = NULL;
+
+/** \class Singleton
+ *  \brief Trida singletonu
+ *
+ * Singleton je takovy stavebni prvek aplikace, ktery zaruci jen jednu instanci dane tridy po celou dobu behu aplikace
+ *
+ * Pote se vytvori makro pro referenci jednotlivych instanci trid pomoci #define sMojeTrida Singleton<MojeTrida>::instance()
+ */
+
+/** \var Singleton::m_instance
+ *  \brief Ukazatel na tridu, kterou dany singleton instancuje
+ */
+
+/** \fn Singleton::instance
+ *  \brief Funkce starajici se o vraceni ukazatele na instancovanou tridu
+ *
+ * Pokud dana instance tridy neexistuje, vytvori se. Pokud ale nebyla vytvorena ani tak, je nutne ukoncit beh programu - pravdepodobne se vyskytla chyba pri alokaci pameti
+ */
 
 #endif

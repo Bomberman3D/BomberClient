@@ -37,6 +37,8 @@ static float numBounds(float value)
         return value;
 }
 
+/** \brief Struktura prostoroveho vektoru
+ */
 struct CVector3
 {
     CVector3() {};
@@ -111,6 +113,68 @@ struct CVector3
     }
 };
 
+/** \fn CVector3::CVector3
+ *  \brief Implicitni konstruktor
+ */
+
+/** \fn CVector3::CVector3(float nx, float ny, float nz)
+ *  \brief Konstruktor s implicitne zadanymi souradnicemi
+ */
+
+/** \var CVector3::x
+ *  \brief Xova souradnice vektoru
+ */
+
+/** \var CVector3::y
+ *  \brief Yova souradnice vektoru
+ */
+
+/** \var CVector3::z
+ *  \brief Zova souradnice vektoru
+ */
+
+/** \fn CVector3::mySize
+ *  \brief Vraci velikost vektoru
+ */
+
+/** \fn CVector3::multiply(float a)
+ *  \brief Vynasobi souradnice vektoru danym cislem
+ */
+
+/** \fn CVector3::unitMultiply(float a)
+ *  \brief Zkrati vektor na jednotkovy a pote vynasobi souradnice danym cislem
+ */
+
+/** \fn CVector3::vectorMultiply
+ *  \brief Provede vektorovy soucin se zadanym druhym vektorem
+ */
+
+/** \fn CVector3::makeNull
+ *  \brief Vynuluje souradnice vektoru
+ */
+
+/** \fn CVector3::operator+(const CVector3 &sec)
+ *  \brief Secte souradnice vektoru se souradnicemi jineho vektoru
+ */
+
+/** \fn CVector3::operator-(const CVector3 &sec)
+ *  \brief Odecte souradnice jineho vektoru od svych souradnic
+ */
+
+/** \fn CVector3::operator*(float sec)
+ *  \brief Vynasobi souradnice vektoru danym cislem. V podstate stejna funkce jako CVector3::multiply
+ */
+
+/** \fn CVector3::operator*(const CVector3 &sec)
+ *  \brief Provede skalarni soucin a vraci jeho vysledek
+ */
+
+/** \fn CVector3::rotate
+ *  \brief Otoci vektor okolo osy \a axis o \a angle radianu
+ */
+
+/** \brief Struktura vekoru v rovine
+ */
 struct CVector2
 {
     float x, y;
@@ -137,5 +201,29 @@ struct CVector2
         y = 0;
     }
 };
+
+/** \var CVector2::x
+ *  \brief Xova souradnice vektoru
+ */
+
+/** \var CVector2::y
+ *  \brief Yova souradnice vektoru
+ */
+
+/** \fn CVector2::mySize
+ *  \brief Vraci velikost vektoru
+ */
+
+/** \fn CVector2::multiply
+ *  \brief Vynasobi souradnice danym cislem
+ */
+
+/** \fn CVector2::unitMultiply
+ *  \brief Zkrati vektor na jednotkovy a pote vynasobi souradnice danym cislem
+ */
+
+/** \fn CVector2::makeNull
+ *  \brief Vynuluje souradnice vektoru
+ */
 
 #endif

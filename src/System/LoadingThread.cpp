@@ -7,6 +7,10 @@
 
 boost::thread* LoadingThread = NULL;
 
+/** \brief Konstruktor
+ *
+ * Nulovani a cisteni
+ */
 LoaderWorker::LoaderWorker()
 {
     m_loadList.clear();
@@ -16,10 +20,16 @@ LoaderWorker::LoaderWorker()
     m_somethingToLoad = false;
 }
 
+/** \brief Destruktor
+ *
+ * Prazdny
+ */
 LoaderWorker::~LoaderWorker()
 {
 }
 
+/** \brief Vraci true, pokud je zadany zdroj prave nacitan
+ */
 bool LoaderWorker::IsCurrentlyLoaded(LoadType type, uint32 sourceId)
 {
     if (m_currentlyLoaded.first == type && m_currentlyLoaded.second == sourceId)
@@ -28,6 +38,8 @@ bool LoaderWorker::IsCurrentlyLoaded(LoadType type, uint32 sourceId)
     return false;
 }
 
+/** \brief Vraci true, pokud je dany zdroj jiz nacten
+ */
 bool LoaderWorker::IsAlreadyLoaded(LoadType type, uint32 sourceId)
 {
     if (type == LOAD_TEXTURE && sStorage->Textures[sourceId] != NULL)
@@ -39,6 +51,10 @@ bool LoaderWorker::IsAlreadyLoaded(LoadType type, uint32 sourceId)
     return false;
 }
 
+/** \brief Nacte zdroj bez nacitaciho vlakna
+ *
+ * Zpusobi blokovani prace volajiciho vlakna, ale zdroj bude hned pripraven k pouziti
+ */
 void LoaderWorker::RequestLoadBlocking(LoadType type, uint32 sourceId)
 {
     // Nejdrive overime, jestli uz neni dany prvek nacten, nebo zrovna nacitan
@@ -51,6 +67,12 @@ void LoaderWorker::RequestLoadBlocking(LoadType type, uint32 sourceId)
         Loaders::LoadTexture(sourceId);
 }
 
+/** \brief Pozada o zarazeni zdroje do fronty k nacteni
+ *
+ * Zamkne si seznam veci k nacteni (pocka na token, ..), overi, zdali tam nas zaznam jiz neni, a pokud ne, vlozi ho tam a preda seznam odemkne
+ *
+ * Pokud nacitaci vlakno nebezi, spusti ho
+ */
 void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySign)
 {
     // Nejdrive overime, jestli uz neni dany prvek nacten, nebo zrovna nacitan
@@ -98,6 +120,10 @@ void LoaderWorker::RequestLoad(LoadType type, uint32 sourceId, uint8 prioritySig
         LoadingThread = new boost::thread(runLoaderWorker);
 }
 
+/** \brief Worker nacitaciho vlakna
+ *
+ * Vyzada si token na seznam veci k nacteni, vybere zdroj k nacteni, preda token a uskutecni nacteni
+ */
 void LoaderWorker::Worker()
 {
     LoadPair chosen = std::make_pair(LOAD_MAX, 0);
@@ -168,11 +194,17 @@ void LoaderWorker::Worker()
     }
 }
 
+/** \brief Nastavi priznak pro ukonceni nacitaciho vlakna
+ */
 void LoaderWorker::ShutdownThread()
 {
     m_isShuttingDown = true;
 }
 
+/** \brief Spousteci funkce nacitaciho vlakna
+ *
+ * Ozivi vlakno, aplikuje renderovaci kontext a spusti hlavni cyklus. Po skonceni prace cyklu vynuluje kontext a umrtvi vlakno
+ */
 void runLoaderWorker()
 {
     sLoader->m_isDead = false;

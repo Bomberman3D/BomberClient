@@ -34,4 +34,42 @@ class Config
 
 #define sConfig Singleton<Config>::instance()
 
+/** \fn Config::Config
+ *  \brief Konstruktor
+ *
+ * Nastaveni implicitnich hodnot
+ */
+
+/** \fn Config::Load
+ *  \brief Nacteni configu z defaultnich souboru
+ */
+
+/** \var Config::WindowWidth
+ *  \brief Sirka okna
+ */
+
+/** \var Config::WindowHeight
+ *  \brief Vyska okna
+ */
+
+/** \var Config::ColorDepth
+ *  \brief Barevna hloubka
+ */
+
+/** \var Config::fullscreen
+ *  \brief Priznak pro beh v rezimu cele obrazovky
+ */
+
+/** \var Config::RefreshRate
+ *  \brief Pokud se jedna o celoobrazovkovy mod, tohle je obnovovaci frekvence
+ */
+
+/** \var Config::HostName
+ *  \brief IP adresa / host name sitoveho herniho serveru
+ */
+
+/** \var Config::NetworkPort
+ *  \brief Port pro komunikaci se serverovou casti aplikace
+ */
+
 #endif

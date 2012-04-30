@@ -52,6 +52,10 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
     glLoadIdentity();
 }
 
+/** \brief Inicializace OpenGL rozhrani
+ *
+ * Zde se pouze zinicializuje veskere zobrazeni
+ */
 bool InitGL(GLvoid)
 {
     glEnable(GL_TEXTURE_2D);
@@ -75,6 +79,11 @@ bool InitGL(GLvoid)
     return true;
 }
 
+/** \brief Hlavni updatovaci funkce aplikace
+ *
+ * Zde se zpracovava veskery update vsech trid a subsystemu.
+ * Tato funkce se vola pri kazdem pruchodu cyklu v Application::Run
+ */
 void Application::Update()
 {
     if (sDisplay->IsIn2DMode())
@@ -410,6 +419,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return sApplication->Run();
 }
 
+/** \brief Konstruktor
+ *
+ * Zde pouze nulujeme veskera nastaveni
+ */
 Application::Application()
 {
     m_currStage = NULL;
@@ -425,10 +438,20 @@ Application::Application()
         mouseXY[i] = 0;
 }
 
+/** \brief Destruktor
+ *
+ * Prazdny, netreba nic uvolnovat
+ */
 Application::~Application()
 {
 }
 
+/** \brief Inicializacni rutina aplikace
+ *
+ * Zde se zinicializuji veskere handlery, vytvori se okno a nastavi se implicitni faze hry na Intro.
+ * Je take mozne odkomentovat kod pro inicializaci testovaci konzole, ktera ve se Windows normalne nespousti.
+ * To jen Linux nam casto automaticky doprava zapnutou konzoli se stdout vystupem
+ */
 bool Application::Init()
 {
     srand((unsigned int)time(NULL));
@@ -472,6 +495,11 @@ bool Application::Init()
     return true;
 }
 
+/** \brief Hlavni funkce aplikace
+ *
+ * Tady se aplikace "toci" po cely svuj beh. Vola se zde update funkce, ktera se stara o herni mechanizmy,
+ * zpracovavaji se tu zpravy okna a tak dale.
+ */
 int Application::Run()
 {
     MSG msg;
@@ -504,6 +532,10 @@ int Application::Run()
     return msg.wParam;
 }
 
+/** \brief Zobrazi okynko s textem podle formatu (asi Windows only)
+ *
+ * Klasicky MessageBox, pouze s parametrovym stylem zadavani textu, jako ma napriklad printf funkce
+ */
 void Application::PMessageBox(const char* caption, const char* format, ...)
 {
     va_list argList;
@@ -515,6 +547,10 @@ void Application::PMessageBox(const char* caption, const char* format, ...)
     MessageBox(NULL, buf, caption, MB_OK);
 }
 
+/** \brief Hlavni prepinaci funkce pro stages hry
+ *
+ * Nastavi herni fazi podle zadaneho parametru \a newstage s para\a newphase
+ */
 void Application::SetStage(uint32 newstage, uint32 newphase)
 {
     if (m_currStage)
@@ -557,6 +593,11 @@ void Application::SetStage(uint32 newstage, uint32 newphase)
     m_currStage->OnEnter();
 }
 
+/** \brief Funkce pro zaznamenani zmeny stavu klavesy
+ *
+ * Tahle funkce je volana po zaznamenani prislusne akce handlerem zprav okna.
+ * Vola i funkci herni faze pro zmenu stavu klavesy
+ */
 void Application::KeyStateChange(uint8 key, bool press)
 {
     if (keys[key] != press)
@@ -567,6 +608,11 @@ void Application::KeyStateChange(uint8 key, bool press)
     }
 }
 
+/** \brief Funkce pro zaznamenani zmeny stavu tlacitek mysi
+ *
+ * Tahle funkce je volana po zaznamenani zmeny stavu leveho nebo praveho tlacitka
+ * Do stage handleru posila jen pokud bylo tlacitko stisknuto
+ */
 void Application::MouseButtonStateChange(bool left, bool press)
 {
     uint8 pos = (left ? 0 : 1);
@@ -579,11 +625,19 @@ void Application::MouseButtonStateChange(bool left, bool press)
     }
 }
 
+/** \brief Funkce pro nastaveni argumentu herni faze
+ *
+ * Pouze nastavi argument, prebirani uz je na samotnem stage handleru
+ */
 void Application::SetStagePhase(uint32 newphase)
 {
     m_currStage->SetSubStage(newphase);
 }
 
+/** \brief Zmena render contextu
+ *
+ * Tato funkce se stara o zmenu rendering contextu pro dovoleni renderovani ve vice vlaknech najednou
+ */
 void Application::ApplyRenderContext(RenderingContext cont)
 {
     switch (cont)

@@ -20,7 +20,11 @@ enum RenderingContext
     RC_MAX
 };
 
-// Samotna kostra aplikace
+/*! \class Application
+ * \brief Trida kostry aplikace
+ *
+ * Obstarava zakladni veci, jako je napriklad management hernich fazi, stisknuti tlacitek a tak podobne
+ */
 class Application
 {
     public:
@@ -67,5 +71,29 @@ class Application
 };
 
 #define sApplication Singleton<Application>::instance()
+
+/** \fn Application::GetStage
+ *  \brief Ziskani aktualni stage aplikace
+ */
+
+/** \fn Application::GetStagePhase
+ *  \brief Ziskani argumentu pro aktualni stage aplikace
+ */
+
+/** \fn Application::SetMouseXY
+ *  \brief Nastaveni pozice mysi pouze v ramci aplikace
+ */
+
+/** \fn Application::GetMouseX
+ *  \brief Ziskani Xove pozice mysoveho kurzoru
+ */
+
+/** \fn Application::GetMouseY
+ *  \brief Ziskani Yove pozice mysoveho kurzoru
+ */
+
+/** \fn Application::IsKeyPressed
+ *  \brief Zjisteni, zdali je dana klavesa stisknuta
+ */
 
 #endif

@@ -38,6 +38,50 @@ struct AnimationRecord
     bool   disabled;
 };
 
+/** \var AnimationRecord::sourceId
+ *  \brief Urcuje ID zdroje (textury nebo modelu)
+ */
+
+/** \var AnimationRecord::animID
+ *  \brief ID animace (viz SQLite databaze a tabulky *_animation)
+ */
+
+/** \var AnimationRecord::animType
+ *  \brief Typ zdroje (textura nebo model)
+ */
+
+/** \var AnimationRecord::frameSkipSpeed
+ *  \brief Urcuje, kolik se ma preskocit snimku, kdyz nastane cas na animaci
+ */
+
+/** \var AnimationRecord::bothWay
+ *  \brief Urcuje, zdali se po dosazeni maximalniho snimku ma zmenit smer animace (od nejvyssiho po nejnizsi snimek)
+ */
+
+/** \var AnimationRecord::animFlags
+ *  \brief Priznaky animace - viz. enumerator AnimFlags
+ */
+
+/** \var AnimationRecord::nextFrameTime
+ *  \brief Dynamicka promenna urcujici cas, ve kterem se ma prepnout snimek na dalsi
+ */
+
+/** \var AnimationRecord::actualTextureId
+ *  \brief Uklada aktualni texturu (platne pouze pro animace textur)
+ */
+
+/** \var AnimationRecord::actualFrame
+ *  \brief Uklada aktualni frame animace
+ */
+
+/** \var AnimationRecord::reversed
+ *  \brief Momentalni stav toho, zdali se snimky inkrementuji nebo dekrementuji (podle bothWay parametru)
+ */
+
+/** \var AnimationRecord::disabled
+ *  \brief Promenna urcujici, zdali animace bezi nebo je zastavena
+ */
+
 class Animator
 {
     public:

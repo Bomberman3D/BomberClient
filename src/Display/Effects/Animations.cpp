@@ -3,12 +3,20 @@
 #include <Storage.h>
 #include <LoadingThread.h>
 
+/** \brief Konstruktor
+ *
+ * Pouze nulovani dat
+ */
 Animator::Animator()
 {
     Anims.clear();
     m_lastUpdate = 0;
 }
 
+/** \brief Hlavni update funkce
+ *
+ * Zde se odehrava veskera magie animovani - projdou se vsechny tickety a pokud je nutne, posune se frame podle zadanych kriterii
+ */
 void Animator::Update()
 {
     // Pokud je mapa prazdna, nema cenu pokracovat
@@ -141,6 +149,8 @@ void Animator::Update()
     }
 }
 
+/** \brief Zjisteni ID animace podle dodaneho ID ticketu
+ */
 uint32 Animator::GetAnimId(uint32 id)
 {
     // Hleda ticket v mape
@@ -153,6 +163,10 @@ uint32 Animator::GetAnimId(uint32 id)
     return itr->second.animId;
 }
 
+/** \brief Spusteni animace
+ *
+ * Zajisti spusteni (odpauzovani) animace podle ticketu
+ */
 void Animator::EnableAnimation(uint32 id)
 {
     // Hleda ticket v mape
@@ -164,6 +178,10 @@ void Animator::EnableAnimation(uint32 id)
     itr->second.disabled = false;
 }
 
+/** \brief Zastaveni animace
+ *
+ * Zastavi animovani daneho ticketu
+ */
 void Animator::DisableAnimation(uint32 id)
 {
     // Hleda ticket v mape
@@ -175,13 +193,16 @@ void Animator::DisableAnimation(uint32 id)
     itr->second.disabled = true;
 }
 
+/** \brief Zjisteni aktualni textury
+ *
+ * Zjisti aktualni texturu podle dodaneho ID ticketu
+ *
+ * Tahle metoda je bezpecnejsi nez vraceni celeho zaznamu, protoze potrebujeme, aby
+ * se o zaznam v mape staral jen a pouze nas Animator - zamezi jakemukoliv leaku,
+ * nebo vymazani zaznamu pred ziskavanim dat v jinem vlakne
+ */
 uint32 Animator::GetActualTexture(uint32 id)
 {
-    /* Tahle metoda je bezpecnejsi nez vraceni celeho zaznamu, protoze potrebujeme, aby
-     * se o zaznam v mape staral jen a pouze nas Animator - zamezi jakemukoliv leaku,
-     * nebo vymazani zaznamu pred ziskavanim dat v jinem vlakne
-     */
-
     // Hleda ticket v mape
     AnimMap::const_iterator itr = Anims.find(id);
     // Pokud nenajde, vrati nulu
@@ -192,6 +213,10 @@ uint32 Animator::GetActualTexture(uint32 id)
     return itr->second.actualTextureId;
 }
 
+/** \brief Zjisteni aktualniho snimku
+ *
+ * Vraci frame animace podle daneho ticketu
+ */
 uint32 Animator::GetActualFrame(uint32 id)
 {
     AnimMap::const_iterator itr = Anims.find(id);
@@ -201,6 +226,10 @@ uint32 Animator::GetActualFrame(uint32 id)
     return itr->second.actualFrame;
 }
 
+/** \brief Zniceni zaznamu animace
+ *
+ * Bezpecne zahodi veskera animacni data spojena s danym ticketem
+ */
 void Animator::DestroyAnimTicket(uint32 id)
 {
     AnimMap::const_iterator itr = Anims.find(id);
@@ -210,6 +239,10 @@ void Animator::DestroyAnimTicket(uint32 id)
     Anims.erase(itr);
 }
 
+/** \brief Zjisteni nejnizsiho pouzitelneho (volneho) ID ticketu
+ *
+ * Projde vsechny animace a zjisti "diry" v jejich cislovani
+ */
 uint32 Animator::GetLowestAnimTicketId()
 {
     // Projde vsechny zaznamy od 0 do nejakeho silene vysokeho cisla jako je INT_MAX ( = 2^31-1 )
@@ -223,6 +256,11 @@ uint32 Animator::GetLowestAnimTicketId()
     return (uint32)-1;
 }
 
+/** \brief Vyzadani ticketu pro animaci textury
+ *
+ * Postara se o prirazeni ID ticketu, pote vytvori animacni zaznam, priradi tento ticket k nemu a zpatky vrati
+ * jen ID ticketu pro pripadne dalsi akce
+ */
 uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 frameSkipSpeed, uint8 flags)
 {
     // Ziska nejnizsi mozne ID ticketu
@@ -259,6 +297,11 @@ uint32 Animator::GetTextureAnimTicket(uint32 textureId, uint32 animId, uint32 fr
     return pos;
 }
 
+/** \brief Vyzadani ticketu pro animaci modelu
+ *
+ * Postara se o prirazeni ID ticketu, pote vytvori animacni zaznam, priradi tento ticket k nemu a zpatky vrati
+ * jen ID ticketu pro pripadne dalsi akce
+ */
 uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed, uint8 flags)
 {
     // Pokud vubec muzeme animovat
@@ -287,6 +330,10 @@ uint32 Animator::GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameS
     return pos;
 }
 
+/** \brief Zmena ID animace danemu ticketu
+ *
+ * Postara se o zmenu animace, framu, rychlosti a priznaku podle vstupnich argumentu
+ */
 void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame, uint32 frameSkipSpeed, uint8 flags)
 {
     if (animId > MAX_ANIM || ticketId == 0)
@@ -304,10 +351,19 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }
 
+/** \brief Konstruktor
+ *
+ * Prazdny
+ */
 CustomAnimator::CustomAnimator()
 {
 }
 
+/** \brief Zjisteni, zdali ma model custom animaci
+ *
+ * Neciste reseni, ale v takto malem meritku se ztrati. Jde o "hardcoded" hodnoty pro par modelu, ktere potrebujeme animovat variabilne k situaci,
+ * nebo chceme obejit nejake zavedene zakonitosti.
+ */
 bool CustomAnimator::HaveModelCustomAnim(uint32 id)
 {
     // TODO: odebrat staticke zaznamy, nahradit necim dynamickym !!!
@@ -322,6 +378,40 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
     return false;
 }
 
+/** \brief Vlastni animace podle zadaneho framu
+ *
+ * Magicka funkce, majici za ukol zastirat programatorovu neschopnost a obchazet absenci kompletni dokumentace formatu 3DS
+ *
+ * Trocha vysvetleni
+ *
+ * Ve skutecnosti jde o neco, co dokaze animovat objekty nebo skupinu objektu (viz. vicecetne strcmp v podminkach a animace
+ * podle pozice jineho objektu) podle relativniho stredu nebo stredu jineho objektu. To nam dovoluje obejit veskery pivot
+ * mechanizmus obsazeny primo ve formatu 3DS. Tady se tedy deje veskera magie, bohuzel se mi nechtelo patlat s kombinaci
+ * s puvodnim animacnim systemem, proto to vypada tak jak to vypada, tzn. bud built-in animace nebo tahle staticka hnusna
+ *
+ * Budoucimu ja preji pevne nervy pri cteni a lusteni tohoto kodu a take prosim o trochu pochopeni.
+ *
+ *
+ * Popis magie:
+ *
+ * Zpravidla se nejdrive najde objekt, jehoz stred se bude povazovat za vychozi (FindModelObject, ..)
+ * Bod rotPos (deklarovany jako vektor, ale ne vsechno co ma tri souradnice je vektor, ze..) dokaze oznacit stred otaceni,
+ * ktery je polozen relativne vuci pocatku celeho modelu.
+ * Pote se matrix posune do danych souradnic a objekt se zvetsi/zmensi/zrotuje jak je treba.
+ * Nakonec se souradnice prelozi zpet na puvodni pozici a nasledne hned na pozici puvodniho objektu, aby se nevykreslovalo
+ * relativne k objektu, jehoz pozice vyuzivame jen k pootoceni.
+ *
+ * Co se tyce "vzorecku" pro rotaci napr. rukou postavy atp.:
+ * Cely vzorec sestava z nekolika zakladnich prvku, ktere se daji defakto identifikovat podle standardniho vzorce linearni
+ * funkce s absolutni hodnotou:
+ *
+ * y = -| x/{nejvyssi_bod} - 1 | + {bod_zlomu}
+ *
+ * nejvyssi bod je takovy, ve kterem ma jednak dana funkce maximum, a jednak je to frame animace s nejvyssi hodnotou rotace.
+ * Pri posunu animace se samozrejme musi posunout i "x", aby "zacinalo od nuly" a ne od prvniho framu animace.
+ * bod zlomu je takovy bod, ve kterem se meni znamenko, tedy pokud z absolutni hodnoty "padaji" cisla v intervalu <0;1>,
+ * tento bod zaruci jakysi posun. Viz napr. pohyb ruky, kdy je treba nejdrive rotovat do plusu a pak do minusu.
+ */
 void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, uint32 modelId, uint32 frame)
 {
     AnimateModelObjectByFrame(object, sStorage->Models[modelId], modelId, frame);
@@ -334,38 +424,6 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject* object, t3DModel* mode
 
 void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim)
 {
-    /*  Magicka funkce, majici za ukol zastirat programatorovu neschopnost a obchazet absenci kompletni dokumentace formatu 3DS
-     *  Trocha vysvetleni
-     *
-     *  Ve skutecnosti jde o neco, co dokaze animovat objekty nebo skupinu objektu (viz. vicecetne strcmp v podminkach a animace
-     *  podle pozice jineho objektu) podle relativniho stredu nebo stredu jineho objektu. To nam dovoluje obejit veskery pivot
-     *  mechanizmus obsazeny primo ve formatu 3DS. Tady se tedy deje veskera magie, bohuzel se mi nechtelo patlat s kombinaci
-     *  s puvodnim animacnim systemem, proto to vypada tak jak to vypada, tzn. bud built-in animace nebo tahle staticka hnusna
-     *
-     *  Budoucimu ja preji pevne nervy pri cteni a lusteni tohoto kodu a take prosim o trochu pochopeni.
-     */
-
-    /*
-     * Trochu popis:
-     *
-     *  Zpravidla se nejdrive najde objekt, jehoz stred se bude povazovat za vychozi (FindModelObject, ..)
-     *  Bod rotPos (deklarovany jako vektor, ale ne vsechno co ma tri souradnice je vektor, ze..) dokaze oznacit stred otaceni,
-     *  ktery je polozen relativne vuci pocatku celeho modelu.
-     *  Pote se matrix posune do danych souradnic a objekt se zvetsi/zmensi/zrotuje jak je treba.
-     *  Nakonec se souradnice prelozi zpet na puvodni pozici a nasledne hned na pozici puvodniho objektu, aby se nevykreslovalo
-     *  relativne k objektu, jehoz pozice vyuzivame jen k pootoceni.
-     *
-     *  Co se tyce "vzorecku" pro rotaci napr. rukou postavy atp.:
-     *  Cely vzorec sestava z nekolika zakladnich prvku, ktere se daji defakto identifikovat podle standardniho vzorce linearni
-     *  funkce s absolutni hodnotou:
-     *
-     *  y = -| x/{nejvyssi_bod} - 1 | + {bod_zlomu}
-     *
-     *  nejvyssi bod je takovy, ve kterem ma jednak dana funkce maximum, a jednak je to frame animace s nejvyssi hodnotou rotace.
-     *  Pri posunu animace se samozrejme musi posunout i "x", aby "zacinalo od nuly" a ne od prvniho framu animace.
-     *  bod zlomu je takovy bod, ve kterem se meni znamenko, tedy pokud z absolutni hodnoty "padaji" cisla v intervalu <0;1>,
-     *  tento bod zaruci jakysi posun. Viz napr. pohyb ruky, kdy je treba nejdrive rotovat do plusu a pak do minusu.
-     */
     bool processed = false;
 
     if (!model || !object)
@@ -607,6 +665,18 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
     }
 }
 
+/** \overload void CustomAnimator::AnimateModelObjectByFrame(t3DObject* object, t3DModel* model, uint32 modelId, uint32 frame)
+ *
+ */
+
+/** \overload void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* model, uint32 modelId, uint32 frame, ModelAnimType anim)
+ *
+ */
+
+/** \brief Vlastni animace modelovych featur
+ *
+ * Jde jen o jejich presun k displaylist zaznamu pro model a nekde i o vlastni animaci (posun, rotaci, ..)
+ */
 void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
 {
     if (!record || record->features.empty())

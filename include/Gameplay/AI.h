@@ -8,12 +8,28 @@
 struct PathNode
 {
     uint32 x, y;
-    uint8 flags; // jeste nepouzito - napr. polozit bombu, prepocitat cestu, atd...
+    uint8 flags;
 };
+
+/** \var PathNode::x
+ *  \brief Xova souradnice bodu cesty
+ */
+
+/** \var PathNode::y
+ *  \brief Yova souradnice bodu cesty
+ */
+
+/** \var PathNode::flags
+ *  \brief Zatim neaktivni - priznak pro dany bod cesty, v budoucnu napriklad polozeni bomby, prepocitani cesty, atp.
+ */
 
 typedef std::vector<PathNode> Path;
 typedef std::pair<uint32, uint32> CoordPair;
 
+/** \brief Trida hledace cesty k cili
+ *
+ * Snazi se najit cestu ze zadanych zdrojovych souradnic ve 2D mape na zadane cilove souradnice
+ */
 class Pathfinder
 {
     public:
@@ -40,6 +56,46 @@ class Pathfinder
         uint32 m_mapSizeY;
 };
 
+/** \fn Pathfinder::Pathfinder
+ *  \brief Konstruktor
+ *
+ * Volany s parametrem ukazatele na cestu, kterou vymaze a bude ji naplnovat v Recursoru
+ */
+
+/** \fn Pathfinder::Initialize(uint32 sourceX, uint32 sourceY, uint32 destX, uint32 destY)
+ *  \brief Inicializace pathfinderu, tvorba dynamicke pristupove mapy
+ *
+ * Zapise potrebna data a vytvori dynamickou pristupovou mapu
+ */
+
+/** \fn Pathfinder::GeneratePath
+ *  \brief Spusti rekurzivni generator cesty
+ *
+ * Vymaze cestu a spusti rekurzivni volani funkce Pathfinder::Recursor. Nakonec cestu prevrati, prida zdrojovou node a vrati jako hotovou
+ */
+
+/** \fn Pathfinder::Recursor(uint32 x, uint32 y)
+ *  \brief Rekurzivni funkce pro generovani cesty
+ *
+ * Rekurzivni funkce, ktera zjisti nejlepsi smer cesty (pripadne nahodny), overi podminku, zdali to neni cilove pole, a pokud neni, provede zanoreni.
+ */
+
+/** \var Pathfinder::accessMatrixDyn
+ *  \brief Dynamicka pristupova mapa
+ *
+ * Generuje se ve funkci Pathfinder::Initialize.
+ *
+ * Slouzi k determinovani pristupne cesty, kterou muzeme projit pri generovani cesty k cili (nahodne cesty, unikove cesty, ..). Plni se jednickami, kde je pristupno,
+ * nulami kde neni, a dvojkami, kde uz jsme byli pri generovani cesty.
+ */
+
+/** \class OutOfZeroPathfinder
+ * \brief Generator cesty z nebezpecnych poli
+ *
+ * Postara se o vygenerovani cesty z nebezpecnych poli na nejake bezpecne, pokud existuje
+ *
+ * Vice info viz dokumentace tridy Pathfinder a jejich metod
+ */
 class OutOfZeroPathfinder
 {
     public:
@@ -64,6 +120,13 @@ class OutOfZeroPathfinder
         uint32 m_mapSizeY;
 };
 
+/** \class RandomPathfinder
+ * \brief Generator nahodne cesty vcetne vyhybani se nebezpecnym polim
+ *
+ * Postara se o vygenerovani nahodne cesty vcetne vyhnuti se nebezpecnym polim
+ *
+ * Vice info viz dokumentace tridy Pathfinder a jejich metod
+ */
 class RandomPathfinder
 {
     public:
@@ -88,6 +151,19 @@ class RandomPathfinder
         uint32 m_mapSizeY;
 };
 
+/** \var RandomPathfinder::m_length
+ *  \brief Maximalni delka cesty
+ *
+ * Generovani cesty se ukonci, jakmile je dosazena tato delka cesty
+ */
+
+/** \class RandomBarePathfinder
+ * \brief Generator nahodne cesty bez vyhybani se nebezpecnym polim
+ *
+ * Postara se o vygenerovani nahodne cesty po jakychkoliv pruchodnych polich
+ *
+ * Vice info viz dokumentace tridy Pathfinder a jejich metod
+ */
 class RandomBarePathfinder: public RandomPathfinder
 {
     public:
@@ -145,6 +221,18 @@ class MovementHolder
         EnemyTemplate* m_src;
 };
 
+/** \fn MovementHolder::GetMovementType
+ *  \brief Vraci aktualni generator cesty
+ */
+
+/** \fn MovementHolder::SetSpeedMod(float speedMod)
+ *  \brief Nastavi celkovy koeficient rychlosti pohybu
+ */
+
+/** \fn MovementHolder::GetSpeedMod
+ *  \brief Vraci aktualni koeficient rychlosti pohybu
+ */
+
 class EnemyTemplate
 {
     public:
@@ -164,5 +252,19 @@ class EnemyTemplate
         bool m_isDead;
         uint8 m_AILevel;
 };
+
+/** \fn EnemyTemplate::EnemyTemplate
+ *  \brief Konstruktor
+ *
+ * Opet pouze a jen nulovani promennych a ukazatelu
+ */
+
+/** \fn EnemyTemplate::IsDead
+ *  \brief Vraci true, pokud je tento nepritel mrtvy (nepohybuje se, nemuze nikoho usmrtit)
+ */
+
+/** \fn EnemyTemplate::SetDead(bool dead = true)
+ *  \brief Usmrti, pripadne ozivi nepritele
+ */
 
 #endif
