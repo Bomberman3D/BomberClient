@@ -64,6 +64,7 @@ class Application
 
         bool keys[256];
         bool mouse[2];
+        bool console;
         uint32 mouseXY[2];
 
         uint32 m_diff;

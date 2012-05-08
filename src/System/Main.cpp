@@ -427,6 +427,7 @@ Application::Application()
 {
     m_currStage = NULL;
     m_lastUpdate = clock();
+    console = false;
 
     for (uint16 i = 0; i < 256; i++)
         keys[i] = false;
@@ -455,16 +456,6 @@ Application::~Application()
 bool Application::Init()
 {
     srand((unsigned int)time(NULL));
-
-    // Alokujeme si konzoli
-    /*AllocConsole();
-    // A presmerujeme do ni stdout (kvuli fprintf do handle stdout)
-    int hCrt, i;
-    FILE *hf;
-    hCrt = _open_osfhandle((long) GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
-    hf   = _fdopen(hCrt, "w");
-    *stdout = *hf;
-    i = setvbuf(stdout, NULL, _IONBF, 0);*/
 
     if (!sConfig->Load())
     {
@@ -605,6 +596,37 @@ void Application::KeyStateChange(uint8 key, bool press)
         keys[key] = press;
 
         m_currStage->OnKeyStateChange(key, press);
+
+        /* Nezavisle na fazi hry muzeme vykonavat i nejake specialni funkce, platne pro jakoukoliv fazi.
+         * Prikladem je treba alokovani / dealokovani konzole
+         */
+
+        // Zapnuti / vypnuti konzole
+        // (CTRL + Y)
+        // Pouze pro Windows !!
+#ifdef WINVER
+        if (key == 'Y' && keys[VK_CONTROL] && press)
+        {
+            if (console)
+            {
+                FreeConsole();
+            }
+            else
+            {
+                AllocConsole();
+
+                // Presmerujeme handle stdoutu tak, abychom do nej mohli psat funkci fprintf
+                int hCrt, i;
+                FILE *hf;
+                hCrt = _open_osfhandle((long) GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
+                hf   = _fdopen(hCrt, "w");
+                *stdout = *hf;
+                i = setvbuf(stdout, NULL, _IONBF, 0);
+            }
+
+            console = !console;
+        }
+#endif
     }
 }
 
