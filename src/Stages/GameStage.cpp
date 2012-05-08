@@ -152,6 +152,19 @@ void GameStage::OnDraw(uint32 diff)
         sDisplay->Draw2D(35, 240, 140, 24, 24); // bomby
         sDisplay->PrintText(MAIN_FONT, 290, 142, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", (sGameplayMgr->GetMaxBombs()-1));
 
+        clock_t endtime = sGameplayMgr->GetGameEndTime();
+        if (endtime != 0)
+        {
+            if (endtime > clock())
+            {
+                uint32 min = (endtime-clock()) / 60000;
+                uint32 sec = ((endtime-clock()) / 1000) - min * 60;
+                sDisplay->PrintText(MAIN_FONT, 450, 52, FONT_SIZE_H3, 0, COLOR(0,0,127), "%u:%02u", min, sec);
+            }
+            else
+                sDisplay->PrintText(MAIN_FONT, 450, 52, FONT_SIZE_H3, 0, COLOR(0,0,127), "0:00");
+        }
+
         sDisplay->Setup3DMode();
     }
     // Hra zapauzovana

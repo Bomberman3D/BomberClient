@@ -161,6 +161,9 @@ class GameplayMgr
         void SetFlameReach(uint32 value, bool relative = false) { m_plFlameReach = (relative)?(m_plFlameReach+value):(value); };
         void SetMaxBombs(float value, bool relative = false) { m_plMaxBombs = (relative)?(m_plMaxBombs+value):(value); };
 
+        void SetGameEndTime(clock_t end) { m_gameEndTime = end; };
+        clock_t GetGameEndTime() {return m_gameEndTime; } ;
+
         uint32 GetSetting(SettingsEnum pos) { if (pos >= SETTING_MAX) return 0; else return m_settings[pos]; };
         void SetSetting(SettingsEnum pos, uint32 val) { if (pos < SETTING_MAX) m_settings[pos] = val; };
         std::vector<uint32>* SettingsPointer() { return &m_settings; };
@@ -198,6 +201,7 @@ class GameplayMgr
         bool m_playerDead;
         bool m_gamePaused;
         clock_t m_pauseTime;
+        clock_t m_gameEndTime;
 
         ModelDisplayListRecord* m_playerRec;
         uint32 m_playerX, m_playerY;
@@ -241,6 +245,14 @@ class GameplayMgr
 
 /** \fn GameplayMgr::SetMaxBombs
  *  \brief Nastavuje maximalni pocet akivnich bomb
+ */
+
+/** \fn GameplayMgr::SetGameEndTime
+ *  \brief Nastavi cas konce hry
+ */
+
+/** \fn GameplayMgr::GetGameEndTime
+ *  \brief Vraci cas konce probihajici hry
  */
 
 /** \fn GameplayMgr::GetSetting

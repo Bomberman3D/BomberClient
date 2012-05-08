@@ -257,7 +257,7 @@ class EnemyTemplate
 
         MovementHolder* m_movement;
 
-    private:
+    protected:
         clock_t m_nextMoveTypeUpdate;
         bool m_isDead;
         uint8 m_AILevel;
@@ -277,5 +277,14 @@ class EnemyTemplate
 /** \fn EnemyTemplate::SetDead(bool dead = true)
  *  \brief Usmrti, pripadne ozivi nepritele
  */
+
+class MemeEnemy: public EnemyTemplate
+{
+    public:
+        MemeEnemy(): EnemyTemplate() { m_respawnTime = 0; }
+
+    protected:
+        clock_t m_respawnTime;
+};
 
 #endif

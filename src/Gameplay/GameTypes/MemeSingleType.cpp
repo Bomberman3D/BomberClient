@@ -59,7 +59,7 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                 {
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
-                    EnemyTemplate* pEnemy = new EnemyTemplate;
+                    MemeEnemy* pEnemy = new MemeEnemy;
                     pEnemy->Init(EnemyModelMap[(rand()%count)], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
@@ -75,6 +75,8 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
             }
         }
     }
+
+    sGameplayMgr->SetGameEndTime(clock() + 2 * 60 * 1000); // 2 minuty
 }
 
 void MemeSingleGameType::OnGameLeave()
@@ -311,13 +313,5 @@ void MemeSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
             continue;
         }
         ++itr;
-    }
-
-    // Vyhra - zabiti vsichni nepratele
-    if (m_enemies.empty())
-    {
-        sGameplayMgr->PauseGame();
-        sApplication->SetStagePhase(5);
-        // TODO: jeste neco?
     }
 }

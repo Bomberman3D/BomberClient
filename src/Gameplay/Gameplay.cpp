@@ -13,6 +13,7 @@ GameplayMgr::GameplayMgr()
 {
     m_game = NULL;
     m_lastMovementUpdate = 0;
+    m_gameEndTime = 0;
 
     m_settings.resize(SETTING_MAX);
     m_settings[SETTING_ENEMY_COUNT] = 4;
@@ -121,6 +122,7 @@ void GameplayMgr::OnGameInit()
     m_movementBlocked = false;
     m_playerDead = false;
     m_gamePaused = false;
+    m_gameEndTime = 0;
 
     m_moveElements.resize(MOVE_MAX);
     for (uint8 i = 0; i < MOVE_MAX; i++)
