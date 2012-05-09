@@ -9,6 +9,14 @@ ModelDisplayListRecord* ClassicSingleGameType::SpawnNewPlayer()
     return sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED);
 }
 
+void ClassicSingleGameType::FillGameTypeResources()
+{
+    gameResources.PlayerModelIDs.push_back(9);
+
+    gameResources.EnemyModelIDs.push_back(10);
+    gameResources.EnemyModelIDs.push_back(12);
+}
+
 void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
@@ -39,10 +47,6 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 
     sMapManager->FillDynamicRecords();
 
-    // Pole vsech moznych modelu nepratel
-    uint32 EnemyModelMap[] = {10, 12};
-    uint32 count = sizeof(EnemyModelMap)/sizeof(uint32);
-
     uint32 enemycount = 0;
 
     for (uint32 i = 0; i < pMap->field.size(); i++)
@@ -54,10 +58,8 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                 // Pokud je vetsi nez 0, muzeme tam dat nepritele, jinak se jedna o hracovu pozici
                 if (startlocpos > 0 && startlocpos <= sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT))
                 {
-                    // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
-                    // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     EnemyTemplate* pEnemy = new EnemyTemplate;
-                    pEnemy->Init(EnemyModelMap[(rand()%count)], i, j, ++enemycount);
+                    pEnemy->Init(gameResources.EnemyModelIDs[(rand()% gameResources.EnemyModelIDs.size() )], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);

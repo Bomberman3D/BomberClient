@@ -31,6 +31,15 @@ class EnemyTemplate;
 
 typedef std::list<EnemyTemplate*> EnemyList;
 
+struct GameTypeResources
+{
+    std::vector<uint32> PlayerModelIDs;
+    std::vector<uint32> EnemyModelIDs;
+
+    std::vector<uint32> MiscModelIDs;
+    std::vector<uint32> MiscTextureIDs;
+};
+
 /** \class GameTypeTemplate
  *  \brief Predloha pro vsechny herni typy, obsahuje jen prazdne prototypy virtualnich funkci
  */
@@ -41,6 +50,7 @@ class GameTypeTemplate
         {
         }
         virtual ModelDisplayListRecord* SpawnNewPlayer() { return NULL; };
+        virtual void FillGameTypeResources() {};
         virtual void OnGameInit(ModelDisplayListRecord* pPlayerRec) {};
         virtual void OnGameLeave() {};
         virtual void OnUpdate() {};
@@ -60,6 +70,8 @@ class GameTypeTemplate
 
         GameType GetType() { return m_type; };
 
+        GameTypeResources gameResources;
+
     protected:
         GameType m_type;
 };
@@ -72,6 +84,10 @@ class GameTypeTemplate
 
 /** \fn GameTypeTemplate::SpawnNewPlayer
  *  \brief Postara se o pridani zaznamu do display listu pro noveho hrace
+ */
+
+/** \fn GameTypeTemplate::FillGameTypeResources
+ *  \brief Naplni strukturu gameResources zdroji, ktere je treba nacist pro dany typ hry
  */
 
 /** \fn GameTypeTemplate::OnGameInit(ModelDisplayListRecord* pPlayerRec)
@@ -110,6 +126,10 @@ class GameTypeTemplate
  *  \brief Vraci typ hry
  */
 
+/** \var GameTypeTemplate::gameResources
+ *  \brief Uloziste ID zdroju (modely, textury), ktere jsou treba nacist v nacitaci fazi pred vstupem do hry
+ */
+
 /** \class ClassicSingleGameType
  *  \brief Trida klasickeho herniho typu
  */
@@ -121,6 +141,7 @@ class ClassicSingleGameType: public GameTypeTemplate
             m_type = GAME_TYPE_SP_CLASSIC;
         }
         ModelDisplayListRecord* SpawnNewPlayer();
+        void FillGameTypeResources();
         void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnGameLeave();
         void OnUpdate();
@@ -149,6 +170,7 @@ class MemeSingleGameType: public GameTypeTemplate
             m_type = GAME_TYPE_SP_MEME;
         }
         ModelDisplayListRecord* SpawnNewPlayer();
+        void FillGameTypeResources();
         void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnGameLeave();
         void OnUpdate();

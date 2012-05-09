@@ -53,7 +53,23 @@ void LoadingStage::OnEnter()
 
     // Nacist modely a jejich display listy!
     PreLoad(LOAD_MODEL, 8);
-    PreLoad(LOAD_MODEL, 9);
+
+    // Pokud jsou dostupne zaznamy o potrebnych zdrojich, nacteme je take
+    GameTypeResources* res = sGameplayMgr->GetGameTypeResources();
+    if (res)
+    {
+        for (std::vector<uint32>::const_iterator itr = res->PlayerModelIDs.begin(); itr != res->PlayerModelIDs.end(); ++itr)
+            PreLoad(LOAD_MODEL, (*itr));
+
+        for (std::vector<uint32>::const_iterator itr = res->EnemyModelIDs.begin(); itr != res->EnemyModelIDs.end(); ++itr)
+            PreLoad(LOAD_MODEL, (*itr));
+
+        for (std::vector<uint32>::const_iterator itr = res->MiscModelIDs.begin(); itr != res->MiscModelIDs.end(); ++itr)
+            PreLoad(LOAD_MODEL, (*itr));
+
+        for (std::vector<uint32>::const_iterator itr = res->MiscTextureIDs.begin(); itr != res->MiscTextureIDs.end(); ++itr)
+            PreLoad(LOAD_TEXTURE, (*itr));
+    }
 
     Map* pMap = (Map*)sMapManager->GetMap();
     uint32 skybox = pMap->m_skybox;

@@ -162,7 +162,9 @@ class GameplayMgr
         void SetMaxBombs(float value, bool relative = false) { m_plMaxBombs = (relative)?(m_plMaxBombs+value):(value); };
 
         void SetGameEndTime(clock_t end) { m_gameEndTime = end; };
-        clock_t GetGameEndTime() {return m_gameEndTime; } ;
+        clock_t GetGameEndTime() { return m_gameEndTime; };
+
+        GameTypeResources* GetGameTypeResources() { if (m_game) return &m_game->gameResources; else return NULL; };
 
         uint32 GetSetting(SettingsEnum pos) { if (pos >= SETTING_MAX) return 0; else return m_settings[pos]; };
         void SetSetting(SettingsEnum pos, uint32 val) { if (pos < SETTING_MAX) m_settings[pos] = val; };
@@ -253,6 +255,10 @@ class GameplayMgr
 
 /** \fn GameplayMgr::GetGameEndTime
  *  \brief Vraci cas konce probihajici hry
+ */
+
+/** \fn GameplayMgr::GetGameTypeResources
+ *  \brief Vraci ukazatel na strukturu s potrebnymi vecmi do daneho typu hry
  */
 
 /** \fn GameplayMgr::GetSetting

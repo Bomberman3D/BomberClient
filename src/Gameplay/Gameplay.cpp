@@ -236,6 +236,8 @@ void GameplayMgr::SetGameType(GameType type)
     }
 
     assert(m_game != NULL);
+
+    m_game->FillGameTypeResources();
 }
 
 /** \brief Vraci zvoleny typ hry

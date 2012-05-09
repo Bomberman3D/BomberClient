@@ -12,6 +12,17 @@ ModelDisplayListRecord* MemeSingleGameType::SpawnNewPlayer()
     return tmp;
 }
 
+void MemeSingleGameType::FillGameTypeResources()
+{
+    gameResources.PlayerModelIDs.push_back(11);
+
+    gameResources.EnemyModelIDs.push_back(11);
+
+    // 62-69 jsou textury rage comics obliceju
+    for (uint32 i = 62; i <= 69; i++)
+        gameResources.MiscTextureIDs.push_back(i);
+}
+
 void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 {
     Map* pMap = (Map*)sMapManager->GetMap();
@@ -42,10 +53,6 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
 
     sMapManager->FillDynamicRecords();
 
-    // Pole vsech moznych modelu nepratel
-    uint32 EnemyModelMap[] = {11};
-    uint32 count = sizeof(EnemyModelMap)/sizeof(uint32);
-
     uint32 enemycount = 0;
 
     for (uint32 i = 0; i < pMap->field.size(); i++)
@@ -60,7 +67,7 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     MemeEnemy* pEnemy = new MemeEnemy;
-                    pEnemy->Init(EnemyModelMap[(rand()%count)], i, j, ++enemycount);
+                    pEnemy->Init(gameResources.EnemyModelIDs[(rand()% gameResources.EnemyModelIDs.size() )], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);
