@@ -12,7 +12,6 @@
 #include <iostream>
 #include <gl\gl.h>
 #include <gl\glu.h>
-#include <gl\glaux.h>
 #include <math.h>
 #include <time.h>
 #include <cstdarg>

@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glu32.lib glut32.lib glaux.lib ws2_32.lib SOIL.lib cAudio.lib Ogg.lib Vorbis.lib OpenAL32.lib cAp_mp3Decoder.lib"
+				AdditionalDependencies="opengl32.lib glu32.lib glut32.lib ws2_32.lib SOIL.lib cAudio.lib Ogg.lib Vorbis.lib OpenAL32.lib cAp_mp3Decoder.lib"
 				AdditionalLibraryDirectories="&quot;$(InputDir)\$(ConfigurationName)&quot;;../lib/"
 				GenerateDebugInformation="true"
 				StackReserveSize="0"
