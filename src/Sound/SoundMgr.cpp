@@ -1,5 +1,6 @@
 #include <Global.h>
 #include <SoundMgr.h>
+#include <Gameplay.h>
 
 /** \brief Konstruktor
  *
@@ -104,10 +105,16 @@ void SoundMgr::Update()
         m_playlistPos++;
     }
 
-    // Preteceni playlistu
-    // TODO: random prehravani
+    // Preteceni playlistu, vybereme nahodne dalsi seznam
     if (m_playlistPos >= m_playlist.size())
-        m_playlistPos = 0;
+        InitMusicPlaylist();
+
+    // Pokud se playlist znovu nevygeneroval, nemuzeme prehravat
+    if (m_playlist.empty())
+    {
+        m_playing = false;
+        return;
+    }
 
     if (m_playlist[m_playlistPos] >= sStorage->MusicData.size())
         return;
@@ -133,8 +140,20 @@ void SoundMgr::InitMusicPlaylist()
     m_playlist.clear();
     m_playlistPos = 0;
 
-    for (Storage::MusicDataMap::iterator itr = sStorage->MusicData.begin(); itr != sStorage->MusicData.end(); ++itr)
-        m_playlist.push_back(itr->first);
+    // Zkopirujeme si seznam hudby pro danou fazi
+    std::vector<uint32> capableMusic;
+    for (std::vector<uint32>::iterator itr = sGameplayMgr->GetGameTypeResources()->MusicIDs.begin(); itr != sGameplayMgr->GetGameTypeResources()->MusicIDs.end(); ++itr)
+        capableMusic.push_back(*itr);
+
+    // A pak si je nahodne vybereme a nasazime do seznamu a z puvodniho seznamu je vymazeme
+    uint32 index;
+    while (capableMusic.size() > 0)
+    {
+        index = rand()%(capableMusic.size());
+        m_playlist.push_back(capableMusic[index]);
+
+        capableMusic.erase(capableMusic.begin() + index);
+    }
 }
 
 /** \brief Postara se o spuseni hudby

@@ -38,6 +38,8 @@ struct GameTypeResources
 
     std::vector<uint32> MiscModelIDs;
     std::vector<uint32> MiscTextureIDs;
+
+    std::vector<uint32> MusicIDs;
 };
 
 /** \class GameTypeTemplate
@@ -48,6 +50,11 @@ class GameTypeTemplate
     public:
         GameTypeTemplate()
         {
+            gameResources.PlayerModelIDs.clear();
+            gameResources.EnemyModelIDs.clear();
+            gameResources.MiscModelIDs.clear();
+            gameResources.MiscTextureIDs.clear();
+            gameResources.MusicIDs.clear();
         }
         virtual ModelDisplayListRecord* SpawnNewPlayer() { return NULL; };
         virtual void FillGameTypeResources() {};
@@ -136,7 +143,7 @@ class GameTypeTemplate
 class ClassicSingleGameType: public GameTypeTemplate
 {
     public:
-        ClassicSingleGameType()
+        ClassicSingleGameType(): GameTypeTemplate()
         {
             m_type = GAME_TYPE_SP_CLASSIC;
         }
@@ -165,7 +172,7 @@ class ClassicSingleGameType: public GameTypeTemplate
 class MemeSingleGameType: public GameTypeTemplate
 {
     public:
-        MemeSingleGameType()
+        MemeSingleGameType(): GameTypeTemplate()
         {
             m_type = GAME_TYPE_SP_MEME;
         }
@@ -194,7 +201,7 @@ class MemeSingleGameType: public GameTypeTemplate
 class ClassicMultiGameType: public GameTypeTemplate
 {
     public:
-        ClassicMultiGameType()
+        ClassicMultiGameType(): GameTypeTemplate()
         {
             m_type = GAME_TYPE_MP_CLASSIC;
         }
