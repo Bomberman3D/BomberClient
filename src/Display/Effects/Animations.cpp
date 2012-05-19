@@ -2,6 +2,7 @@
 #include <Effects/Animations.h>
 #include <Storage.h>
 #include <LoadingThread.h>
+#include <SoundMgr.h>
 
 /** \brief Konstruktor
  *

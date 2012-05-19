@@ -15,6 +15,7 @@ GameplayMgr::GameplayMgr()
     m_game = NULL;
     m_lastMovementUpdate = 0;
     m_gameEndTime = 0;
+    m_stepSoundIndicator = 0;
 
     m_settings.resize(SETTING_MAX);
     m_settings[SETTING_ENEMY_COUNT] = 4;
@@ -44,6 +45,24 @@ void GameplayMgr::Update()
 {
     if (m_game)
         m_game->OnUpdate();
+
+    // Zvuky kroku
+    if (m_playerRec)
+    {
+        if (m_playerRec->modelId == 9 || m_playerRec->modelId == 11)
+        {
+            if (sAnimator->GetActualFrame(m_playerRec->AnimTicket) >= 50 && m_stepSoundIndicator == 0)
+            {
+                sSoundMgr->PlayEffect(18 + rand()%4);
+                m_stepSoundIndicator = 1;
+            }
+            else if (sAnimator->GetActualFrame(m_playerRec->AnimTicket) < 50 && m_stepSoundIndicator == 1)
+            {
+                sSoundMgr->PlayEffect(18 + rand()%4);
+                m_stepSoundIndicator = 0;
+            }
+        }
+    }
 
     clock_t tnow = clock();
 
@@ -269,6 +288,8 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     bomb->reach = GetFlameReach();
     bomb->sizzleSound = sSoundMgr->PlayEffect(2, true, true);
     BombMap.push_back(bomb);
+
+    sSoundMgr->PlayEffect(25);
 
     m_plActiveBombs++;
 
@@ -513,6 +534,8 @@ void GameplayMgr::PlayerDied()
 
     if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
         sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
+
+    sSoundMgr->PlayEffect(9);
 
     sApplication->SetStagePhase(3);
 }

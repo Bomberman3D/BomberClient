@@ -73,6 +73,8 @@ class SoundMgr
         cAudio::IAudioSource* m_current;
         clock_t m_lastMusicStart;
 
+        cAudio::IAudioSource* m_footSteps[4];
+
         std::list<SoundEffectRecord*> m_effectsPlayed;
 
         PlaylistVector m_playlist;

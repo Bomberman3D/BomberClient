@@ -293,6 +293,7 @@ void ClassicSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32
             }
 
             sGameplayMgr->localPlayerStats.ClassicSingleStats.bonusesEarned += 1;
+            sSoundMgr->PlayEffect(3);
         }
     }
 

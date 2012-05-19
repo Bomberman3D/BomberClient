@@ -16,6 +16,9 @@ SoundMgr::SoundMgr()
     m_audioEffectMgr = NULL;
     m_current = NULL;
     m_playing = false;
+
+    for (uint32 i = 0; i < 4; i++)
+        m_footSteps[i] = NULL;
 }
 
 /** \brief Destruktor
@@ -234,6 +237,18 @@ SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manua
 {
     if (sStorage->SoundEffectData.find(sound_id) == sStorage->SoundEffectData.end())
         return NULL;
+
+    // Uchovame si ukazatele na kroky postavy
+    if (sound_id >= 18 && sound_id <= 21)
+    {
+        if (!m_footSteps[sound_id-18])
+            m_footSteps[sound_id-18] = CreateSoundEffectSource(sStorage->SoundEffectData[sound_id].c_str());
+
+        if (m_footSteps[sound_id-18])
+            m_footSteps[sound_id-18]->play2d();
+
+        return NULL;
+    }
 
     SoundEffectRecord* pNew = new SoundEffectRecord;
     pNew->sound_id = sound_id;

@@ -211,6 +211,7 @@ class GameplayMgr
         bool m_gamePaused;
         clock_t m_pauseTime;
         clock_t m_gameEndTime;
+        uint8 m_stepSoundIndicator;
 
         ModelDisplayListRecord* m_playerRec;
         uint32 m_playerX, m_playerY;
