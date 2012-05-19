@@ -73,7 +73,7 @@ void SoundMgr::Update()
         }
 
         if (((*itr)->manual_remove && (*itr)->remove)
-            || (!(*itr)->manual_remove && !(*itr)->audiosource->isPlaying()))
+            || (!(*itr)->manual_remove && !(*itr)->audiosource->isPlaying() && (*itr)->start_time == 0))
         {
             (*itr)->audiosource->stop();
             m_audioEffectMgr->release((*itr)->audiosource);
@@ -276,7 +276,8 @@ SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manua
         return NULL;
     }
 
-    pNew->audiosource->play2d(repeat);
+    if (delay_by == 0)
+        pNew->audiosource->play2d(repeat);
 
     m_effectsPlayed.push_back(pNew);
 
