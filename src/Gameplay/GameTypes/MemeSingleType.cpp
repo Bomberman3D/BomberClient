@@ -273,8 +273,8 @@ void MemeSingleGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 ne
                         sGameplayMgr->SetFlameReach(1, true);
                     break;
                 case BONUS_SPEED:
-                    if (sGameplayMgr->GetPlayerSpeedCoef() < 2.0f)
-                        sGameplayMgr->SetPlayerSpeedCoef(0.2f, true);
+                    if (sGameplayMgr->GetPlayerSpeedCoef() < 1.6f)
+                        sGameplayMgr->SetPlayerSpeedCoef(0.1f, true);
                     break;
                 case BONUS_BOMB:
                     if (sGameplayMgr->GetMaxBombs() < 6)

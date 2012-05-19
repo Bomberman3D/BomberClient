@@ -177,6 +177,7 @@ class RandomBarePathfinder: public RandomPathfinder
 
 // Cas na dalsi update pohyboveho generatoru [ms]
 #define HOLDER_UPDATE_DELAY 500
+#define MOVEMENT_DELAY_COEF 1.5f;
 
 enum MovementType
 {

@@ -905,7 +905,7 @@ void MovementHolder::Update()
 
         Generator();
 
-        m_nextUpdate = tnow + HOLDER_UPDATE_DELAY * m_speedMod;
+        m_nextUpdate = tnow + HOLDER_UPDATE_DELAY * m_speedMod * MOVEMENT_DELAY_COEF;
         return;
     }
 
@@ -923,7 +923,7 @@ void MovementHolder::Update()
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
         sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
 
-    float timePass = 500 * m_speedMod;
+    float timePass = 500 * m_speedMod * MOVEMENT_DELAY_COEF;
     float timeDiff = tnow-m_nodeStartTime;
     if (timeDiff > timePass)
         timeDiff = timePass;
@@ -1099,7 +1099,7 @@ void EnemyTemplate::Update()
                     }
                 }
 
-                m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod();
+                m_nextMoveTypeUpdate = tnow + HOLDER_UPDATE_DELAY * m_movement->GetSpeedMod() * MOVEMENT_DELAY_COEF;
             }
 
             // A samotny update pohybu

@@ -160,7 +160,7 @@ void GameStage::OnDraw(uint32 diff)
         sDisplay->PrintText(MAIN_FONT, 290, 42, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", (sGameplayMgr->GetFlameReach()-1));
 
         sDisplay->Draw2D(34, 240, 90 , 24, 24); // rychlost
-        sDisplay->PrintText(MAIN_FONT, 290, 92, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", uint32((sGameplayMgr->GetPlayerSpeedCoef()-1.0f)/0.2f));
+        sDisplay->PrintText(MAIN_FONT, 290, 92, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", uint32((sGameplayMgr->GetPlayerSpeedCoef()-1.0f)/0.1f));
 
         sDisplay->Draw2D(35, 240, 140, 24, 24); // bomby
         sDisplay->PrintText(MAIN_FONT, 290, 142, FONT_SIZE_H2, 0, COLOR(0,0,127), "%ux", (sGameplayMgr->GetMaxBombs()-1));
