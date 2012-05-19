@@ -19,6 +19,11 @@ enum ModelAnimType
 
 // Definice jednotlivych ulozist
 
+struct TextureData
+{
+    uint32 flags;
+};
+
 /** \struct Skybox
  *  \brief Struktura dat skyboxu
  */
@@ -241,6 +246,7 @@ class Storage
         typedef std::pair<uint32, std::string> IDNamePair;
 
         typedef std::map<uint32, std::string> IdFilenameMap;
+        typedef std::map<uint32, TextureData> TextureDataMap;
         typedef std::map<uint32, ModelAnim>   ModelAnimMap;
         typedef std::map<uint32, TextureAnim> TextureAnimMap;
         typedef std::map<uint32, Skybox>      SkyboxMap;
@@ -253,6 +259,7 @@ class Storage
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
+        TextureDataMap TextureInfo;
         IdFilenameMap ModelFilename;
         ModelAnimMap ModelAnimation;
         TextureAnimMap TextureAnimation;

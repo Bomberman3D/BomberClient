@@ -3,37 +3,25 @@
 #include <Storage.h>
 #include <SOIL.h> // Simple OpenGL Image Library hlavickovy soubor
 
-void Loaders::LoadGLImage(uint32* dest, const char* path)
+void Loaders::LoadGLImage(uint32* dest, const char* path, uint8 flags)
 {
     if (!dest)
         dest = new uint32;
 
     fprintf(stdout, "Nacitani souboru %s\n", path);
 
-    int width = 0, height = 0, channels = 0;
-    GLubyte *imgArray;
-    imgArray = SOIL_load_image(path, &width, &height, &channels, SOIL_LOAD_AUTO);
+    uint32 soilflags = SOIL_FLAG_POWER_OF_TWO;
 
-    glEnable(GL_TEXTURE_2D);
+    if (!(flags & IMAGE_LOAD_NO_REPEAT))
+        soilflags |= SOIL_FLAG_TEXTURE_REPEATS;
 
-    glGenTextures(1, dest);
-    glBindTexture(GL_TEXTURE_2D, *dest);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    if (channels == 4)
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgArray);
-    }
-    else
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, imgArray);
-    }
+    if (flags & IMAGE_LOAD_MIPMAP)
+        soilflags |= SOIL_FLAG_MIPMAPS;
 
-    SOIL_free_image_data( imgArray );
+    if (flags & IMAGE_LOAD_COMPRESS)
+        soilflags |= SOIL_FLAG_COMPRESS_TO_DXT;
+
+    (*dest) = SOIL_load_OGL_texture(path, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, soilflags);
 }
 
 void Loaders::LoadTexture(uint32 id)
@@ -52,7 +40,7 @@ void Loaders::LoadTexture(uint32 id)
 
     fprintf(stdout, "Nacitani textury %u: %s\n", id, path);
 
-    LoadGLImage(dest, path);
+    LoadGLImage(dest, path, sStorage->TextureInfo[id].flags);
 
     if (dest)
         sStorage->Textures[id] = dest;

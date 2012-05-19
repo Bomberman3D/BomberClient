@@ -40,9 +40,12 @@ bool Storage::LoadTextureData()
         return false;
 
     uint32 count = 0;
+    uint32 textureId;
     while (qry.fetch_row())
     {
-        TextureFilename[qry.getval()] = qry.getstr();
+        textureId = qry.getval();
+        TextureFilename[textureId] = qry.getstr();
+        TextureInfo[textureId].flags = qry.getval();
         count++;
     }
     fprintf(stdout,"Nacteno %u odkazu textur\n",count);
@@ -54,7 +57,8 @@ bool Storage::LoadTextureData()
         return false;
 
     count = 0;
-    uint32 textureId = 0, animId = 0, frame = 0;
+    textureId = 0;
+    uint32 animId = 0, frame = 0;
     while (qry.fetch_row())
     {
         textureId = qry.getval();
