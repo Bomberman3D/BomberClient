@@ -40,6 +40,7 @@ struct GameTypeResources
     std::vector<uint32> MiscTextureIDs;
 
     std::vector<uint32> MusicIDs;
+    std::vector<uint32> RandomSayIDs;
 };
 
 /** \class GameTypeTemplate
@@ -55,6 +56,7 @@ class GameTypeTemplate
             gameResources.MiscModelIDs.clear();
             gameResources.MiscTextureIDs.clear();
             gameResources.MusicIDs.clear();
+            gameResources.RandomSayIDs.clear();
         }
         virtual ModelDisplayListRecord* SpawnNewPlayer() { return NULL; };
         virtual void FillGameTypeResources() {};

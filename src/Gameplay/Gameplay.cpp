@@ -80,6 +80,15 @@ void GameplayMgr::Update()
             {
                 sSoundMgr->StopSoundEffect((*itr)->sizzleSound);
                 sSoundMgr->PlayEffect(1);
+
+                // Nahodna hlaska
+                // Do budoucna osetrit singleplayer(pouze lokalni hrac mluvi) / multiplayer(muzou i ostatni!)
+                if (rand()%5 == 0)
+                {
+                    if (!GetGameTypeResources()->RandomSayIDs.empty())
+                        sSoundMgr->PlayEffect(GetGameTypeResources()->RandomSayIDs[rand()%(GetGameTypeResources()->RandomSayIDs.size())], false, false, 1000);
+                }
+
                 m_game->OnBombBoom(*itr);
                 m_plActiveBombs--;
                 itr = BombMap.erase(itr);

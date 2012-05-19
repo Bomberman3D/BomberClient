@@ -19,6 +19,13 @@ void ClassicSingleGameType::FillGameTypeResources()
     // 1-9 jsou songy zakladni sady
     for (uint32 i = 1; i <= 9; i++)
         gameResources.MusicIDs.push_back(i);
+
+    gameResources.RandomSayIDs.push_back(4);
+    gameResources.RandomSayIDs.push_back(8);
+    gameResources.RandomSayIDs.push_back(11);
+    gameResources.RandomSayIDs.push_back(16);
+    gameResources.RandomSayIDs.push_back(23);
+    gameResources.RandomSayIDs.push_back(24);
 }
 
 void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
