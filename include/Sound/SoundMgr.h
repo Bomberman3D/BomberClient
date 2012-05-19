@@ -17,8 +17,10 @@
 struct SoundEffectRecord
 {
     uint32 sound_id;
+    bool repeat;
     bool manual_remove;
     bool remove;
+    clock_t start_time;
     cAudio::IAudioSource* audiosource;
 };
 
@@ -61,7 +63,7 @@ class SoundMgr
         int32 GetCurrentMusicId() { if (!m_playlist.empty() && m_playlistPos < m_playlist.size()) return m_playlist[m_playlistPos]; else return -1; };
         clock_t GetLastMusicStart() { return m_lastMusicStart; };
 
-        SoundEffectRecord* PlayEffect(uint32 sound_id, bool repeat = false, bool manual_remove = false);
+        SoundEffectRecord* PlayEffect(uint32 sound_id, bool repeat = false, bool manual_remove = false, uint32 delay_by = 0);
         void StopSoundEffect(SoundEffectRecord* rec);
 
         cAudio::IAudioSource* CreateMusicSource(std::string filename);

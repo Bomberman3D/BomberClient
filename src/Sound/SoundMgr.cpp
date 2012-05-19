@@ -65,6 +65,13 @@ void SoundMgr::Update()
     // pripadne ty, co maji nastaveny priznak pro smazani
     for (std::list<SoundEffectRecord*>::iterator itr = m_effectsPlayed.begin(); itr != m_effectsPlayed.end(); )
     {
+        if ((*itr)->start_time > 0 && (*itr)->start_time <= clock())
+        {
+            (*itr)->start_time = 0;
+            if ((*itr)->audiosource)
+                (*itr)->audiosource->play2d((*itr)->repeat);
+        }
+
         if (((*itr)->manual_remove && (*itr)->remove)
             || (!(*itr)->manual_remove && !(*itr)->audiosource->isPlaying()))
         {
@@ -233,7 +240,7 @@ cAudio::IAudioSource* SoundMgr::CreateSoundEffectSource(std::string filename)
 
 /** \brief Vytvori zaznam pro prehravani zvukoveho efektu a spusti jeho prehravani
  */
-SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manual_remove)
+SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manual_remove, uint32 delay_by)
 {
     if (sStorage->SoundEffectData.find(sound_id) == sStorage->SoundEffectData.end())
         return NULL;
@@ -252,8 +259,15 @@ SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manua
 
     SoundEffectRecord* pNew = new SoundEffectRecord;
     pNew->sound_id = sound_id;
+    pNew->repeat = repeat;
     pNew->manual_remove = manual_remove;
     pNew->remove = false;
+
+    if (delay_by > 0)
+        pNew->start_time = clock() + delay_by;
+    else
+        pNew->start_time = 0;
+
     pNew->audiosource = CreateSoundEffectSource(sStorage->SoundEffectData[sound_id].c_str());
 
     if (!pNew->audiosource)
