@@ -177,7 +177,7 @@ void SoundMgr::MusicPause()
  */
 void SoundMgr::MusicUnpause()
 {
-    m_playing = false;
+    m_playing = true;
 
     if (m_current)
         m_current->play();

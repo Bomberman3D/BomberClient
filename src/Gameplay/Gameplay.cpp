@@ -528,6 +528,7 @@ void GameplayMgr::PauseGame()
 
     m_gamePaused = true;
     m_pauseTime = clock();
+    sSoundMgr->MusicPause();
 
     if (IsSingleGameType())
     {
@@ -550,6 +551,7 @@ void GameplayMgr::UnpauseGame()
     m_gamePaused = false;
     clock_t diff = clock() - m_pauseTime;
     m_pauseTime = 0;
+    sSoundMgr->MusicUnpause();
 
     if (IsSingleGameType())
     {
