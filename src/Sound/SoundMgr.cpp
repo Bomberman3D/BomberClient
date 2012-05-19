@@ -118,6 +118,7 @@ void SoundMgr::Update()
 
     // Vytvorime novy zdroj a nechame ho prehrat
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
+    m_lastMusicStart = clock();
 
     if (m_current)
         m_current->play2d(false);
@@ -146,6 +147,7 @@ void SoundMgr::MusicStart()
     m_playing = true;
 
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
+    m_lastMusicStart = clock();
 
     if (m_current)
         m_current->play2d(false);

@@ -76,6 +76,19 @@ void GameStage::OnDraw(uint32 diff)
         if (!sDisplay->IsIn2DMode())
             sDisplay->Setup2DMode();
 
+        // Vytiskneme, co prave bezi za hudbu
+        if (sSoundMgr->GetLastMusicStart() > clock()-4000)
+        {
+            int32 music = sSoundMgr->GetCurrentMusicId();
+            if (music > 0)
+            {
+                sDisplay->Draw2D(15, WIDTH-300, 20, 300, 80);
+                sDisplay->PrintText(FONT_ONE, WIDTH-300+10, 25, 0.275f, 0, COLOR(255, 127, 127), "Music:");
+                sDisplay->PrintText(FONT_ONE, WIDTH-300+10, 50, 0.3f, 0, NOCOLOR, "%s",sStorage->MusicData[uint32(music)].author.c_str());
+                sDisplay->PrintText(FONT_ONE, WIDTH-300+10, 76, 0.3f, 0, NOCOLOR, "%s",sStorage->MusicData[uint32(music)].description.c_str());
+            }
+        }
+
         // Vykreslime minimapu do leveho horniho rohu
         Map* pMap = (Map*)sMapManager->GetMap();
         uint32 textureId = 0;
