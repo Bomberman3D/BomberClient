@@ -310,3 +310,28 @@ bool Storage::LoadMusicData()
 
     return true;
 }
+
+/** \brief Nacteni dat o hudebnich skladbach
+ */
+bool Storage::LoadSoundEffectData()
+{
+    Database* pDB = OpenDatabase("soundeffects.db3");
+    Query qry(*pDB);
+    SQLiteQuery(&qry, "SELECT * FROM sound_filename");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    uint32 count = 0;
+    uint32 id;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        SoundEffectData[id] = qry.getstr();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u dat zvukovych efektu\n",count);
+    qry.free_result();
+
+    return true;
+}

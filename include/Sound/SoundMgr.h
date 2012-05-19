@@ -11,6 +11,33 @@
   #define AUDIO_FILE(_soundName_) CAUDIO_MEDIA_ROOT#_soundName_
 #endif
 
+/** \struct SoundEffectRecord
+ *  \brief Struktura zaznamu mapy vsech prehravanych zvukovych efektu
+ */
+struct SoundEffectRecord
+{
+    uint32 sound_id;
+    bool manual_remove;
+    bool remove;
+    cAudio::IAudioSource* audiosource;
+};
+
+/** \var SoundEffectRecord::sound_id
+ *  \brief ID zdrojoveho zvukoveho zaznamu
+ */
+
+/** \var SoundEffectRecord::manual_remove
+ *  \brief Priznak pro rucni odebrani externe
+ */
+
+/** \var SoundEffectRecord::remove
+ *  \brief Priznak Update funkci tridy SoundMgr k odebrani zvuku (zastaveni a odebrani)
+ */
+
+/** \var SoundEffectRecord::audiosource
+ *  \brief Ukazatel na wrapper pro streamovani prehravaneho zvukoveho efektu
+ */
+
 typedef std::vector<uint32> PlaylistVector;
 
 /** \class SoundMgr
@@ -33,11 +60,18 @@ class SoundMgr
         bool IsMusicPlaying() { return m_playing; };
         int32 GetCurrentMusicId() { if (!m_playlist.empty() && m_playlistPos < m_playlist.size()) return m_playlist[m_playlistPos]; else return -1; };
 
+        SoundEffectRecord* PlayEffect(uint32 sound_id, bool repeat = false, bool manual_remove = false);
+        void StopSoundEffect(SoundEffectRecord* rec);
+
         cAudio::IAudioSource* CreateMusicSource(std::string filename);
+        cAudio::IAudioSource* CreateSoundEffectSource(std::string filename);
 
     private:
         cAudio::IAudioManager* m_audioMgr;
+        cAudio::IAudioManager* m_audioEffectMgr;
         cAudio::IAudioSource* m_current;
+
+        std::list<SoundEffectRecord*> m_effectsPlayed;
 
         PlaylistVector m_playlist;
         uint32 m_playlistPos;

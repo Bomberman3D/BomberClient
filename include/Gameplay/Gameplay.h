@@ -5,6 +5,7 @@
 #include <Singleton.h>
 #include <GameTypes.h>
 #include <AI.h>
+#include <SoundMgr.h>
 
 enum SettingsEnum
 {
@@ -35,6 +36,8 @@ struct BombRecord
     uint32 reach;
     clock_t boomTime;
     //pozdeji i data o vlastnikovi?
+
+    SoundEffectRecord* sizzleSound;
 };
 
 /** \var BombRecord::x
@@ -51,6 +54,10 @@ struct BombRecord
 
 /** \var BombRecord::boomTime
  *  \brief Cas, kdy ma bomba vybouchnout [ms]
+ */
+
+/** \var BombRecord::sizzleSound
+ *  \brief Odkaz na zvukovy efekt syceni bomby, pro pripadne preruseni
  */
 
 

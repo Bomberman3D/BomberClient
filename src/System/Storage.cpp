@@ -21,6 +21,7 @@ void Storage::Load()
     LoadSkyboxData();
     LoadMapObjectData();
     LoadMusicData();
+    LoadSoundEffectData();
 
     PrepareDynamicStorages();
 }

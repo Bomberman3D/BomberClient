@@ -4,6 +4,7 @@
 #include <Map.h>
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
+#include <SoundMgr.h>
 
 /** \brief Konstruktor
  *
@@ -58,6 +59,8 @@ void GameplayMgr::Update()
 
             if ((*itr)->boomTime <= tnow)
             {
+                sSoundMgr->StopSoundEffect((*itr)->sizzleSound);
+                sSoundMgr->PlayEffect(1);
                 m_game->OnBombBoom(*itr);
                 m_plActiveBombs--;
                 itr = BombMap.erase(itr);
@@ -264,6 +267,7 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     bomb->y = y;
     bomb->boomTime = clock() + 2500;
     bomb->reach = GetFlameReach();
+    bomb->sizzleSound = sSoundMgr->PlayEffect(2, true, true);
     BombMap.push_back(bomb);
 
     m_plActiveBombs++;

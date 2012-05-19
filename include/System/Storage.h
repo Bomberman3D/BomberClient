@@ -235,6 +235,7 @@ class Storage
         bool LoadMapData();
         bool LoadMapObjectData();
         bool LoadMusicData();
+        bool LoadSoundEffectData();
 
         // Typedefs
         typedef std::pair<uint32, std::string> IDNamePair;
@@ -262,6 +263,7 @@ class Storage
         ObjectModifierMap ObjectModifiers;
         ObjectArtkitMap ObjectArtkits;
         MusicDataMap MusicData;
+        IdFilenameMap SoundEffectData;
 
         // Dynamicky ukladana data
         // textury, modely a podobne
