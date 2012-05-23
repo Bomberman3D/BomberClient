@@ -1141,6 +1141,10 @@ unsigned int
 		{
 			reduce_block_y = height / max_supported_size;
 		}
+		if (reduce_block_x == 0)
+			reduce_block_x = 1;
+		if (reduce_block_y == 0)
+			reduce_block_y = 1;
 		new_width = width / reduce_block_x;
 		new_height = height / reduce_block_y;
 		resampled = (unsigned char*)malloc( channels*new_width*new_height );
