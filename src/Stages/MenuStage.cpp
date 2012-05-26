@@ -49,6 +49,8 @@ void MenuStage::OnDraw(uint32 diff)
     sDisplay->Draw2D(19,WIDTH-350,160,350,80);
     // Odejit
     sDisplay->Draw2D(11,WIDTH-350,270,350,80);
+    // Nastaveni
+    sDisplay->PrintText(FONT_ONE, WIDTH-350, 380, FONT_SIZE_1, 0, COLOR(255,0,0), "Nastavení");
 
     sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15-15-15, FONT_SIZE_N, 0, NOCOLOR,"Verze %u.%u", 0, 1);
     sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15, FONT_SIZE_1, 0, NOCOLOR,"Copyright (c) Kennny 2011-2012");
@@ -76,6 +78,11 @@ void MenuStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 270, 270+80))
     {
         exit(0);
+        return;
+    }
+    else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 380, 380+80))
+    {
+        sApplication->SetStage(STAGE_OPTIONS);
         return;
     }
 }

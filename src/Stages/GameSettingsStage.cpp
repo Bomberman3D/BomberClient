@@ -11,11 +11,6 @@
 
 void GameSettingsStage::OnEnter()
 {
-    // Menu scene
-    sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
-
-    sDisplay->SetAngleX(20.0f);
-
     // Defaultni hodnoty nastaveni
     m_selected = 0;
     m_nickfield = "";
@@ -48,6 +43,19 @@ void GameSettingsStage::OnDraw(uint32 diff)
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
+
+    // Ramecky
+    sDisplay->Draw2D(76, 30, 30, 30, 30);
+    sDisplay->Draw2D(77, WIDTH-30-30, 30, 30, 30);
+    sDisplay->Draw2D(78, WIDTH-30-30, HEIGHT-30-30, 30, 30);
+    sDisplay->Draw2D(79, 30, HEIGHT-30-30, 30, 30);
+
+    // -2 a +4 magie kvuli 1 pixelovemu paddingu na kraji kazde textury, ktery osobne nechapu
+    // vyresim to jindy, momentalne je to takova jedna mala vada na krase no..
+    sDisplay->Draw2D(72, 30, 30+30-2, 30, HEIGHT-30-30-30-30+4);
+    sDisplay->Draw2D(73, 30+30-2, 30, WIDTH-30-30-30-30+4, 30);
+    sDisplay->Draw2D(74, WIDTH-30-30, 30+30-2, 30, HEIGHT-30-30-30-30+4);
+    sDisplay->Draw2D(75, 30+30-2, HEIGHT-30-30, WIDTH-30-30-30-30+4, 30);
 
     //////////////
     // Multiplayer

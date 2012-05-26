@@ -80,3 +80,25 @@ bool Config::Load()
 
     return true;
 }
+
+void Config::Save()
+{
+    char dest[200];
+
+    //Globalni uzivatelsky config
+    sprintf(dest,"%s/global.set",SETTINGS_PATH);
+    FILE* config = fopen(dest,"w");
+    if (!config)
+        return;
+
+    fprintf(config, "WINDOW_WIDTH=%u\n", WindowWidth);
+    fprintf(config, "WINDOW_HEIGHT=%u\n", WindowHeight);
+    fprintf(config, "COLOR_DEPTH=%u\n", ColorDepth);
+    fprintf(config, "FULLSCREEN=%u\n", fullscreen?1:0);
+    fprintf(config, "REFRESH_RATE=%u\n", RefreshRate);
+
+    fprintf(config, "HOST=%s\n", HostName.c_str());
+    fprintf(config, "PORT=%u\n", NetworkPort);
+
+    fclose(config);
+}

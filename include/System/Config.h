@@ -24,6 +24,7 @@ class Config
         }
 
         bool Load();
+        void Save();
 
         uint32 WindowWidth;
         uint32 WindowHeight;
@@ -45,6 +46,10 @@ class Config
 
 /** \fn Config::Load
  *  \brief Nacteni configu z defaultnich souboru
+ */
+
+/** \fn Config::Save
+ *  \brief Ulozeni configu do souboru
  */
 
 /** \var Config::WindowWidth

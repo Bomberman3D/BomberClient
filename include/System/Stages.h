@@ -197,6 +197,11 @@ class OptionsStage: public StageControl
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
     protected:
+
+        uint32 m_selResolution;
+        uint32 m_selColorDepth;
+        uint32 m_selRefreshRate;
+        bool m_fullscreen;
 };
 
 /** \class GameStage
