@@ -40,6 +40,9 @@
 #ifndef HEADER_SIMPLE_OPENGL_IMAGE_LIBRARY
 #define HEADER_SIMPLE_OPENGL_IMAGE_LIBRARY
 
+// Disable Visual C++ warning about unsafe functions
+#pragma warning(disable: 4996)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

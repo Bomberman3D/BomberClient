@@ -154,6 +154,9 @@
 //
 //     stbi_is_hdr(char *filename);
 
+// Disable Visual C++ warning about unsafe functions
+#pragma warning(disable: 4996)
+
 #ifndef STBI_NO_STDIO
 #include <stdio.h>
 #endif

@@ -10,6 +10,9 @@
 #ifndef HEADER_IMAGE_DXT
 #define HEADER_IMAGE_DXT
 
+// Disable Visual C++ warning about unsafe functions
+#pragma warning(disable: 4996)
+
 /**
 	Converts an image from an array of unsigned chars (RGB or RGBA) to
 	DXT1 or DXT5, then saves the converted image to disk.
