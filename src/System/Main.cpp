@@ -643,7 +643,10 @@ void Application::MouseButtonStateChange(bool left, bool press)
         mouse[pos] = press;
 
         if (press)
+        {
             m_currStage->OnMouseButtonPress(mouseXY[0], mouseXY[1], left);
+            fprintf(stdout, "%s tlacitko mysi stisknuto [%u ; %u]\n", left?"Leve":"Prave", mouseXY[0], mouseXY[1]);
+        }
     }
 }
 
