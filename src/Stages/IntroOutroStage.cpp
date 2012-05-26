@@ -19,6 +19,10 @@ void IntroOutroStage::OnDraw(uint32 diff)
     sDisplay->Draw2D(70, 40, HEIGHT - 140 - 40, 140, 140);
 
     sDisplay->Setup3DMode();
+
+    // Automaticky prehodit do menu po 2 vterinach
+    if (startTime + 2000 < clock())
+        sApplication->SetStage(STAGE_MENU);
 }
 
 void IntroOutroStage::OnKeyStateChange(uint16 key, bool press)
