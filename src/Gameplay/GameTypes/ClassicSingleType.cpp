@@ -16,8 +16,8 @@ void ClassicSingleGameType::FillGameTypeResources()
     gameResources.EnemyModelIDs.push_back(10);
     gameResources.EnemyModelIDs.push_back(12);
 
-    // 1-9 jsou songy zakladni sady
-    for (uint32 i = 1; i <= 9; i++)
+    // 1-12 jsou songy zakladni sady
+    for (uint32 i = 1; i <= 12; i++)
         gameResources.MusicIDs.push_back(i);
 
     gameResources.RandomSayIDs.push_back(4);
