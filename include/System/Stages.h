@@ -13,6 +13,7 @@ enum Stages
     STAGE_GAMESETTINGS,
     STAGE_LOADING,
     STAGE_GAME,
+    STAGE_CREDITS,
     STAGE_MAX
 };
 
@@ -223,6 +224,27 @@ class GameStage: public StageControl
         void OnUpdate(uint32 diff);
 
     protected:
+};
+
+/** \class CreditsStage
+ *  \brief Faze hry - info o vyvojarich, podekovani
+ */
+class CreditsStage: public StageControl
+{
+    public:
+        CreditsStage()
+        {
+            m_type = STAGE_CREDITS;
+        }
+        void OnEnter();
+        void OnDraw(uint32 diff);
+        void OnKeyStateChange(uint16 key, bool press);
+        void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
+
+    protected:
+
+        uint32 m_scrollPos;
+        clock_t m_moveTimer;
 };
 
 #endif

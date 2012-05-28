@@ -257,6 +257,10 @@
 				Name="Stages"
 				>
 				<File
+					RelativePath="..\src\Stages\CreditsStage.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Stages\GameSettingsStage.cpp"
 					>
 				</File>

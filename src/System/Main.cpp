@@ -570,6 +570,9 @@ void Application::SetStage(uint32 newstage, uint32 newphase)
         case STAGE_GAME:
             m_currStage = new GameStage;
             break;
+        case STAGE_CREDITS:
+            m_currStage = new CreditsStage;
+            break;
         default:
             assert(false && "Invalid stage!");
     }
