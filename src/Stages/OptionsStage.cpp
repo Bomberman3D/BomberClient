@@ -3,38 +3,39 @@
 #include <Stages.h>
 #include <Config.h>
 
-static const uint32 resolutionMap[][3] = {
-    {0, 640, 480},
-    {1, 800, 600},
-    {2, 1024, 768},
-    {3, 1152, 768},
-    {4, 1280, 800},
-    {5, 1280, 960},
-    {6, 1280, 1024},
-    {7, 1366, 768},
-    {8, 1600, 1200},
-    {9, 1680, 1050},
-    {10, 1920, 1080}
+static const uint32 resolutionMap[][2] = {
+    {640, 480},
+    {800, 600},
+    {1024, 600},
+    {1024, 768},
+    {1152, 768},
+    {1280, 800},
+    {1280, 960},
+    {1280, 1024},
+    {1366, 768},
+    {1600, 1200},
+    {1680, 1050},
+    {1920, 1080}
 };
 
-static const uint32 colorDepthMap[][2] = {
-    {0, 16},
-    {1, 32}
+static const uint32 colorDepthMap[] = {
+    16,
+    32
 };
 
-static const uint32 refreshRateMap[][2] = {
-    {0, 30},
-    {1, 60},
-    {2, 75},
-    {3, 100}
+static const uint32 refreshRateMap[] = {
+    30,
+    60,
+    75,
+    100
 };
 
 void OptionsStage::OnEnter()
 {
     m_selResolution = 0;
-    for (uint32 i = 0; i < sizeof(resolutionMap)/sizeof(uint32[3]); i++)
+    for (uint32 i = 0; i < sizeof(resolutionMap)/sizeof(uint32[2]); i++)
     {
-        if (resolutionMap[i][1] == sConfig->WindowWidth && resolutionMap[i][2] == sConfig->WindowHeight)
+        if (resolutionMap[i][0] == sConfig->WindowWidth && resolutionMap[i][1] == sConfig->WindowHeight)
         {
             m_selResolution = i;
             break;
@@ -42,9 +43,9 @@ void OptionsStage::OnEnter()
     }
 
     m_selColorDepth = 0;
-    for (uint32 i = 0; i < sizeof(colorDepthMap)/sizeof(uint32[2]); i++)
+    for (uint32 i = 0; i < sizeof(colorDepthMap)/sizeof(uint32); i++)
     {
-        if (colorDepthMap[i][1] == sConfig->ColorDepth)
+        if (colorDepthMap[i] == sConfig->ColorDepth)
         {
             m_selColorDepth = i;
             break;
@@ -52,9 +53,9 @@ void OptionsStage::OnEnter()
     }
 
     m_selRefreshRate = 0;
-    for (uint32 i = 0; i < sizeof(refreshRateMap)/sizeof(uint32[2]); i++)
+    for (uint32 i = 0; i < sizeof(refreshRateMap)/sizeof(uint32); i++)
     {
-        if (refreshRateMap[i][1] == sConfig->RefreshRate)
+        if (refreshRateMap[i] == sConfig->RefreshRate)
         {
             m_selRefreshRate = i;
             break;
@@ -83,17 +84,17 @@ void OptionsStage::OnDraw(uint32 diff)
     sDisplay->Draw2D(75, 30+30-2, HEIGHT-30-30, WIDTH-30-30-30-30+4, 30);
 
     sDisplay->PrintText(FONT_ONE, 100, 140, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Rozlišení obrazovky");
-    sDisplay->PrintText(FONT_ONE, 130, 175, FONT_SIZE_3, 0, NOCOLOR, "%u x %u", resolutionMap[m_selResolution][1], resolutionMap[m_selResolution][2]);
+    sDisplay->PrintText(FONT_ONE, 130, 175, FONT_SIZE_3, 0, NOCOLOR, "%u x %u", resolutionMap[m_selResolution][0], resolutionMap[m_selResolution][1]);
     if (m_selResolution > 0)
         sDisplay->Draw2D(43, 110, 175, 12, 24);
-    if (m_selResolution < sizeof(resolutionMap)/sizeof(uint32[3])-1)
+    if (m_selResolution < sizeof(resolutionMap)/sizeof(uint32[2])-1)
         sDisplay->Draw2D(41, 410, 175, 12, 24);
 
     sDisplay->PrintText(FONT_ONE, 100, 140+100, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Barevná hloubka");
-    sDisplay->PrintText(FONT_ONE, 130, 175+100, FONT_SIZE_3, 0, NOCOLOR, "%u bit", colorDepthMap[m_selColorDepth][1]);
+    sDisplay->PrintText(FONT_ONE, 130, 175+100, FONT_SIZE_3, 0, NOCOLOR, "%u bit", colorDepthMap[m_selColorDepth]);
     if (m_selColorDepth > 0)
         sDisplay->Draw2D(43, 110, 175+100, 12, 24);
-    if (m_selColorDepth < sizeof(colorDepthMap)/sizeof(uint32[2])-1)
+    if (m_selColorDepth < sizeof(colorDepthMap)/sizeof(uint32)-1)
         sDisplay->Draw2D(41, 410, 175+100, 12, 24);
 
     sDisplay->PrintText(FONT_ONE, 100, 140+200, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Celá obrazovka");
@@ -104,10 +105,10 @@ void OptionsStage::OnDraw(uint32 diff)
         sDisplay->Draw2D(41, 410, 175+200, 12, 24);
 
     sDisplay->PrintText(FONT_ONE, 100, 140+300, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Obnovovací frekvence");
-    sDisplay->PrintText(FONT_ONE, 130, 175+300, FONT_SIZE_3, 0, NOCOLOR, "%u Hz", refreshRateMap[m_selRefreshRate][1]);
+    sDisplay->PrintText(FONT_ONE, 130, 175+300, FONT_SIZE_3, 0, NOCOLOR, "%u Hz", refreshRateMap[m_selRefreshRate]);
     if (m_selRefreshRate > 0)
         sDisplay->Draw2D(43, 110, 175+300, 12, 24);
-    if (m_selRefreshRate < sizeof(refreshRateMap)/sizeof(uint32[2])-1)
+    if (m_selRefreshRate < sizeof(refreshRateMap)/sizeof(uint32)-1)
         sDisplay->Draw2D(41, 410, 175+300, 12, 24);
 
     sDisplay->PrintText(FONT_ONE, WIDTH-424, HEIGHT-118, FONT_SIZE_3, 0, NOCOLOR, "Uložit");
@@ -132,7 +133,7 @@ void OptionsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     }
     else if (IN_RANGE(x, y, 410, 410+12, 175, 175+24))
     {
-        if (m_selResolution < sizeof(resolutionMap)/sizeof(uint32[3])-1)
+        if (m_selResolution < sizeof(resolutionMap)/sizeof(uint32[2])-1)
             m_selResolution++;
     }
 
@@ -144,7 +145,7 @@ void OptionsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     }
     else if (IN_RANGE(x, y, 410, 410+12, 175+100, 175+100+24))
     {
-        if (m_selColorDepth < sizeof(colorDepthMap)/sizeof(uint32[2])-1)
+        if (m_selColorDepth < sizeof(colorDepthMap)/sizeof(uint32)-1)
             m_selColorDepth++;
     }
 
@@ -168,18 +169,18 @@ void OptionsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     }
     else if (IN_RANGE(x, y, 410, 410+12, 175+300, 175+300+24))
     {
-        if (m_selRefreshRate < sizeof(refreshRateMap)/sizeof(uint32[2])-1)
+        if (m_selRefreshRate < sizeof(refreshRateMap)/sizeof(uint32)-1)
             m_selRefreshRate++;
     }
 
     // Ulozit
     if (IN_RANGE(x, y, WIDTH-424, WIDTH-264, HEIGHT-118, HEIGHT-90))
     {
-        sConfig->WindowWidth   = resolutionMap[m_selResolution][1];
-        sConfig->WindowHeight  = resolutionMap[m_selResolution][2];
-        sConfig->ColorDepth    = colorDepthMap[m_selColorDepth][1];
+        sConfig->WindowWidth   = resolutionMap[m_selResolution][0];
+        sConfig->WindowHeight  = resolutionMap[m_selResolution][1];
+        sConfig->ColorDepth    = colorDepthMap[m_selColorDepth];
         sConfig->fullscreen    = m_fullscreen;
-        sConfig->RefreshRate   = refreshRateMap[m_selRefreshRate][1];
+        sConfig->RefreshRate   = refreshRateMap[m_selRefreshRate];
 
         sConfig->Save();
         //sApplication->SetStage(STAGE_MENU);
