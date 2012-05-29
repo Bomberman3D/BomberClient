@@ -380,17 +380,17 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
         // (v pripade true hodnoty bool promenne +1 / -1 proto, ze reach je definovan pro dosah plamene. Bedna je o jedno pole dal)
         clock_t tnow = clock();
 
-        sGameplayMgr->SetDangerous(bomb->x, bomb->y, bomb, tnow+2500, 1500);
+        sGameplayMgr->SetDangerous(bomb->x, bomb->y, bomb, tnow+2500, DEFAULT_BOMB_FLAME_DURATION);
         for (uint32 i = 1; i <= bombreach; i++)
         {
             if (reach_x1 + (rx1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, bomb, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x + i, bomb->y, bomb, tnow+i*100+2500, DEFAULT_BOMB_FLAME_DURATION);
             if (reach_x2 + (rx2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, bomb, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x - i, bomb->y, bomb, tnow+i*100+2500, DEFAULT_BOMB_FLAME_DURATION);
             if (reach_y1 + (ry1_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, bomb, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y + i, bomb, tnow+i*100+2500, DEFAULT_BOMB_FLAME_DURATION);
             if (reach_y2 + (ry2_box?1:0) >= i)
-                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, bomb, tnow+i*100+2500, 1500);
+                sGameplayMgr->SetDangerous(bomb->x, bomb->y - i, bomb, tnow+i*100+2500, DEFAULT_BOMB_FLAME_DURATION);
         }
     }
 

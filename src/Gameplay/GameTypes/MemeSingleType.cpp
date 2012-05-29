@@ -204,16 +204,16 @@ void MemeSingleGameType::OnBombBoom(BombRecord* bomb)
 
         // Exploze - particle emittery
         BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,   0.0f, 0, 0, reach_y1*100 + (ry1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,   0.0f, 0, 0, reach_y1*100 + (ry1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, DEFAULT_BOMB_FLAME_DURATION);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,  90.0f, 0, 0, reach_x2*100 + (rx2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0,  90.0f, 0, 0, reach_x2*100 + (rx2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, DEFAULT_BOMB_FLAME_DURATION);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 180.0f, 0, 0, reach_y2*100 + (ry2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 180.0f, 0, 0, reach_y2*100 + (ry2_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, DEFAULT_BOMB_FLAME_DURATION);
 
         templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100 + (rx1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, 1500);
+        sParticleEmitterMgr->AddEmitter(templ, bomb->x-0.5f, 0.1f, bomb->y-0.5f, 0.15f, 0.4f, 0, 270.0f, 0, 0, reach_x1*100 + (rx1_box?100:0), 20, 10.0f, 0.1f, 50, 10, 1, 0, ANIM_FLAG_NOT_REPEAT, DEFAULT_BOMB_FLAME_DURATION);
 
         // Casovani vybuchu je implementovano pri polozeni bomby
     }
@@ -222,7 +222,7 @@ void MemeSingleGameType::OnBombBoom(BombRecord* bomb)
 void MemeSingleGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
 {
     BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
-    sParticleEmitterMgr->AddEmitter(templ, x-0.5f, 0.0f, y-0.5f, 0.6f, 0.6f, 90.0f, 0.0f, 0, 0, 150, 30, 5.0f, 0.1f, 10, 5, 0, 0, 0, 1500);
+    sParticleEmitterMgr->AddEmitter(templ, x-0.5f, 0.0f, y-0.5f, 0.6f, 0.6f, 90.0f, 0.0f, 0, 0, 150, 30, 5.0f, 0.1f, 10, 5, 0, 0, 0, DEFAULT_BOMB_FLAME_DURATION);
 
     if (by_bomb)
     {

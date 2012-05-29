@@ -134,6 +134,9 @@ static const char* PlayerStatsNames[GAME_TYPE_MAX][MAX_PLAYER_STATS] = {
     //{'\0','\0','\0'}
 };
 
+
+#define DEFAULT_BOMB_FLAME_DURATION 800
+
 /** \class GameplayMgr
  *  \brief Trida starajici se o herni principy a specificke mechanizmy
  */
