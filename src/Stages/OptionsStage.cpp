@@ -4,7 +4,7 @@
 #include <Config.h>
 
 static const uint32 resolutionMap[][2] = {
-    {640, 480},
+    //{640, 480}, // Toho, komu nezbyde nic jineho, nez spustit hru na tomto rozliseni, velice lituji a nabizim k zapujceni muj stary Intel i486 PC
     {800, 600},
     {1024, 600},
     {1024, 768},

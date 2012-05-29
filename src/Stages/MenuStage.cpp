@@ -10,7 +10,8 @@ void MenuStage::OnEnter()
     // Vynulovat vsechny mozne uhly a podobne
     sDisplay->Initialize();
     // Menu scene
-    sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
+    //sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
+    glClearColor(0.05f, 0.2f, 0.0f, 0.0f);
 
     sDisplay->SetAngleX(20.0f);
 
@@ -40,23 +41,36 @@ void MenuStage::OnDraw(uint32 diff)
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
 
+    float mult = 0.5f;
+    if (WIDTH > 800 && HEIGHT > 600)
+        mult = 1.0f;
+    else if (WIDTH > 640 && HEIGHT > 480)
+        mult = 0.7f;
+
+    sDisplay->Draw2D(3, 0, 0, 640*mult, 624*mult);
+    sDisplay->Draw2D(1, WIDTH-(640*mult), HEIGHT-(624*mult), 640*mult, 624*mult);
+
     // Logo skoly
     sDisplay->Draw2D(32,WIDTH-144-20, HEIGHT-42-20, 144, 42);
 
     // Nova hra
-    sDisplay->Draw2D(4 ,WIDTH-350,50 ,350,80);
+    //sDisplay->Draw2D(4 ,WIDTH-350,50 ,350,80);
     // Multiplayer
-    sDisplay->Draw2D(19,WIDTH-350,160,350,80);
+    //sDisplay->Draw2D(19,WIDTH-350,160,350,80);
     // Odejit
-    sDisplay->Draw2D(11,WIDTH-350,270,350,80);
+    //sDisplay->Draw2D(11,WIDTH-350,270,350,80);
     // Nastaveni
-    sDisplay->PrintText(FONT_ONE, WIDTH-350, 380, FONT_SIZE_1, 0, COLOR(255,0,0), "Nastavení");
-
+    //sDisplay->PrintText(FONT_ONE, WIDTH-350, 380, FONT_SIZE_1, 0, COLOR(255,0,0), "Nastavení");
     // Credits
-    sDisplay->PrintText(FONT_ONE, WIDTH-350, 450, FONT_SIZE_1, 0, COLOR(255,127,255), "Credits");
+    //sDisplay->PrintText(FONT_ONE, WIDTH-350, 450, FONT_SIZE_1, 0, COLOR(255,127,255), "Credits");
 
-    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15-15-15, FONT_SIZE_N, 0, NOCOLOR,"Verze %u.%u", 0, 1);
-    sDisplay->PrintText(MAIN_FONT, 15,HEIGHT-15-15, FONT_SIZE_1, 0, NOCOLOR,"Copyright (c) Kennny 2011-2012");
+    sDisplay->PrintText(FONT_ONE, WIDTH-300*WIDTH/800, 70*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Nová hra");
+    sDisplay->PrintText(FONT_ONE, WIDTH-340*WIDTH/800, 180*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Multiplayer");
+    sDisplay->PrintText(FONT_ONE, WIDTH-390*WIDTH/800, 285*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Nastavení");
+    sDisplay->PrintText(FONT_ONE, WIDTH-490*WIDTH/800, 380*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Autoøi");
+    sDisplay->PrintText(FONT_ONE, WIDTH-610*WIDTH/800, 460*HEIGHT/600, FONT_SIZE_1, 0, COLOR(255,20,20), "Odejít");
+
+    sDisplay->PrintText(MAIN_FONT, 3,HEIGHT-12-5, FONT_SIZE_1, 0, NOCOLOR,"Verze %u.%u (%s)", 0, 1, __DATE__);
 }
 
 void MenuStage::OnKeyStateChange(uint16 key, bool press)
@@ -67,28 +81,33 @@ void MenuStage::OnKeyStateChange(uint16 key, bool press)
 
 void MenuStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
 {
-    if (IN_RANGE(x,y, WIDTH-350, WIDTH, 50, 50+80))
+    // Nova hra
+    if (IN_RANGE(x,y, WIDTH-300*WIDTH/800, WIDTH, 70*HEIGHT/600, (70*HEIGHT/600)+80))
     {
         sApplication->SetStage(STAGE_GAMESETTINGS, 100);
         return;
     }
-    else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 160, 160+80))
+    // Multiplayer
+    else if (IN_RANGE(x,y, WIDTH-340*WIDTH/800, WIDTH, 180*HEIGHT/600, (180*HEIGHT/600)+80))
     {
         sNetwork->Connect(sConfig->HostName.c_str(), sConfig->NetworkPort);
         sApplication->SetStage(STAGE_GAMESETTINGS);
         return;
     }
-    else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 270, 270+80))
+    // Odejit
+    else if (IN_RANGE(x,y, WIDTH-610*WIDTH/800, WIDTH-310, 460*HEIGHT/600, (460*HEIGHT/600)+80))
     {
         exit(0);
         return;
     }
-    else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 380, 380+80))
+    // Nastaveni
+    else if (IN_RANGE(x,y, WIDTH-390*WIDTH/800, WIDTH, 285*HEIGHT/600, (285*HEIGHT/600)+80))
     {
         sApplication->SetStage(STAGE_OPTIONS);
         return;
     }
-    else if (IN_RANGE(x,y, WIDTH-350, WIDTH, 450, 450+80))
+    // Credits
+    else if (IN_RANGE(x,y, WIDTH-490*WIDTH/800, WIDTH-190, 380*HEIGHT/600, (380*HEIGHT/600)+80))
     {
         sApplication->SetStage(STAGE_CREDITS);
         return;
