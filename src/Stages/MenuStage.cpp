@@ -9,8 +9,7 @@ void MenuStage::OnEnter()
 {
     // Vynulovat vsechny mozne uhly a podobne
     sDisplay->Initialize();
-    // Menu scene
-    //sDisplay->DrawModel(4, 0.3f, -5.0f, -9.5f, ANIM_NONE, 1.6f);
+
     glClearColor(0.05f, 0.2f, 0.0f, 0.0f);
 
     sDisplay->SetAngleX(20.0f);
@@ -42,8 +41,10 @@ void MenuStage::OnDraw(uint32 diff)
         sDisplay->Setup2DMode();
 
     float mult = 0.5f;
-    if (WIDTH > 800 && HEIGHT > 600)
+    if (WIDTH > 1024 && HEIGHT > 768)
         mult = 1.0f;
+    if (WIDTH > 800 && HEIGHT > 600)
+        mult = 0.85f;
     else if (WIDTH > 640 && HEIGHT > 480)
         mult = 0.7f;
 
@@ -52,17 +53,6 @@ void MenuStage::OnDraw(uint32 diff)
 
     // Logo skoly
     sDisplay->Draw2D(32,WIDTH-144-20, HEIGHT-42-20, 144, 42);
-
-    // Nova hra
-    //sDisplay->Draw2D(4 ,WIDTH-350,50 ,350,80);
-    // Multiplayer
-    //sDisplay->Draw2D(19,WIDTH-350,160,350,80);
-    // Odejit
-    //sDisplay->Draw2D(11,WIDTH-350,270,350,80);
-    // Nastaveni
-    //sDisplay->PrintText(FONT_ONE, WIDTH-350, 380, FONT_SIZE_1, 0, COLOR(255,0,0), "Nastavení");
-    // Credits
-    //sDisplay->PrintText(FONT_ONE, WIDTH-350, 450, FONT_SIZE_1, 0, COLOR(255,127,255), "Credits");
 
     sDisplay->PrintText(FONT_ONE, WIDTH-300*WIDTH/800, 70*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Nová hra");
     sDisplay->PrintText(FONT_ONE, WIDTH-340*WIDTH/800, 180*HEIGHT/600, FONT_SIZE_1, 0, NOCOLOR, "Multiplayer");

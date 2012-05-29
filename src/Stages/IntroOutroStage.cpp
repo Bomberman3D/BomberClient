@@ -1,10 +1,13 @@
 #include <Global.h>
 #include <Application.h>
 #include <Stages.h>
+#include <LoadingThread.h>
 
 void IntroOutroStage::OnEnter()
 {
     sDisplay->Initialize();
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 70);
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 71);
 
     startTime = clock();
 }

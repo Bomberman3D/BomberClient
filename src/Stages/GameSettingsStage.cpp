@@ -19,6 +19,8 @@ void GameSettingsStage::OnEnter()
     m_selectedMode = GAME_TYPE_SP_CLASSIC;
     m_selectedMapId = 1;
 
+    glClearColor(0.05f, 0.2f, 0.0f, 0.0f);
+
     // Svetlo
     glEnable(GL_LIGHTING);
     glEnable(GL_NORMALIZE);
@@ -43,6 +45,14 @@ void GameSettingsStage::OnDraw(uint32 diff)
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();
+
+    float mult = 0.5f;
+    if (WIDTH > 800 && HEIGHT > 600)
+        mult = 1.0f;
+    else if (WIDTH > 640 && HEIGHT > 480)
+        mult = 0.7f;
+
+    sDisplay->Draw2D(1, WIDTH-(640*mult), HEIGHT-(624*mult), 640*mult, 624*mult);
 
     // Ramecky
     sDisplay->Draw2D(76, 30, 30, 30, 30);
@@ -116,27 +126,27 @@ void GameSettingsStage::OnDraw(uint32 diff)
         // Vyber modu
 
         if (m_selectedMode != GAME_TYPE_SP_MIN)
-            sDisplay->Draw2D(39, 30, 45, 50, 25);  // Sipka doleva
+            sDisplay->Draw2D(39, 60, 65, 50, 25);  // Sipka doleva
 
         if (m_selectedMode != GAME_TYPE_SP_MAX)
-            sDisplay->Draw2D(37, 400, 45, 50, 25); // Sipka doprava
+            sDisplay->Draw2D(37, 430, 65, 50, 25); // Sipka doprava
 
         switch (m_selectedMode)
         {
             case GAME_TYPE_SP_CLASSIC:
-                sDisplay->PrintText(FONT_ONE, 140, 45, FONT_SIZE_3, 0, NOCOLOR, "Rychlá hra");
+                sDisplay->PrintText(FONT_ONE, 170, 65, FONT_SIZE_3, 0, NOCOLOR, "Rychlá hra");
 
                 // TODO: funkce pro odstavcovy text a zalamovani
-                sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
+                sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-150);
                 sDisplay->PrintParagraphText(FONT_ONE, 100, 150, WIDTH-100-100, FONT_SIZE_4, 0, NOCOLOR,
-                    "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou. Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat     " \
+                    "Rychlá hra je základním typem hry. Princip je inspirován pùvodní pøedlohou. Obsahuje klasické krabice, bonusy, nepøátele. Podmínkou výhry je zdolat " \
                     "všechny nepøátele v èasovém limitu.");
                 break;
             case GAME_TYPE_SP_MEME:
-                sDisplay->PrintText(FONT_ONE, 140, 45, FONT_SIZE_3, 0, NOCOLOR, "Meme wars");
+                sDisplay->PrintText(FONT_ONE, 170, 65, FONT_SIZE_3, 0, NOCOLOR, "Meme wars");
 
                 // TODO: funkce pro odstavcovy text a zalamovani
-                sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-130);
+                sDisplay->Draw2D(15, 80, 130, WIDTH-80-80, HEIGHT-130-150);
                 sDisplay->PrintParagraphText(FONT_ONE, 100, 150, WIDTH-100-100, FONT_SIZE_4, 0, NOCOLOR,
                     "Meme wars je typ hry inspirovaný internetovými meme postavièkami a " \
                     "srandièkami, jako napøíklad troll, nyan cat, rickroll, rage comics, pedobear, " \
@@ -150,9 +160,9 @@ void GameSettingsStage::OnDraw(uint32 diff)
         }
 
         // Dalsi
-        sDisplay->Draw2D(37, WIDTH-200, HEIGHT-100, 100, 50);
+        sDisplay->Draw2D(37, WIDTH-200, HEIGHT-120, 100, 50);
         // Zpet
-        sDisplay->Draw2D(39, 100, HEIGHT-100, 100, 50);
+        sDisplay->Draw2D(39, 100, HEIGHT-120, 100, 50);
     }
     else if (m_subStage == 101)
     {
@@ -161,7 +171,7 @@ void GameSettingsStage::OnDraw(uint32 diff)
         {
             case GAME_TYPE_SP_CLASSIC:
             {
-                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50, FONT_SIZE_N, 0, NOCOLOR, "Rychlá hra");
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 70, FONT_SIZE_N, 0, NOCOLOR, "Rychlá hra");
 
                 sDisplay->PrintText(FONT_ONE, 50, 150, FONT_SIZE_4, 0, NOCOLOR, "Poèet nepøátel");
                 sDisplay->PrintText(MAIN_FONT, 105, 183, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT));
@@ -198,7 +208,7 @@ void GameSettingsStage::OnDraw(uint32 diff)
             }
             case GAME_TYPE_SP_MEME:
             {
-                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 50, FONT_SIZE_N, 0, NOCOLOR, "Meme wars");
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-64*4+4*36/2, 70, FONT_SIZE_N, 0, NOCOLOR, "Meme wars");
 
                 sDisplay->PrintText(FONT_ONE, 50, 150, FONT_SIZE_4, 0, NOCOLOR, "Poèet nepøátel");
                 sDisplay->PrintText(MAIN_FONT, 105, 183, FONT_SIZE_N, 0, NOCOLOR, "%u", sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT));
@@ -232,14 +242,13 @@ void GameSettingsStage::OnDraw(uint32 diff)
                 sDisplay->Draw2D(43, 80, 180+spacing, 18, 20);
                 sDisplay->Draw2D(41, 140, 180+spacing, 18, 20);
                 break;
-                break;
             }
         }
 
         // Tlacitko "Hrat"
-        sDisplay->Draw2D(20, WIDTH-200, HEIGHT-100, 200, 40);
+        sDisplay->Draw2D(20, WIDTH-200, HEIGHT-120, 200, 40);
         // Zpet
-        sDisplay->Draw2D(39, 100, HEIGHT-100, 100, 50);
+        sDisplay->Draw2D(39, 100, HEIGHT-120, 100, 50);
     }
 }
 
@@ -309,27 +318,27 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         // Vyber modu
 
         // Sipka doleva
-        if (x > 30 && y > 45 && x < 30+50 && y < 45+25)
+        if (x > 60 && y > 65 && x < 60+50 && y < 65+25)
         {
             // Posun jen pokud jsme na jinem nez prvnim modu
             if (m_selectedMode != GAME_TYPE_SP_MIN)
                 m_selectedMode = GameType(uint32(m_selectedMode)-1);
         }
         // Sipka doprava
-        else if (x > 400 && y > 45 && x < 400+50 && y < 45+25)
+        else if (x > 430 && y > 65 && x < 430+50 && y < 65+25)
         {
             // Posun jen pokud jsme na mensim nez je maximalni mod
             if (m_selectedMode != GAME_TYPE_SP_MAX)
                 m_selectedMode = GameType(uint32(m_selectedMode)+1);
         }
         // Sipka pro pokracovani
-        else if (x > WIDTH-200 && x < WIDTH-100 && y > HEIGHT-100 && y < HEIGHT-50)
+        else if (x > WIDTH-200 && x < WIDTH-100 && y > HEIGHT-120 && y < HEIGHT-70)
         {
             // Dalsi staz - vyber podrobnosti
             m_subStage = 101;
         }
         // Sipka pro vraceni
-        else if (x > 100 && x < 200 && y > HEIGHT-100 && y < HEIGHT-50)
+        else if (x > 100 && x < 200 && y > HEIGHT-120 && y < HEIGHT-70)
         {
             sApplication->SetStage(STAGE_MENU);
             return;
@@ -407,13 +416,13 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
                  sGameplayMgr->SetSetting(SETTING_ENEMY_SPEED, sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED) + 1);
         }
         // "Hrat"
-        else if (x > WIDTH-200 && x < WIDTH && y > HEIGHT-100 && y < HEIGHT-60)
+        else if (x > WIDTH-200 && x < WIDTH && y > HEIGHT-120 && y < HEIGHT-80)
         {
             sGameplayMgr->SetGameType(m_selectedMode);
             sApplication->SetStage(STAGE_LOADING, 1);
         }
         // Sipka pro vraceni
-        else if (x > 100 && x < 200 && y > HEIGHT-100 && y < HEIGHT-50)
+        else if (x > 100 && x < 200 && y > HEIGHT-120 && y < HEIGHT-70)
         {
             m_subStage = 100;
             return;
