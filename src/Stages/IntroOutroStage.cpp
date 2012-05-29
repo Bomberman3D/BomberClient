@@ -12,7 +12,7 @@ void IntroOutroStage::OnEnter()
     startTime = clock();
 }
 
-void IntroOutroStage::OnDraw(uint32 diff)
+void IntroOutroStage::OnDraw()
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();

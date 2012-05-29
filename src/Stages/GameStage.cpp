@@ -48,12 +48,12 @@ void GameStage::OnLeave()
     glDisable(GL_NORMALIZE);
 }
 
-void GameStage::OnBeforeDraw(uint32 diff)
+void GameStage::OnBeforeDraw()
 {
     sDisplay->DrawMap();
 }
 
-void GameStage::OnDraw(uint32 diff)
+void GameStage::OnDraw()
 {
     // Pokud existuje zaznam hrace, posuneme svetlo
     if (sGameplayMgr->GetPlayerRec())
@@ -396,13 +396,13 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
     }
 }
 
-void GameStage::OnUpdate(uint32 diff)
+void GameStage::OnUpdate()
 {
     // Odsud budeme updatovat i GameplayMgr
     // Nejdrive uhel podle mysi
     sGameplayMgr->UpdatePlayerMoveAngle();
     // Pak pohyb
-    sGameplayMgr->UpdatePlayerMotion(diff);
+    sGameplayMgr->UpdatePlayerMotion();
     // A pote zbytek
     sGameplayMgr->Update();
 }

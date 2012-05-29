@@ -41,7 +41,7 @@ void GameSettingsStage::OnLeave()
     glDisable(GL_NORMALIZE);
 }
 
-void GameSettingsStage::OnDraw(uint32 diff)
+void GameSettingsStage::OnDraw()
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();

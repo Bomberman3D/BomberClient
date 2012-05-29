@@ -68,7 +68,7 @@ void OptionsStage::OnEnter()
     m_fullscreen = sConfig->fullscreen;
 }
 
-void OptionsStage::OnDraw(uint32 diff)
+void OptionsStage::OnDraw()
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();

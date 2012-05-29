@@ -83,7 +83,7 @@ void LoadingStage::OnEnter()
         PreLoad(LOAD_TEXTURE, i);
 }
 
-void LoadingStage::OnDraw(uint32 diff)
+void LoadingStage::OnDraw()
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();

@@ -25,11 +25,11 @@ class StageControl
     public:
         virtual void OnEnter() {};
         virtual void OnLeave() {};
-        virtual void OnDraw(uint32 diff) {};
-        virtual void OnBeforeDraw(uint32 diff) {};
+        virtual void OnDraw() {};
+        virtual void OnBeforeDraw() {};
         virtual void OnKeyStateChange(uint16 key, bool press) {};
         virtual void OnMouseButtonPress(uint32 x, uint32 y, bool left = true) {};
-        virtual void OnUpdate(uint32 diff) {};
+        virtual void OnUpdate() {};
 
         Stages GetType() { return m_type; }
         // Stage je nastavena v konstruktoru potomka, nic externiho ji nesmi zmenit
@@ -95,7 +95,7 @@ class MenuStage: public StageControl
         }
         void OnEnter();
         void OnLeave();
-        void OnDraw(uint32 diff);
+        void OnDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
@@ -113,7 +113,7 @@ class IntroOutroStage: public StageControl
             m_type = STAGE_INTRO;
         }
         void OnEnter();
-        void OnDraw(uint32 diff);
+        void OnDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
@@ -132,7 +132,7 @@ class LoadingStage: public StageControl
             m_type = STAGE_LOADING;
         }
         void OnEnter();
-        void OnDraw(uint32 diff);
+        void OnDraw();
 
         void PreLoad(LoadType type, uint32 sourceId);
         bool IsAllLoaded();
@@ -167,7 +167,7 @@ class GameSettingsStage: public StageControl
         }
         void OnEnter();
         void OnLeave();
-        void OnDraw(uint32 diff);
+        void OnDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
@@ -193,7 +193,7 @@ class OptionsStage: public StageControl
             m_type = STAGE_OPTIONS;
         }
         void OnEnter();
-        void OnDraw(uint32 diff);
+        void OnDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 
@@ -219,11 +219,11 @@ class GameStage: public StageControl
         }
         void OnEnter();
         void OnLeave();
-        void OnDraw(uint32 diff);
-        void OnBeforeDraw(uint32 diff);
+        void OnDraw();
+        void OnBeforeDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
-        void OnUpdate(uint32 diff);
+        void OnUpdate();
 
     protected:
 };
@@ -239,7 +239,7 @@ class CreditsStage: public StageControl
             m_type = STAGE_CREDITS;
         }
         void OnEnter();
-        void OnDraw(uint32 diff);
+        void OnDraw();
         void OnKeyStateChange(uint16 key, bool press);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
 

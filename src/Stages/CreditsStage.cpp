@@ -12,7 +12,7 @@ void CreditsStage::OnEnter()
     m_moveTimer = clock()+1000;
 }
 
-void CreditsStage::OnDraw(uint32 diff)
+void CreditsStage::OnDraw()
 {
     if (!sDisplay->IsIn2DMode())
         sDisplay->Setup2DMode();

@@ -348,7 +348,7 @@ class DisplayMgr
         void InitFont(uint8 font);
 
         // Update funkce co se vola cely loop
-        void Update(const uint32 diff);
+        void Update();
 
         // Vse co se tyce vykreslovani modelu
         ModelDisplayListRecord* DrawModel(uint32 modelId, float x, float y, float z,

@@ -67,7 +67,6 @@ class Application
         bool console;
         uint32 mouseXY[2];
 
-        uint32 m_diff;
         clock_t m_lastUpdate;
 };
 

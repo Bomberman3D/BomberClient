@@ -284,7 +284,7 @@ bool DisplayMgr::BindTexture(uint32 textureId)
  *
  * Zde se provadi veskery update a vykresleni nasich model a billboard display listu. Zaroven dochazi k updatu animatoru a particle emitteru
  */
-void DisplayMgr::Update(const uint32 diff)
+void DisplayMgr::Update()
 {
     if (m_is2D)
         Setup3DMode();

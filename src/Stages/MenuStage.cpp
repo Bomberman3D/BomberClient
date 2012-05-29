@@ -34,7 +34,7 @@ void MenuStage::OnLeave()
     glDisable(GL_NORMALIZE);
 }
 
-void MenuStage::OnDraw(uint32 diff)
+void MenuStage::OnDraw()
 {
     // Vykreslit 2D prvky
     if (!sDisplay->IsIn2DMode())

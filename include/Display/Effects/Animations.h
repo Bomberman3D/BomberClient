@@ -119,7 +119,6 @@ class Animator
 
         // Update veci
         clock_t m_lastUpdate;
-        uint32 m_diff;
 };
 
 #define sAnimator Singleton<Animator>::instance()

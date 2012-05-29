@@ -642,7 +642,7 @@ void GameplayMgr::UpdatePlayerMoveAngle()
  *
  * Pohne hracem o predem stanoveny usek, jehoz delka se lisi podle ubehnuteho casu (diff od puvodniho update)
  */
-void GameplayMgr::UpdatePlayerMotion(uint32 diff)
+void GameplayMgr::UpdatePlayerMotion()
 {
     if (m_movementBlocked)
         return;

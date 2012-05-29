@@ -186,7 +186,7 @@ class GameplayMgr
 
         void PlayerDied();
         void UpdatePlayerMoveAngle();
-        void UpdatePlayerMotion(uint32 diff);
+        void UpdatePlayerMotion();
         void SetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = true; };
         void UnsetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = false; };
         void BlockMovement() { m_movementBlocked = true; };
