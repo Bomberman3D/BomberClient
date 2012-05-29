@@ -99,6 +99,15 @@ void Application::Update()
     sSoundMgr->Update();
     sTimer->Update();
 
+    // Kurzor - vykresluje se vzdycky, krome samotne herni faze pri hrani (ne pauza)
+    if (m_currStage->GetType() != STAGE_GAME || m_currStage->GetSubStage() != 0)
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        sDisplay->Draw2D(4, GetMouseX(), GetMouseY(), 30, 37);
+    }
+
     m_lastUpdate = clock();
 }
 
@@ -222,7 +231,6 @@ bool CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
     {
         dwExStyle = WS_EX_APPWINDOW;
         dwStyle = WS_POPUP;
-        ShowCursor(FALSE);
     }
     else
     {
@@ -464,7 +472,7 @@ bool Application::Init()
     if (!CreateGLWindow("BomberEngine",sConfig->WindowWidth,sConfig->WindowHeight,sConfig->ColorDepth,sConfig->fullscreen,sConfig->RefreshRate))
         return false;
 
-    ShowCursor(true);
+    ShowCursor(FALSE);
 
     sStorage->Load();
 
