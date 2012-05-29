@@ -62,6 +62,9 @@ void OptionsStage::OnEnter()
         }
     }
 
+    m_selMusicVolume = sConfig->MusicVolume/5;
+    m_selEffectVolume = sConfig->EffectVolume/5;
+
     m_fullscreen = sConfig->fullscreen;
 }
 
@@ -113,6 +116,23 @@ void OptionsStage::OnDraw(uint32 diff)
 
     sDisplay->PrintText(FONT_ONE, WIDTH-424, HEIGHT-118, FONT_SIZE_3, 0, NOCOLOR, "Uložit");
     sDisplay->PrintText(FONT_ONE, WIDTH-224, HEIGHT-118, FONT_SIZE_3, 0, NOCOLOR, "Zpìt");
+
+    //////////////////////////////
+    // Druhy sloupec
+
+    sDisplay->PrintText(FONT_ONE, 450, 140, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Hlasitost hudby [%%]");
+    sDisplay->PrintText(FONT_ONE, 480, 175, FONT_SIZE_3, 0, NOCOLOR, "%u%%", m_selMusicVolume*5);
+    if (m_selMusicVolume > 0)
+        sDisplay->Draw2D(43, 460, 175, 12, 24);
+    if (m_selMusicVolume < 20)
+        sDisplay->Draw2D(41, 610, 175, 12, 24);
+
+    sDisplay->PrintText(FONT_ONE, 450, 140+100, FONT_SIZE_3-0.05f, 0, COLOR(255,127,255), "Hlasitost efektù [%%]");
+    sDisplay->PrintText(FONT_ONE, 480, 175+100, FONT_SIZE_3, 0, NOCOLOR, "%u%%", m_selEffectVolume*5);
+    if (m_selEffectVolume > 0)
+        sDisplay->Draw2D(43, 460, 175+100, 12, 24);
+    if (m_selEffectVolume < 20)
+        sDisplay->Draw2D(41, 610, 175+100, 12, 24);
 }
 
 void OptionsStage::OnKeyStateChange(uint16 key, bool press)
@@ -173,6 +193,30 @@ void OptionsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             m_selRefreshRate++;
     }
 
+    // Hlasitost hudby
+    if (IN_RANGE(x, y, 460, 460+12, 175, 175+24))
+    {
+        if (m_selMusicVolume > 0)
+            m_selMusicVolume--;
+    }
+    else if (IN_RANGE(x, y, 610, 610+12, 175, 175+24))
+    {
+        if (m_selMusicVolume < 20)
+            m_selMusicVolume++;
+    }
+
+    // Hlasitost efektu
+    if (IN_RANGE(x, y, 460, 460+12, 175+100, 175+100+24))
+    {
+        if (m_selEffectVolume > 0)
+            m_selEffectVolume--;
+    }
+    else if (IN_RANGE(x, y, 610, 610+12, 175+100, 175+100+24))
+    {
+        if (m_selEffectVolume < 20)
+            m_selEffectVolume++;
+    }
+
     // Ulozit
     if (IN_RANGE(x, y, WIDTH-424, WIDTH-264, HEIGHT-118, HEIGHT-90))
     {
@@ -181,6 +225,8 @@ void OptionsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         sConfig->ColorDepth    = colorDepthMap[m_selColorDepth];
         sConfig->fullscreen    = m_fullscreen;
         sConfig->RefreshRate   = refreshRateMap[m_selRefreshRate];
+        sConfig->MusicVolume   = m_selMusicVolume*5;
+        sConfig->EffectVolume  = m_selEffectVolume*5;
 
         sConfig->Save();
         //sApplication->SetStage(STAGE_MENU);

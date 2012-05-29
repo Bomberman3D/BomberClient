@@ -70,6 +70,14 @@ bool Config::Load()
             if (ivalue > 0)
                 RefreshRate = ivalue;
 
+        if (strcmp(setting,"MUSIC_VOLUME") == 0)
+            if (ivalue > 0)
+                MusicVolume = ivalue;
+
+        if (strcmp(setting,"EFFECT_VOLUME") == 0)
+            if (ivalue > 0)
+                EffectVolume = ivalue;
+
         if (strcmp(setting,"HOST") == 0)
             HostName = value;
 
@@ -96,6 +104,9 @@ void Config::Save()
     fprintf(config, "COLOR_DEPTH=%u\n", ColorDepth);
     fprintf(config, "FULLSCREEN=%u\n", fullscreen?1:0);
     fprintf(config, "REFRESH_RATE=%u\n", RefreshRate);
+
+    fprintf(config, "MUSIC_VOLUME=%u\n", MusicVolume);
+    fprintf(config, "EFFECT_VOLUME=%u\n", EffectVolume);
 
     fprintf(config, "HOST=%s\n", HostName.c_str());
     fprintf(config, "PORT=%u\n", NetworkPort);

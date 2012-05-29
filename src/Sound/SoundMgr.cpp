@@ -46,10 +46,10 @@ void SoundMgr::Initialize()
     m_audioEffectMgr = cAudio::createAudioManager(true);
 
     if (m_audioMgr)
-        m_audioMgr->setMasterVolume(0.2f);
+        m_audioMgr->setMasterVolume((float)sConfig->MusicVolume/100.0f);
 
     if (m_audioEffectMgr)
-        m_audioEffectMgr->setMasterVolume(0.75f);
+        m_audioEffectMgr->setMasterVolume((float)sConfig->EffectVolume/100.0f);
 }
 
 /** \brief Update funkce

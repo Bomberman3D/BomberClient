@@ -18,6 +18,8 @@ class Config
             ColorDepth   = 32;
             fullscreen   = false;
             RefreshRate  = 60;
+            MusicVolume  = 30;
+            EffectVolume = 65;
 
             HostName = "127.0.0.1";
             NetworkPort = 2530;
@@ -31,6 +33,8 @@ class Config
         uint8  ColorDepth;
         bool   fullscreen;
         uint32 RefreshRate;
+        uint32 MusicVolume;
+        uint32 EffectVolume;
 
         std::string HostName;
         uint32 NetworkPort;
@@ -78,6 +82,14 @@ class Config
 
 /** \var Config::NetworkPort
  *  \brief Port pro komunikaci se serverovou casti aplikace
+ */
+
+/** \var Config::MusicVolume
+ *  \brief Hlasitost hudby v procentech
+ */
+
+/** \var Config::EffectVolume
+ *  \brief Hlasitost efektu v procentech
  */
 
 #endif

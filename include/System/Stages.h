@@ -202,6 +202,8 @@ class OptionsStage: public StageControl
         uint32 m_selResolution;
         uint32 m_selColorDepth;
         uint32 m_selRefreshRate;
+        uint32 m_selMusicVolume;
+        uint32 m_selEffectVolume;
         bool m_fullscreen;
 };
 
