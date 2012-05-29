@@ -11,6 +11,7 @@ SoundMgr::SoundMgr()
     m_playlist.clear();
     m_playlistPos = 0;
     m_effectsPlayed.clear();
+    m_lastMusicStart = 0;
 
     m_audioMgr = NULL;
     m_audioEffectMgr = NULL;
@@ -135,10 +136,14 @@ void SoundMgr::Update()
 
     // Vytvorime novy zdroj a nechame ho prehrat
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
-    m_lastMusicStart = clock();
 
     if (m_current)
+    {
         m_current->play2d(false);
+        m_lastMusicStart = clock();
+    }
+    else
+        m_lastMusicStart = 0;
 }
 
 /** \brief Inicializace a sestaveni playlistu
@@ -176,10 +181,14 @@ void SoundMgr::MusicStart()
     m_playing = true;
 
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
-    m_lastMusicStart = clock();
 
     if (m_current)
+    {
         m_current->play2d(false);
+        m_lastMusicStart = clock();
+    }
+    else
+        m_lastMusicStart = 0;
 }
 
 /** \brief Postara se o zastaveni hudby

@@ -77,7 +77,7 @@ void GameStage::OnDraw()
             sDisplay->Setup2DMode();
 
         // Vytiskneme, co prave bezi za hudbu
-        if (sSoundMgr->GetLastMusicStart() > clock()-4000)
+        if (sSoundMgr->GetLastMusicStart() > 0 && sSoundMgr->GetLastMusicStart() > clock()-4000)
         {
             int32 music = sSoundMgr->GetCurrentMusicId();
             if (music > 0)
