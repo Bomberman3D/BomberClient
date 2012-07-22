@@ -1265,8 +1265,6 @@ void DisplayMgr::AdjustViewToTarget()
         m_viewX = m_targetX + camera_dist*cos(PI*(m_tarangleY)/180.0f);
         m_viewY = -3.5f; // potrebuje upresnit, vyska pohledu, pri FPS minimalni
         m_viewZ = m_targetZ + camera_dist*sin(PI*(m_tarangleY)/180.0f);
-
-        m_angleX = 40.0f; // 0 pri FPS
     }
 
     glLoadIdentity();

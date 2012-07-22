@@ -169,6 +169,7 @@ void GameplayMgr::OnGameInit()
     m_playerX = 0;
     m_playerY = 0;
     m_playerRec->rotate = m_moveAngle;
+    sDisplay->SetAngleX(40.0f);
 
     sDisplay->SetTargetModel(m_playerRec);
 
@@ -634,8 +635,16 @@ void GameplayMgr::UpdatePlayerMoveAngle()
     int middleY = sConfig->WindowHeight >> 1;
     GetCursorPos(&mousePos);
     SetCursorPos(middleX, middleY);  // Posuneme mys zase na stred
-    if (!((mousePos.x == middleX) && (mousePos.y == middleY)))
+    if (mousePos.x != middleX)
         m_moveAngle += 0.0025f*(mousePos.x-middleX);
+    if (mousePos.y != middleY)
+    {
+        sDisplay->SetAngleX(0.02f*(mousePos.y-middleY), true);
+        if (sDisplay->GetAngleX() > 40.0f)
+            sDisplay->SetAngleX(40.0f);
+        if (sDisplay->GetAngleX() < 20.0f)
+            sDisplay->SetAngleX(20.0f);
+    }
 }
 
 /** \brief Funkce starajici se o pohyb hrace
