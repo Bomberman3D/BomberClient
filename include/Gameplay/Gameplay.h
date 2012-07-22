@@ -134,6 +134,38 @@ static const char* PlayerStatsNames[GAME_TYPE_MAX][MAX_PLAYER_STATS] = {
     //{'\0','\0','\0'}
 };
 
+// Vycet existujicich "cheatu"
+enum CheatTypes
+{
+    CHEAT_IMMORTAL                 = 0,
+    CHEAT_UNLIMITED_BOMBS          = 1,
+    CHEAT_MAX_FLAME                = 2,
+    CHEAT_MAX_SPEED                = 3,
+    CHEAT_NEXT_LEVEL               = 4,
+    CHEAT_KILL_ALL                 = 5,
+    CHEAT_WALLHACK                 = 6,
+    MAX_CHEAT,
+};
+
+#define CONSOLE_OUTPUT_LINES 5
+#define CONSOLE_INPUT_HISTORY 10
+
+// Struktura popisniku cheatu
+struct ToggleCheatDesc
+{
+    uint32 id;        // id, viz CheatTypes
+    std::string name; // jmeno, zobrazi se jako vystup v konzoli
+    std::string str;  // co se musi zadat do konzole
+};
+
+static ToggleCheatDesc toggleCheatMap[] = {
+    {CHEAT_IMMORTAL,        "Immortality",     "REDHEAD"},
+    {CHEAT_UNLIMITED_BOMBS, "Unlimited bombs", "BIGPOCKET"},
+    {CHEAT_MAX_FLAME,       "Max flame",       "FIRESTARTER"},
+    {CHEAT_MAX_SPEED,       "Max speed",       "GONZALES"},
+    {CHEAT_WALLHACK,        "Wallhack",        "HAXORZ"},
+};
+
 
 #define DEFAULT_BOMB_FLAME_DURATION 800
 
@@ -201,6 +233,18 @@ class GameplayMgr
         // verejne pristupne, tady to nebude vadit
         PlayerStats localPlayerStats;
 
+        bool IsConsoleOpened() { return m_console; };
+        void OpenConsole() { if (IsGamePaused()) m_console = true; };
+        void CloseConsole() { m_console = false; };
+        const char* GetConsoleOutput(uint32 line) { if (line >= CONSOLE_OUTPUT_LINES) return ""; else return m_consoleOutput[line].c_str(); };
+        const char* GetConsoleInputHistory(uint32 line) { if (line >= CONSOLE_INPUT_HISTORY) return ""; else return m_consoleInputHistory[line].c_str(); };
+        void ConsoleWrite(const char* str, ...);
+        void ConsoleSubmit();
+        const char* GetConsoleInput() { return m_consoleInput.c_str(); };
+        void SetConsoleInput(const char* inp) { m_consoleInput = inp; }
+        uint32 GetCheatValue(uint32 id) { if (id >= MAX_CHEAT) return 0; else return m_cheatMap[id]; };
+        bool IsCheatOn(uint32 id) { return (GetCheatValue(id) > 0); };
+
     private:
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;
@@ -215,6 +259,12 @@ class GameplayMgr
         clock_t m_pauseTime;
         clock_t m_gameEndTime;
         uint8 m_stepSoundIndicator;
+
+        bool m_console;
+        uint32 m_cheatMap[MAX_CHEAT];
+        std::string m_consoleOutput[CONSOLE_OUTPUT_LINES];
+        std::string m_consoleInputHistory[CONSOLE_INPUT_HISTORY];
+        std::string m_consoleInput;
 
         ModelDisplayListRecord* m_playerRec;
         uint32 m_playerX, m_playerY;

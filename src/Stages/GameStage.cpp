@@ -16,6 +16,7 @@ void GameStage::OnEnter()
     sSoundMgr->InitMusicPlaylist();
     sSoundMgr->MusicStart();
     m_subStage = 0;
+    m_consoleHistoryLine = 0;
 
     // Svetla
     glEnable(GL_LIGHTING);
@@ -177,8 +178,6 @@ void GameStage::OnDraw()
             else
                 sDisplay->PrintText(MAIN_FONT, 450, 52, FONT_SIZE_H3, 0, COLOR(0,0,127), "0:00");
         }
-
-        sDisplay->Setup3DMode();
     }
     // Hra zapauzovana
     else if (m_subStage == 2)
@@ -198,8 +197,6 @@ void GameStage::OnDraw()
             sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, 0, COLOR(200, 200, 0), "Ukonèit hru");
         else
             sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*FONT_SIZE_3, 250+60 , FONT_SIZE_3, 0, COLOR(200, 0, 0), "Ukonèit hru");
-
-        sDisplay->Setup3DMode();
     }
     // Game over!
     else if (m_subStage == 3)
@@ -222,8 +219,6 @@ void GameStage::OnDraw()
             sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Hlavní menu");
         else
             sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Hlavní menu");
-
-        sDisplay->Setup3DMode();
     }
     // Statistiky (po smrti)
     else if (m_subStage == 4 || m_subStage == 5)
@@ -257,9 +252,26 @@ void GameStage::OnDraw()
             sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 255, 0), "Zpìt do menu");
         else
             sDisplay->PrintText(FONT_ONE, WIDTH-50-38*12*FONT_SIZE_2, HEIGHT-64*FONT_SIZE_2-50, FONT_SIZE_2, 0, COLOR(255, 0, 0), "Zpìt do menu");
-
-        sDisplay->Setup3DMode();
     }
+
+    // Vykresleni konzole
+    if (sGameplayMgr->IsConsoleOpened())
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        // Pozadi
+        sDisplay->Draw2D(14, 5, 0, WIDTH-10, 140);
+
+        // Historie vystupu
+        for (uint32 i = 0; i < CONSOLE_OUTPUT_LINES; i++)
+            sDisplay->PrintText(MAIN_FONT, 10, 5+i*20, 1.0f, 0, NOCOLOR, "%s", sGameplayMgr->GetConsoleOutput(i));
+
+        // Aktualni vstup
+        sDisplay->PrintText(MAIN_FONT, 10, 5+CONSOLE_OUTPUT_LINES*20+15, 1.0f, 0, COLOR(255,200,200), "> %s", sGameplayMgr->GetConsoleInput());
+    }
+
+     sDisplay->Setup3DMode();
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
@@ -270,13 +282,82 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
         // Dovolime prepnuti pouze kdyz jsme zapauzovani nebo hrajeme
         if (m_subStage == 2)
         {
-            sGameplayMgr->UnpauseGame();
-            m_subStage = 0;
+            if (sGameplayMgr->IsConsoleOpened())
+                sGameplayMgr->CloseConsole();
+            else
+            {
+                sGameplayMgr->UnpauseGame();
+                m_subStage = 0;
+            }
         }
         else if (m_subStage == 0)
         {
             sGameplayMgr->PauseGame();
             m_subStage = 2;
+        }
+    }
+
+    // Pokud je substage rovna 2 (menu), zadny pohyb !
+    if (m_subStage == 2)
+    {
+        if (key == 192 && press)
+        {
+            if (sGameplayMgr->IsConsoleOpened())
+                sGameplayMgr->CloseConsole();
+            else
+            {
+                sGameplayMgr->OpenConsole();
+                return;
+            }
+        }
+    }
+
+    // Psani do konzole
+    if (sGameplayMgr->IsConsoleOpened() && press)
+    {
+        // tisknutelne znaky
+        if ((key >= 'a' && key <= 'z')
+            || (key >= 'A' && key <= 'Z')
+            || (key >= '0' && key <= '9')
+            || key == VK_SPACE)
+        {
+            char* newline = new char[strlen(sGameplayMgr->GetConsoleInput())+1];
+            sprintf(newline, "%s%c", sGameplayMgr->GetConsoleInput(), key);
+            sGameplayMgr->SetConsoleInput(newline);
+            m_consoleHistoryLine = 0;
+        }
+        // backspace
+        else if (key == VK_BACK)
+        {
+            char* newline = new char[strlen(sGameplayMgr->GetConsoleInput())];
+            sprintf(newline, "%s", sGameplayMgr->GetConsoleInput());
+            newline[strlen(newline)-1] = '\0';
+            sGameplayMgr->SetConsoleInput(newline);
+            m_consoleHistoryLine = 0;
+        }
+        // sipka nahoru - historie
+        else if (key == VK_UP)
+        {
+            if (m_consoleHistoryLine < CONSOLE_INPUT_HISTORY)
+            {
+                m_consoleHistoryLine++;
+                sGameplayMgr->SetConsoleInput(sGameplayMgr->GetConsoleInputHistory(CONSOLE_INPUT_HISTORY-m_consoleHistoryLine));
+            }
+        }
+        // sipka dolu - historie
+        else if (key == VK_DOWN)
+        {
+            if (m_consoleHistoryLine > 0)
+            {
+                m_consoleHistoryLine--;
+                sGameplayMgr->SetConsoleInput(sGameplayMgr->GetConsoleInputHistory(CONSOLE_INPUT_HISTORY-m_consoleHistoryLine));
+            }
+        }
+        // enter - potvrzeni
+        else if (key == VK_RETURN)
+        {
+            sGameplayMgr->ConsoleSubmit();
+            m_consoleHistoryLine = 0;
         }
     }
 
@@ -355,6 +436,7 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             // Zpet do hry
             if (IN_RANGE(x, y, WIDTH/2-38*5.5f*FONT_SIZE_3, WIDTH/2+38*5.5f*FONT_SIZE_3, 250-5, 250+35))
             {
+                sGameplayMgr->CloseConsole();
                 sGameplayMgr->UnpauseGame();
                 m_subStage = 0;
             }

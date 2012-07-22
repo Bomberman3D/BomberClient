@@ -175,6 +175,11 @@ void GameplayMgr::OnGameInit()
 
     memset(&localPlayerStats, 0, sizeof(PlayerStats::UniversalStatTemplate));
 
+    m_console = false;
+    memset(&m_cheatMap, 0, sizeof(m_cheatMap));
+    for (uint32 i = 0; i < CONSOLE_OUTPUT_LINES; i++)
+        m_consoleOutput[i] = "";
+
     if (!BombMap.empty())
     {
         for (std::list<BombRecord*>::iterator itr = BombMap.begin(); itr != BombMap.end();)
@@ -538,6 +543,9 @@ void GameplayMgr::PlayerDied()
     if (m_playerDead)
         return;
 
+    if (IsCheatOn(CHEAT_IMMORTAL))
+        return;
+
     BlockMovement();
 
     m_playerDead = true;
@@ -617,6 +625,97 @@ void GameplayMgr::UnpauseGame()
     int middleX = sConfig->WindowWidth >> 1;
     int middleY = sConfig->WindowHeight >> 1;
     SetCursorPos(middleX, middleY);
+}
+
+/** \brief Vystup na herni konzoli
+ *
+ * Vyroluje vsechny polozky ve vystupu o jednu nahoru (jedna se tedy zahodi) a novy vypis da na novou radku
+ * TODO: zalamovani --> nova privatni fce pouze s argumentem typu const char*
+ */
+void GameplayMgr::ConsoleWrite(const char *str, ...)
+{
+    va_list argList;
+    va_start(argList, str);
+    char buf[2048];
+    vsnprintf(buf,2048,str,argList);
+    va_end(argList);
+
+    for (uint32 i = 1; i < CONSOLE_OUTPUT_LINES; i++)
+        m_consoleOutput[i-1] = m_consoleOutput[i].c_str();
+
+    m_consoleOutput[CONSOLE_OUTPUT_LINES-1] = buf;
+}
+
+/** \brief Vstup na herni konzoli (povrzeno enterem)
+ *
+ * Zaznamena vstup do mapy a zpracuje ho
+ */
+void GameplayMgr::ConsoleSubmit()
+{
+    if (!IsConsoleOpened())
+        return;
+
+    // = potvrzeni prazdneho radku, nema cenu handlovat dale
+    if (m_consoleInput.size() == 0)
+        return;
+
+    // Odrolovat historii vstupu
+    for (uint32 i = 1; i < CONSOLE_INPUT_HISTORY; i++)
+        m_consoleInputHistory[i-1] = m_consoleInputHistory[i];
+
+    // a na konec zaradit aktualni vstup
+    m_consoleInputHistory[CONSOLE_INPUT_HISTORY-1] = m_consoleInput.c_str();
+
+    // vypsat nas prikaz na konzoli
+    ConsoleWrite(">> %s", m_consoleInput.c_str());
+
+    // prikazy pouzitelne jen pri hrani
+    if (sApplication->GetStage() == STAGE_GAME)
+    {
+        // Testovaci vystupy
+        if (m_consoleInput.compare(0, m_consoleInput.size(), "POS X") == 0)
+            ConsoleWrite("Position X: %f", sDisplay->GetTargetX());
+        else if (m_consoleInput.compare(0, m_consoleInput.size(), "POS Y") == 0)
+            ConsoleWrite("Position Y: %f", sDisplay->GetTargetY());
+        else if (m_consoleInput.compare(0, m_consoleInput.size(), "POS Z") == 0)
+            ConsoleWrite("Position Z: %f", sDisplay->GetTargetZ());
+        // Cheaty
+        else if (m_consoleInput.compare(0, m_consoleInput.size(), "JUMPOVER") == 0)
+        {
+            // CHEAT_NEXT_LEVEL
+            // TODO: az bude hotova kampan, overit, zdali je to kampan a pripadne postoupit do dalsiho levelu
+            ConsoleWrite("Next level!");
+        }
+        else if (m_consoleInput.compare(0, m_consoleInput.size(), "KILLKENNNY") == 0)
+        {
+            // CHEAT_KILL_ALL
+            // TODO: projit mapu nepratel a vsechny zabit
+            ConsoleWrite("All enemies killed!");
+        }
+        // Prepinaci cheaty
+        else
+        {
+            for (uint32 i = 0; i < sizeof(toggleCheatMap)/sizeof(ToggleCheatDesc); i++)
+            {
+                if (m_consoleInput.compare(0, m_consoleInput.size(), toggleCheatMap[i].str.c_str()) == 0)
+                {
+                    if (m_cheatMap[toggleCheatMap[i].id] > 0)
+                    {
+                        ConsoleWrite("%s OFF!", toggleCheatMap[i].name.c_str());
+                        m_cheatMap[toggleCheatMap[i].id] = 0;
+                    }
+                    else
+                    {
+                        ConsoleWrite("%s ON!", toggleCheatMap[i].name.c_str());
+                        m_cheatMap[toggleCheatMap[i].id] = 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    m_consoleInput = "";
 }
 
 /** \brief Natoceni hrace podle posunu mysi

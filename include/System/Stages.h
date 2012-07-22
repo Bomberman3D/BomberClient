@@ -226,6 +226,7 @@ class GameStage: public StageControl
         void OnUpdate();
 
     protected:
+        uint8 m_consoleHistoryLine;
 };
 
 /** \class CreditsStage
