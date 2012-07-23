@@ -195,7 +195,7 @@ class GameplayMgr
         bool AddBomb(uint32 x, uint32 y);
         void PreBoomBomb(uint32 x, uint32 y);
 
-        float GetPlayerSpeedCoef() { return m_plSpeedCoef; };
+        float GetPlayerSpeedCoef() { return IsCheatOn(CHEAT_MAX_SPEED)?2.0f:m_plSpeedCoef; };
         uint32 GetFlameReach() { return m_plFlameReach; };
         uint32 GetMaxBombs() { return m_plMaxBombs; };
 

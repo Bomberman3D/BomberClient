@@ -293,14 +293,14 @@ GameType GameplayMgr::GetGameType()
  */
 bool GameplayMgr::AddBomb(uint32 x, uint32 y)
 {
-    if (m_plActiveBombs >= m_plMaxBombs)
+    if (m_plActiveBombs >= m_plMaxBombs && !IsCheatOn(CHEAT_UNLIMITED_BOMBS))
         return false;
 
     BombRecord* bomb = new BombRecord;
     bomb->x = x;
     bomb->y = y;
     bomb->boomTime = clock() + 2500;
-    bomb->reach = GetFlameReach();
+    bomb->reach = IsCheatOn(CHEAT_MAX_FLAME)?10:GetFlameReach();
     bomb->sizzleSound = sSoundMgr->PlayEffect(2, true, true);
     BombMap.push_back(bomb);
 

@@ -5,6 +5,7 @@
 #include <Effects/ParticleEmitter.h>
 #include <Map.h>
 #include <LoadingThread.h>
+#include <Gameplay.h>
 
 /** \brief Konstruktor
  *
@@ -1360,6 +1361,10 @@ uint16 DisplayMgr::CheckCollision(float newx, float newy, float newz)
             // Kolize s dynamickymi prvky mapy
             else if (pMap->dynfield[i][j].size() > 0)
             {
+                // wallhack cheat
+                if (sGameplayMgr->IsCheatOn(CHEAT_WALLHACK))
+                    continue;
+
                 for (uint32 k = 0; k < pMap->dynfield[i][j].size(); k++)
                 {
                     switch (pMap->dynfield[i][j][k].type)
