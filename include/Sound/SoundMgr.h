@@ -3,13 +3,7 @@
 
 #include <Global.h>
 #include <Singleton.h>
-#include <cAudio.h>
-
-#if defined(CAUDIO_PLATFORM_WIN)
-  #define AUDIO_FILE(_soundName_) CAUDIO_MEDIA_ROOT##_soundName_
-#else
-  #define AUDIO_FILE(_soundName_) CAUDIO_MEDIA_ROOT#_soundName_
-#endif
+#include <FreeSLW.h>
 
 /** \struct SoundEffectRecord
  *  \brief Struktura zaznamu mapy vsech prehravanych zvukovych efektu
@@ -21,7 +15,7 @@ struct SoundEffectRecord
     bool manual_remove;
     bool remove;
     clock_t start_time;
-    cAudio::IAudioSource* audiosource;
+    freeslw::Sound* audiosource;
 };
 
 /** \var SoundEffectRecord::sound_id
@@ -66,16 +60,16 @@ class SoundMgr
         SoundEffectRecord* PlayEffect(uint32 sound_id, bool repeat = false, bool manual_remove = false, uint32 delay_by = 0);
         void StopSoundEffect(SoundEffectRecord* rec);
 
-        cAudio::IAudioSource* CreateMusicSource(std::string filename);
-        cAudio::IAudioSource* CreateSoundEffectSource(std::string filename);
+        freeslw::Sound* CreateMusicSource(std::string filename);
+        freeslw::Sound* CreateSoundEffectSource(std::string filename);
 
     private:
-        cAudio::IAudioManager* m_audioMgr;
-        cAudio::IAudioManager* m_audioEffectMgr;
-        cAudio::IAudioSource* m_current;
+        freeslw::AudioInterface* m_audioMgr;
+        freeslw::AudioInterface* m_audioEffectMgr;
+        freeslw::Sound* m_current;
         clock_t m_lastMusicStart;
 
-        cAudio::IAudioSource* m_footSteps[4];
+        freeslw::Sound* m_footSteps[4];
 
         std::list<SoundEffectRecord*> m_effectsPlayed;
 

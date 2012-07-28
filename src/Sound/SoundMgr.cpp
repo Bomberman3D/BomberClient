@@ -2,6 +2,11 @@
 #include <SoundMgr.h>
 #include <Gameplay.h>
 
+void soundEngineErrorCallback(const char* msg)
+{
+    fprintf(stdout, "SoundMgr: an error occured: %s", msg);
+}
+
 /** \brief Konstruktor
  *
  * Pouze nulovani veskerych hodnot a ukazatelu
@@ -28,13 +33,7 @@ SoundMgr::SoundMgr()
  */
 SoundMgr::~SoundMgr()
 {
-    if (m_audioMgr)
-        m_audioMgr->shutDown();
-
-    if (m_audioEffectMgr)
-        m_audioEffectMgr->shutDown();
-
-    cAudio::destroyAudioManager(m_audioMgr);
+    freeslw::ReleaseInterface();
 }
 
 /** \brief Inicializace zvukoveho enginu
@@ -43,14 +42,16 @@ SoundMgr::~SoundMgr()
  */
 void SoundMgr::Initialize()
 {
-    m_audioMgr = cAudio::createAudioManager(true);
-    m_audioEffectMgr = cAudio::createAudioManager(true);
+    freeslw::SetErrorCallback(soundEngineErrorCallback);
+
+    m_audioMgr = freeslw::GetInterface(freeslw::AS_OPENAL);
+    m_audioEffectMgr = freeslw::GetInterface(freeslw::AS_OPENAL);
 
     if (m_audioMgr)
-        m_audioMgr->setMasterVolume((float)sConfig->MusicVolume/100.0f);
+        m_audioMgr->SetVolume((float)sConfig->MusicVolume/100.0f);
 
     if (m_audioEffectMgr)
-        m_audioEffectMgr->setMasterVolume((float)sConfig->EffectVolume/100.0f);
+        m_audioEffectMgr->SetVolume((float)sConfig->EffectVolume/100.0f);
 }
 
 /** \brief Update funkce
@@ -62,6 +63,9 @@ void SoundMgr::Update()
     if (!m_audioMgr || !m_audioEffectMgr)
         return;
 
+    m_audioMgr->Update();
+    m_audioEffectMgr->Update();
+
     // Nejdriv projedeme cely list prehravanych zvuku a odstranime vsechny, co jiz nehrajou a nemaji nastaveny priznak pro manualni smazani
     // pripadne ty, co maji nastaveny priznak pro smazani
     for (std::list<SoundEffectRecord*>::iterator itr = m_effectsPlayed.begin(); itr != m_effectsPlayed.end(); )
@@ -70,14 +74,17 @@ void SoundMgr::Update()
         {
             (*itr)->start_time = 0;
             if ((*itr)->audiosource)
-                (*itr)->audiosource->play2d((*itr)->repeat);
+                (*itr)->audiosource->Play();
         }
 
+        if ((*itr)->repeat && (!(*itr)->remove))
+            (*itr)->audiosource->Play();
+
         if (((*itr)->manual_remove && (*itr)->remove)
-            || (!(*itr)->manual_remove && !(*itr)->audiosource->isPlaying() && (*itr)->start_time == 0))
+            || (!(*itr)->manual_remove && !(*itr)->audiosource->IsPlaying() && (*itr)->start_time == 0))
         {
-            (*itr)->audiosource->stop();
-            m_audioEffectMgr->release((*itr)->audiosource);
+            (*itr)->audiosource->Stop();
+            m_audioEffectMgr->ReleaseSound((*itr)->audiosource);
             itr = m_effectsPlayed.erase(itr);
             continue;
         }
@@ -94,10 +101,10 @@ void SoundMgr::Update()
     if (!m_playing)
     {
         // Pripadne ho zastavime
-        if (m_current && m_current->isPlaying())
+        if (m_current && m_current->IsPlaying())
         {
-            m_current->stop();
-            m_audioMgr->release(m_current);
+            m_current->Stop();
+            m_audioMgr->ReleaseSound(m_current);
         }
 
         return;
@@ -109,7 +116,7 @@ void SoundMgr::Update()
     if (m_current)
     {
         // Pokud jeste muziku prehravame, neni co delat
-        if (m_current->isPlaying())
+        if (m_current->IsPlaying())
             return;
 
         // pozice v playlistu se inkrementuje jen pokud skoncilo prehravani predchozi polozky
@@ -132,14 +139,14 @@ void SoundMgr::Update()
 
     // Uvolnime stary zaznam
     if (m_current)
-        m_audioMgr->release(m_current);
+        m_audioMgr->ReleaseSound(m_current);
 
     // Vytvorime novy zdroj a nechame ho prehrat
     m_current = CreateMusicSource(sStorage->MusicData[m_playlist[m_playlistPos]].filename.c_str());
 
     if (m_current)
     {
-        m_current->play2d(false);
+        m_current->Play();
         m_lastMusicStart = clock();
     }
     else
@@ -184,7 +191,7 @@ void SoundMgr::MusicStart()
 
     if (m_current)
     {
-        m_current->play2d(false);
+        m_current->Play();
         m_lastMusicStart = clock();
     }
     else
@@ -198,7 +205,7 @@ void SoundMgr::MusicStop()
     m_playing = false;
 
     if (m_current)
-        m_current->stop();
+        m_current->Stop();
 }
 
 /** \brief Pauza hudby
@@ -208,7 +215,7 @@ void SoundMgr::MusicPause()
     m_playing = false;
 
     if (m_current)
-        m_current->pause();
+        m_current->Pause();
 }
 
 /** \brief Odpauzovani hudby
@@ -218,12 +225,12 @@ void SoundMgr::MusicUnpause()
     m_playing = true;
 
     if (m_current)
-        m_current->play();
+        m_current->Play();
 }
 
 /** \brief Postara se o vytvoreni zdroje hudby (pro streamovani z disku)
  */
-cAudio::IAudioSource* SoundMgr::CreateMusicSource(std::string filename)
+freeslw::Sound* SoundMgr::CreateMusicSource(std::string filename)
 {
     std::stringstream tmpname;
     tmpname.clear();
@@ -231,12 +238,12 @@ cAudio::IAudioSource* SoundMgr::CreateMusicSource(std::string filename)
     tmpname << filename;
     tmpname << '\0';
 
-    return m_audioMgr->create("music", tmpname.str().c_str(), true);
+    return m_audioMgr->LoadSound(tmpname.str().c_str());
 }
 
 /** \brief Postara se o vytvoreni zdroje zvukoveho efektu (pro streamovani z disku)
  */
-cAudio::IAudioSource* SoundMgr::CreateSoundEffectSource(std::string filename)
+freeslw::Sound* SoundMgr::CreateSoundEffectSource(std::string filename)
 {
     std::stringstream tmpname;
     tmpname.clear();
@@ -244,7 +251,7 @@ cAudio::IAudioSource* SoundMgr::CreateSoundEffectSource(std::string filename)
     tmpname << filename;
     tmpname << '\0';
 
-    return m_audioEffectMgr->create("bling", tmpname.str().c_str(), true);
+    return m_audioEffectMgr->LoadSound(tmpname.str().c_str());
 }
 
 /** \brief Vytvori zaznam pro prehravani zvukoveho efektu a spusti jeho prehravani
@@ -261,7 +268,7 @@ SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manua
             m_footSteps[sound_id-18] = CreateSoundEffectSource(sStorage->SoundEffectData[sound_id].c_str());
 
         if (m_footSteps[sound_id-18])
-            m_footSteps[sound_id-18]->play2d();
+            m_footSteps[sound_id-18]->Play();
 
         return NULL;
     }
@@ -286,7 +293,7 @@ SoundEffectRecord* SoundMgr::PlayEffect(uint32 sound_id, bool repeat, bool manua
     }
 
     if (delay_by == 0)
-        pNew->audiosource->play2d(repeat);
+        pNew->audiosource->Play();
 
     m_effectsPlayed.push_back(pNew);
 
@@ -313,7 +320,7 @@ void SoundMgr::StopSoundEffect(SoundEffectRecord *rec)
         if ((*itr) == rec)
         {
             if (rec->audiosource)
-                rec->audiosource->stop();
+                rec->audiosource->Stop();
 
             rec->remove = true;
             break;
