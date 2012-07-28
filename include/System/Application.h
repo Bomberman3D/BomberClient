@@ -38,7 +38,7 @@ class Application
 
         void Update();
 
-        void SetStage(uint32 newstage, uint32 newphase = 0);
+        void SetStage(uint32 newstage, uint32 newphase = 0, bool cleanup = true);
         uint32 GetStage() { return m_currStage->GetType(); };
         void SetStagePhase(uint32 newphase);
         uint32 GetStagePhase() { return m_currStage->GetSubStage(); };

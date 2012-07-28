@@ -963,13 +963,42 @@ bool MovementHolder::HasPath()
     return (m_path.size() > 1);
 }
 
+EnemyTemplate::EnemyTemplate()
+{
+    pRecord = NULL;
+    m_isDead = false;
+    m_movement = new MovementHolder(this);
+    m_nextMoveTypeUpdate = 0;
+    m_AILevel = 1;
+}
+
 /** \brief Inicializace nepritele
  *
  * Zde dojde k vytvoreni modelu, jeho featur, zvetseni/zmenseni a podobne. Zaroven se zde nastavuje uroven jeho inteligence pomoci udaju zadanych hracem
  */
-void EnemyTemplate::Init(uint32 modelId, uint32 x, uint32 y, uint32 position)
+void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
 {
     m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
+
+    m_AI = sScriptMgr->CreateEnemyAI(0, this);
+
+    m_Data = &sStorage->EnemyData[enemyId];
+
+    uint32 modelId = 0;
+    for (int32 i = MAX_ENEMY_MODELS-1; i >= 0; i--)
+    {
+        if (m_Data->modelID[i] != 0)
+        {
+            modelId = m_Data->modelID[rand()%(i+1)];
+            break;
+        }
+    }
+
+    // Pokud AI neprepise ID modelu, vrati to same
+    modelId = m_AI->OverrideModelId(modelId);
+
+    // Pokud jeste neni zarazen k nacteni, udelame to
+    sGameplayMgr->AddResourceModelID(modelId);
 
     float scale = 1.0f;
     float height = 0.0f;
@@ -1107,4 +1136,12 @@ void EnemyTemplate::Update()
             m_movement->Update();
         }
     }
+}
+
+void EnemyTemplate::SetDead(bool dead)
+{
+    m_isDead = dead;
+
+    if (dead)
+        m_AI->OnDead();
 }

@@ -12,7 +12,6 @@
 
 void GameStage::OnEnter()
 {
-    sGameplayMgr->OnGameInit();
     sSoundMgr->InitMusicPlaylist();
     sSoundMgr->MusicStart();
     m_subStage = 0;

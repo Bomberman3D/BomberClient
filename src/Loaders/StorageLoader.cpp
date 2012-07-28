@@ -339,3 +339,30 @@ bool Storage::LoadSoundEffectData()
 
     return true;
 }
+
+/** \brief Nacteni dat o nepratelich
+ */
+bool Storage::LoadEnemyData()
+{
+    Database* pDB = OpenDatabase("enemy.db3");
+    Query qry(*pDB);
+    SQLiteQuery(&qry, "SELECT * FROM enemy_template");
+
+    if (qry.num_rows() == 0)
+        return false;
+
+    uint32 count = 0;
+    uint32 id;
+    while (qry.fetch_row())
+    {
+        id = qry.getval();
+        EnemyData[id].defAILevel = qry.getval();
+        for (uint32 i = 0; i < MAX_ENEMY_MODELS; i++)
+            EnemyData[id].modelID[i] = qry.getval();
+        count++;
+    }
+    fprintf(stdout,"Nacteno %u dat nepratel\n",count);
+    qry.free_result();
+
+    return true;
+}

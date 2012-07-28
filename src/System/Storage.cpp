@@ -22,6 +22,7 @@ void Storage::Load()
     LoadMapObjectData();
     LoadMusicData();
     LoadSoundEffectData();
+    LoadEnemyData();
 
     PrepareDynamicStorages();
 }

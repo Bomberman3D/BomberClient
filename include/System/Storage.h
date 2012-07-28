@@ -211,6 +211,21 @@ struct MusicFileData
  *  \brief Popis, obvykle jmeno skladby
  */
 
+#define MAX_ENEMY_MODELS 4
+
+/** \struct EnemyTemplateData
+ *  \brief Struktura dat o nepratelskych typech
+ */
+struct EnemyTemplateData
+{
+    uint32 defAILevel;
+    uint32 modelID[MAX_ENEMY_MODELS];
+};
+
+/** \var EnemyTemplateData::defAILevel
+ *  \brief Vychozi uroven AI
+ */
+
 
 /** \class Storage
  *  \brief Trida uchovavajici veskera staticka data a cast dynamickych, stara se take o jejich nacteni
@@ -241,6 +256,7 @@ class Storage
         bool LoadMapObjectData();
         bool LoadMusicData();
         bool LoadSoundEffectData();
+        bool LoadEnemyData();
 
         // Typedefs
         typedef std::pair<uint32, std::string> IDNamePair;
@@ -256,6 +272,7 @@ class Storage
         typedef std::map<IDNamePair, ObjectModifierData> ObjectModifierMap;
         typedef std::map<IDNamePair, std::vector<ObjectArtkitData>> ObjectArtkitMap;
         typedef std::map<uint32, MusicFileData> MusicDataMap;
+        typedef std::map<uint32, EnemyTemplateData> EnemyTemplateMap;
 
         // Uloziste (externi, SQLite)
         IdFilenameMap TextureFilename;
@@ -271,6 +288,7 @@ class Storage
         ObjectArtkitMap ObjectArtkits;
         MusicDataMap MusicData;
         IdFilenameMap SoundEffectData;
+        EnemyTemplateMap EnemyData;
 
         // Dynamicky ukladana data
         // textury, modely a podobne

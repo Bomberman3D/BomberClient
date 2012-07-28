@@ -51,6 +51,8 @@ void LoadingStage::OnEnter()
     // GameSettings stage by nam mela do storage nastavit ID mapy, kterou si uzivatel vybral
     sMapManager->LoadMap(sGameplayMgr->GetSetting(SETTING_MAP_ID));
 
+    sGameplayMgr->OnGameInit();
+
     // Nacist modely a jejich display listy!
     PreLoad(LOAD_MODEL, 8);
 
@@ -96,6 +98,6 @@ void LoadingStage::OnDraw()
     if (IsAllLoaded())
     {
         m_toLoad.clear();
-        sApplication->SetStage(STAGE_GAME);
+        sApplication->SetStage(STAGE_GAME, 0, false);
     }
 }

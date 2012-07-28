@@ -4,6 +4,9 @@
 #include <Global.h>
 #include <Map.h>
 #include <Gameplay.h>
+#include <ScriptMgr.h>
+
+struct EnemyAI;
 
 /** \struct PathNode
  *  \brief Bod cesty (pole ve 2D mape)
@@ -247,12 +250,12 @@ class MovementHolder
 class EnemyTemplate
 {
     public:
-        EnemyTemplate() { pRecord = NULL; m_isDead = false; m_movement = new MovementHolder(this); m_nextMoveTypeUpdate = 0; m_AILevel = 1; };
-        void Init(uint32 modelId, uint32 x, uint32 y, uint32 position);
+        EnemyTemplate();
+        void Init(uint32 enemyId, uint32 x, uint32 y, uint32 position);
         void Update();
 
         bool IsDead() { return m_isDead; };
-        void SetDead(bool dead = true) { m_isDead = dead; };
+        void SetDead(bool dead = true);
 
         ModelDisplayListRecord* pRecord;
 
@@ -263,6 +266,8 @@ class EnemyTemplate
         bool m_isDead;
         uint8 m_AILevel;
         uint32 m_enemyX, m_enemyY;
+        EnemyAI* m_AI;
+        EnemyTemplateData* m_Data;
 };
 
 /** \fn EnemyTemplate::EnemyTemplate

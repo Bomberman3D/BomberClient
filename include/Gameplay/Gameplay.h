@@ -207,6 +207,7 @@ class GameplayMgr
         clock_t GetGameEndTime() { return m_gameEndTime; };
 
         GameTypeResources* GetGameTypeResources() { if (m_game) return &m_game->gameResources; else return NULL; };
+        void AddResourceModelID(uint32 id) { if (m_game) m_game->AddEnemyModelID(id); }
 
         uint32 GetSetting(SettingsEnum pos) { if (pos >= SETTING_MAX) return 0; else return m_settings[pos]; };
         void SetSetting(SettingsEnum pos, uint32 val) { if (pos < SETTING_MAX) m_settings[pos] = val; };
@@ -320,6 +321,10 @@ class GameplayMgr
 
 /** \fn GameplayMgr::GetGameTypeResources
  *  \brief Vraci ukazatel na strukturu s potrebnymi vecmi do daneho typu hry
+ */
+
+ /** \fn GameplayMgr::AddResourceModelID
+ *  \brief Pridava do hernich dat k nacteni ID modelu
  */
 
 /** \fn GameplayMgr::GetSetting

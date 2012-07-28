@@ -16,7 +16,9 @@ void MemeSingleGameType::FillGameTypeResources()
 {
     gameResources.PlayerModelIDs.push_back(11);
 
-    gameResources.EnemyModelIDs.push_back(11);
+    // nepratele 1-5 jsou prirazeni poporade
+    // model bude prepsan ve specialni metode jejich skriptu
+    gameResources.EnemyIDs.push_back(0+sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
 
     // 62-69 jsou textury rage comics obliceju
     for (uint32 i = 62; i <= 69; i++)
@@ -67,7 +69,7 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     MemeEnemy* pEnemy = new MemeEnemy;
-                    pEnemy->Init(gameResources.EnemyModelIDs[(rand()% gameResources.EnemyModelIDs.size() )], i, j, ++enemycount);
+                    pEnemy->Init(gameResources.EnemyIDs[(rand()% gameResources.EnemyIDs.size() )], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);

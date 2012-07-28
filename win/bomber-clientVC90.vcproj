@@ -298,6 +298,10 @@
 					RelativePath="..\src\Gameplay\Gameplay.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Gameplay\ScriptMgr.cpp"
+					>
+				</File>
 				<Filter
 					Name="GameTypes"
 					>
@@ -446,6 +450,10 @@
 				</File>
 				<File
 					RelativePath="..\include\Gameplay\GameTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Gameplay\ScriptMgr.h"
 					>
 				</File>
 			</Filter>

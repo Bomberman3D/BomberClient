@@ -547,7 +547,7 @@ void Application::PMessageBox(const char* caption, const char* format, ...)
  *
  * Nastavi herni fazi podle zadaneho parametru \a newstage s para\a newphase
  */
-void Application::SetStage(uint32 newstage, uint32 newphase)
+void Application::SetStage(uint32 newstage, uint32 newphase, bool cleanup)
 {
     if (m_currStage)
     {
@@ -584,9 +584,12 @@ void Application::SetStage(uint32 newstage, uint32 newphase)
 
     assert(m_currStage != NULL);
 
-    sDisplay->FlushModelDisplayList();
-    sDisplay->FlushBillboardDisplayList();
-    sParticleEmitterMgr->FlushEmitters();
+    if (cleanup)
+    {
+        sDisplay->FlushModelDisplayList();
+        sDisplay->FlushBillboardDisplayList();
+        sParticleEmitterMgr->FlushEmitters();
+    }
 
     m_currStage->SetSubStage(newphase);
     m_currStage->OnEnter();

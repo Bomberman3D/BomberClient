@@ -313,6 +313,10 @@ void DisplayMgr::Update()
     sAnimator->Update();
     sParticleEmitterMgr->Update();
 
+    // V nacitaci fazi se nebude nic vykreslovat - v teto fazi se defakto pripravuje a konstruuje svet, coz by se vykreslilo
+    if (sApplication->GetStage() == STAGE_LOADING)
+        return;
+
     DrawModels();
     DrawBillboards();
 }

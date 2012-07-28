@@ -13,8 +13,8 @@ void ClassicSingleGameType::FillGameTypeResources()
 {
     gameResources.PlayerModelIDs.push_back(9);
 
-    gameResources.EnemyModelIDs.push_back(10);
-    gameResources.EnemyModelIDs.push_back(12);
+    // nepratele 1-5 jsou prirazeni poporade
+    gameResources.EnemyIDs.push_back(0+sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
 
     // 1-8 jsou songy zakladni sady
     for (uint32 i = 1; i <= 8; i++)
@@ -70,7 +70,7 @@ void ClassicSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                 if (startlocpos > 0 && startlocpos <= sGameplayMgr->GetSetting(SETTING_ENEMY_COUNT))
                 {
                     EnemyTemplate* pEnemy = new EnemyTemplate;
-                    pEnemy->Init(gameResources.EnemyModelIDs[(rand()% gameResources.EnemyModelIDs.size() )], i, j, ++enemycount);
+                    pEnemy->Init(gameResources.EnemyIDs[(rand()% gameResources.EnemyIDs.size() )], i, j, ++enemycount);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);

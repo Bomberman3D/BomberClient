@@ -34,7 +34,8 @@ typedef std::list<EnemyTemplate*> EnemyList;
 struct GameTypeResources
 {
     std::vector<uint32> PlayerModelIDs;
-    std::vector<uint32> EnemyModelIDs;
+    std::vector<uint32> EnemyIDs;
+    std::vector<uint32> EnemyModelIDs; // plneno az za behu!
 
     std::vector<uint32> MiscModelIDs;
     std::vector<uint32> MiscTextureIDs;
@@ -52,6 +53,7 @@ class GameTypeTemplate
         GameTypeTemplate()
         {
             gameResources.PlayerModelIDs.clear();
+            gameResources.EnemyIDs.clear();
             gameResources.EnemyModelIDs.clear();
             gameResources.MiscModelIDs.clear();
             gameResources.MiscTextureIDs.clear();
@@ -80,6 +82,14 @@ class GameTypeTemplate
         GameType GetType() { return m_type; };
 
         GameTypeResources gameResources;
+        void AddEnemyModelID(uint32 modelId)
+        {
+            for (std::vector<uint32>::const_iterator itr = gameResources.EnemyModelIDs.begin(); itr != gameResources.EnemyModelIDs.end(); ++itr)
+                if ((*itr) == modelId)
+                    return;
+
+            gameResources.EnemyModelIDs.push_back(modelId);
+        }
 
     protected:
         GameType m_type;
@@ -137,6 +147,10 @@ class GameTypeTemplate
 
 /** \var GameTypeTemplate::gameResources
  *  \brief Uloziste ID zdroju (modely, textury), ktere jsou treba nacist v nacitaci fazi pred vstupem do hry
+ */
+
+/** \fn GameTypeTemplate::AddEnemyModelID
+ *  \brief Prida ID modelu do mapy k nacteni
  */
 
 /** \class ClassicSingleGameType
