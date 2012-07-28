@@ -35,6 +35,24 @@ DisplayMgr::~DisplayMgr()
         glDeleteLists(m_fontBase[i], 96);
 }
 
+/** \brief Prvotni inicializace volana pred samotnym spustenim zbytku enginu
+ *
+ * Zajisti nacteni textur/modelu, ktere budou vyzadovany po cely beh aplikace, atd..
+ */
+void DisplayMgr::StartUp()
+{
+    // Textury fontu
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 17);
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 44);
+    // Polopruhledne podklady
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 14);
+    sLoader->RequestLoadBlocking(LOAD_TEXTURE, 15);
+
+    // Ramecky
+    for (uint32 i = 72; i <= 79; i++)
+        sLoader->RequestLoadBlocking(LOAD_TEXTURE, i);
+}
+
 /** \brief Inicializace zobrazeni, reset do puvodnich hodnot
  *
  * Zajistuje vynulovani uplne vsech hodnot - pouziva se napriklad pri prechodech do jinych fazi hry

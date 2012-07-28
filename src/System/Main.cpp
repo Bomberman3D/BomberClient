@@ -74,6 +74,7 @@ bool InitGL(GLvoid)
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_COLOR_MATERIAL);
 
+    sDisplay->StartUp();
     sDisplay->Initialize();
 
     return true;

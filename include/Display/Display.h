@@ -344,6 +344,7 @@ class DisplayMgr
         ~DisplayMgr();
 
         // Inicializace vseho mozneho
+        void StartUp();
         void Initialize();
         void InitFont(uint8 font);
 
