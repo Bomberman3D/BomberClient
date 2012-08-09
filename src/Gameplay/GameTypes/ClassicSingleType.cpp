@@ -329,6 +329,7 @@ void ClassicSingleGameType::OnDangerousFieldActivate(uint32 x, uint32 y)
         // Znicit nepritele pokud je na poli s vybuchem
         if (!(*itr)->IsDead() && ceil((*itr)->pRecord->x) == x && ceil((*itr)->pRecord->z) == y)
         {
+            (*itr)->AI()->OnDamageHit();
             (*itr)->SetDead(true);
             (*itr)->m_movement->Mutate(MOVEMENT_NONE);
 

@@ -1080,11 +1080,16 @@ void EnemyTemplate::Update()
         {
             m_AI->OnFieldChange(m_enemyX, m_enemyY, mx, my);
 
+            bool wasDangerous = sGameplayMgr->IsDangerousField(m_enemyX, m_enemyY);
+
             m_enemyX = mx;
             m_enemyY = my;
 
             if (sGameplayMgr->IsDangerousField(m_enemyX, m_enemyY))
             {
+                if (!wasDangerous)
+                    m_AI->OnDamageHit();
+
                 SetDead(true);
                 if (m_movement)
                     m_movement->Mutate(MOVEMENT_NONE);
@@ -1155,8 +1160,12 @@ void EnemyTemplate::Update()
     m_AI->OnUpdate();
 }
 
-void EnemyTemplate::SetDead(bool dead)
+void EnemyTemplate::SetDead(bool dead, bool force)
 {
+    // pokud se rozhodneme v AI zamezit smrti (treba boss vydrzi vetsi naloz nebo tak), adios
+    if (dead && !force && m_AI->AvoidDeath())
+        return;
+
     m_isDead = dead;
 
     if (dead)

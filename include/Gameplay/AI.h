@@ -255,7 +255,7 @@ class EnemyTemplate
         void Update();
 
         bool IsDead() { return m_isDead; };
-        void SetDead(bool dead = true);
+        void SetDead(bool dead = true, bool force = false);
 
         EnemyAI* AI() { return m_AI; };
 

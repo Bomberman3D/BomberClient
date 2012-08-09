@@ -21,6 +21,8 @@ struct EnemyAI
 
         virtual void OnUpdate() {};
         virtual void OnDead() {};
+        virtual void OnDamageHit() {};
+        virtual bool AvoidDeath() { return false; };
         virtual void OnFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY) {};
         virtual void OnMovementGeneratorChange(uint32 oldMovement, uint32 newMovement) {};
 
