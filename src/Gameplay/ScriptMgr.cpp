@@ -1,5 +1,6 @@
 #include <Global.h>
 #include <ScriptMgr.h>
+#include <Loader.h>
 
 EnemyScript::EnemyScript()
 {
@@ -19,6 +20,11 @@ ScriptMgr::ScriptMgr()
 ScriptMgr::~ScriptMgr()
 {
     //
+}
+
+void ScriptMgr::Initialize()
+{
+    LoadScripts();
 }
 
 void ScriptMgr::RegisterScript(uint32 enemyId, EnemyScript *scr)

@@ -863,6 +863,8 @@ bool MovementHolder::TryMutate(MovementType moveType)
 {
     if (TryGenerator(moveType))
     {
+        m_src->AI()->OnMovementGeneratorChange(m_moveType, moveType);
+
         m_moveType = moveType;
         m_path.clear();
         m_path.assign(m_tryPath.begin(), m_tryPath.end());
@@ -928,9 +930,18 @@ void MovementHolder::Update()
     if (timeDiff > timePass)
         timeDiff = timePass;
 
+    int32 fieldBefX = ceil(m_src->pRecord->x);
+    int32 fieldBefY = ceil(m_src->pRecord->z);
+
     // Posun modelu po vektoru pohybu
     m_src->pRecord->x = m_path[m_currentPathNode].x - 0.5f + ( m_nodeVector.x*( timeDiff/timePass ));
     m_src->pRecord->z = m_path[m_currentPathNode].y - 0.5f + ( m_nodeVector.y*( timeDiff/timePass ));
+
+    int32 fieldThenX = ceil(m_src->pRecord->x);
+    int32 fieldThenY = ceil(m_src->pRecord->z);
+
+    if (fieldBefX != fieldThenX || fieldBefY != fieldThenY)
+        m_src->AI()->OnFieldChange(fieldBefX, fieldBefY, fieldThenX, fieldThenY);
 
     // No a pokud jsme dosahli maximalniho bodu usecky urcene vektorem a delkou 1,
     // posuneme se na dalsi bod cesty
@@ -980,7 +991,7 @@ void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
 {
     m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
 
-    m_AI = sScriptMgr->CreateEnemyAI(0, this);
+    m_AI = sScriptMgr->CreateEnemyAI(enemyId, this);
 
     m_Data = &sStorage->EnemyData[enemyId];
 
@@ -1040,6 +1051,8 @@ void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
             sDisplay->AddModelFeature(pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(65, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
             break;
     }
+
+    m_AI->OnCreate();
 }
 
 /** \brief Update funkce nepritele
@@ -1136,6 +1149,8 @@ void EnemyTemplate::Update()
             m_movement->Update();
         }
     }
+
+    m_AI->OnUpdate();
 }
 
 void EnemyTemplate::SetDead(bool dead)

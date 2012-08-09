@@ -14,6 +14,7 @@
 #include <Timer.h>
 #include <LoadingThread.h>
 #include <SoundMgr.h>
+#include <ScriptMgr.h>
 
 #include <io.h>
 #include <stdlib.h>
@@ -484,6 +485,8 @@ bool Application::Init()
     sApplication->ApplyRenderContext(RC_MAIN);
 
     sSoundMgr->Initialize();
+
+    sScriptMgr->Initialize();
 
     m_currStage = new MenuStage;
     SetStage(STAGE_INTRO, 0); // Nasavit stage intro s parametrem 0, coz znaci uvodni prvotni intro

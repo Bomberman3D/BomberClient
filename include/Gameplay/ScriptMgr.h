@@ -46,6 +46,8 @@ class ScriptMgr
         ScriptMgr();
         ~ScriptMgr();
 
+        void Initialize();
+
         void RegisterScript(uint32 enemyId, EnemyScript* scr);
         bool HasScript(uint32 enemyId);
         EnemyAI* CreateEnemyAI(uint32 enemyId, EnemyTemplate* parent);

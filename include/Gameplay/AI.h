@@ -257,6 +257,8 @@ class EnemyTemplate
         bool IsDead() { return m_isDead; };
         void SetDead(bool dead = true);
 
+        EnemyAI* AI() { return m_AI; };
+
         ModelDisplayListRecord* pRecord;
 
         MovementHolder* m_movement;

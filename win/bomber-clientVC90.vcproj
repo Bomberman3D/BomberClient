@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Gameplay;../include/System;../dep/SQLite/;../dep/SOIL/;../include/Sound;../include/Sound/FreeSLW"
+				AdditionalIncludeDirectories="../include/;../include/Display;../include/Loaders;../include/Network;../include/Gameplay;../include/System;../dep/SQLite/;../dep/SOIL/;../include/Sound;../include/Sound/FreeSLW;../include/Scripts/"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glu32.lib glut32.lib ws2_32.lib SOIL.lib FreeSLW.lib"
+				AdditionalDependencies="opengl32.lib glu32.lib glut32.lib ws2_32.lib SOIL.lib FreeSLW.lib bomber-scripts.lib"
 				AdditionalLibraryDirectories="&quot;$(InputDir)\$(ConfigurationName)&quot;;../lib/"
 				GenerateDebugInformation="true"
 				StackReserveSize="0"
