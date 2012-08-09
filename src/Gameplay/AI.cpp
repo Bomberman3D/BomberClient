@@ -1078,6 +1078,8 @@ void EnemyTemplate::Update()
         // Pokud jsme se posunuli na jine pole ve 2D mape, musime osetrit, zdali jsme nestoupnuli na nebezpecne pole
         if (mx != m_enemyX || my != m_enemyY)
         {
+            m_AI->OnFieldChange(m_enemyX, m_enemyY, mx, my);
+
             m_enemyX = mx;
             m_enemyY = my;
 
