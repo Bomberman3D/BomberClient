@@ -348,6 +348,7 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
     itr->second.actualFrame    = sStorage->ModelAnimation[itr->second.sourceId].Anim[animId].frameFirst + startFrame;
     itr->second.nextFrameTime  = clock();
     itr->second.bothWay        = (flags & ANIM_FLAG_BOTHWAY);
+    itr->second.animFlags      = flags;
     if (frameSkipSpeed > 0)
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }
@@ -623,6 +624,23 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
             processed = true;
         }
     }
+    // Model hrace - smrt
+    else if ((modelId == 9 || modelId == 11) && anim == ANIM_DYING)
+    {
+        if (strcmp(object->strName, "Hlava") == 0 || strcmp(object->strName, "Oci") == 0 || strcmp(object->strName, "Antena") == 0
+             || strcmp(object->strName, "AntenaS") == 0 || strcmp(object->strName, "PravaRuka") == 0 || strcmp(object->strName, "PravaDlan") == 0
+             || strcmp(object->strName, "LevaRuka") == 0 || strcmp(object->strName, "LevaDlan") == 0 || strcmp(object->strName, "PravaNoha") == 0
+             || strcmp(object->strName, "PraveCh") == 0 || strcmp(object->strName, "LevaNoha") == 0 || strcmp(object->strName, "LeveCh") == 0
+             || strcmp(object->strName, "Telo") == 0 || strcmp(object->strName, "Pasek") == 0 || strcmp(object->strName, "Preska") == 0)
+        {
+            CVector3 vPosition = object->vPosition[realFrame];
+            glTranslatef(vPosition.x*(1.0f+(float(frame-102)/100)), vPosition.y*cos(((2.0f*float(frame-102)/100.0f)-1.0f)*(PI/2)), vPosition.z*(1.0f+(float(frame-102)/100)));
+            CVector3 vScale = object->vScale[realFrame];
+            glScalef(vScale.x*(1.0f-(float(frame-102)/150.0f)), vScale.y*(1.0f-(float(frame-102)/150.0f)), vScale.z*(1.0f-(float(frame-102)/150.0f)));
+
+            processed = true;
+        }
+    }
     // Model bomby - tikani
     else if (modelId == 8 && anim == ANIM_IDLE)
     {
@@ -688,6 +706,11 @@ void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
     if (!pModel)
         return;
 
+    uint32 frame = sAnimator->GetActualFrame(record->AnimTicket);
+    uint32 realFrame = frame;
+    if (realFrame >= pModel->customScale.size())
+        realFrame = 1;
+
     // Tikajici bomba - posunovani emitteru
     if (record->modelId == 8 && sAnimator->GetAnimId(record->AnimTicket) == ANIM_IDLE)
     {
@@ -711,22 +734,34 @@ void CustomAnimator::AnimateModelFeatures(ModelDisplayListRecord *record)
         switch ((*itr)->type)
         {
             case MF_TYPE_MODEL:
-                (*itr)->ToModel()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToModel()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToModel()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToModel()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToModel()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToModel()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
                 break;
             case MF_TYPE_BILLBOARD:
-                (*itr)->ToBillboard()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToBillboard()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToBillboard()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToBillboard()->x = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToBillboard()->y = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToBillboard()->z = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
 
-                if (record->modelId == 11 && sAnimator->GetAnimId(record->AnimTicket) == ANIM_WALK)
-                    (*itr)->ToBillboard()->y += (cos((1.0f-fabs((float(sAnimator->GetActualFrame(record->AnimTicket)%50)/25.0f)-1.0f))*PI/2))*0.1f;
+                // Headless bomberman
+                if (record->modelId == 11)
+                {
+                    if (sAnimator->GetAnimId(record->AnimTicket) == ANIM_WALK)
+                        (*itr)->ToBillboard()->y += (cos((1.0f-fabs((float(frame%50)/25.0f)-1.0f))*PI/2))*0.1f;
+                    else if (sAnimator->GetAnimId(record->AnimTicket) == ANIM_DYING)
+                    {
+                        (*itr)->ToBillboard()->y -= float(frame-102)/130.0f;
+                        (*itr)->ToBillboard()->billboard_x = false;
+                        (*itr)->ToBillboard()->billboard_y = false;
+                        (*itr)->ToBillboard()->rotate_x = (90.0f*float(frame-102)/100.0f);
+                        (*itr)->ToBillboard()->rotate_z = (90.0f*float(frame-102)/100.0f);
+                    }
+                }
                 break;
             case MF_TYPE_EMITTER:
-                (*itr)->ToEmitter()->m_centerX = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToEmitter()->m_centerY = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
-                (*itr)->ToEmitter()->m_centerZ = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[sAnimator->GetActualFrame(record->AnimTicket)]);
+                (*itr)->ToEmitter()->m_centerX = record->x + ((*itr)->offset_x * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToEmitter()->m_centerY = record->y + ((*itr)->offset_y * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
+                (*itr)->ToEmitter()->m_centerZ = record->z + ((*itr)->offset_z * MODEL_SCALE * record->scale * pModel->customScale[realFrame]);
                 break;
             default:
                 break;

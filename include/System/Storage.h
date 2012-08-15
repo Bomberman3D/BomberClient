@@ -14,6 +14,7 @@ enum ModelAnimType
     ANIM_WALK      = 2,
     ANIM_SPECIAL   = 3,
     ANIM_DISAPPEAR = 4,
+    ANIM_DYING     = 5,
     MAX_ANIM
 };
 

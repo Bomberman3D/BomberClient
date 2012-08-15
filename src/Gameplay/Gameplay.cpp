@@ -550,8 +550,7 @@ void GameplayMgr::PlayerDied()
 
     m_playerDead = true;
 
-    if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
+    sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_DYING, 0, 0, ANIM_FLAG_NOT_REPEAT);
 
     sSoundMgr->PlayEffect(9);
 

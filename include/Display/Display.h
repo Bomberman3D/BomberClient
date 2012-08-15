@@ -287,6 +287,7 @@ struct BillboardDisplayListRecord: public DisplayListRecord
     {
         remove = false;
         AnimTicket = 0;
+        rotate_x = rotate_y = rotate_z = 0.0f;
     }
 
     static BillboardDisplayListRecord* Create(uint32 textureId, float x, float y, float z,
@@ -295,6 +296,7 @@ struct BillboardDisplayListRecord: public DisplayListRecord
 
     uint32 textureId;
     float  scale_x, scale_y;
+    float  rotate_x, rotate_y, rotate_z;
     bool   billboard_x, billboard_y;
 };
 
