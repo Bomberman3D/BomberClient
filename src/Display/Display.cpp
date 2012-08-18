@@ -912,11 +912,11 @@ void DisplayMgr::DrawBillboards()
             temp->rotate_y = 90.0f-m_angleY;
 
         if (temp->billboard_x)
-            temp->rotate_x = m_angleX;
+            temp->rotate_z = -m_angleX;
 
-        glRotatef(temp->rotate_x, 0.0f, 0.0f, -1.0f);
+        glRotatef(temp->rotate_x, 1.0f, 0.0f,  0.0f);
         glRotatef(temp->rotate_y, 0.0f, 1.0f,  0.0f);
-        glRotatef(temp->rotate_z, 1.0f, 0.0f,  0.0f);
+        glRotatef(temp->rotate_z, 0.0f, 0.0f,  1.0f);
 
         if (temp->displayList > 0)
         {
