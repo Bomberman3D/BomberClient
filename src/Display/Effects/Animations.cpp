@@ -667,43 +667,31 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
 
         processed = true;
     }
-    // Enemy model 1 - umiraci sekvence
-    else if (modelId == 10 && anim == ANIM_DYING)
+    // Sdilena DYING (umiraci) animace pro enemy modely, nejspis bude u hodne modelu stejna
+    else if (anim == ANIM_DYING)
     {
-        t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Loft01");
-        if (!pObj)
-            return;
+        // Nalezeni objektu slouziciho jako ridici (podle jeho stredu se budou otacet vsechny objekty)
+        t3DObject* pObj = NULL;
+        if (modelId == 10)
+            pObj = sStorage->FindModelObjectInNonStored(model, "Loft01");
+        else if (modelId == 12)
+            pObj = sStorage->FindModelObjectInNonStored(model, "Voko");
 
-        CVector3 vPosition = object->vPosition[realFrame];
-        glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y-(8.0f*float(frame)/100.0f), pObj->vPosition[realFrame].z);
+        // Pokud byl nalezen, pootocit a sundat na zem
+        if (pObj)
+        {
+            CVector3 vPosition = object->vPosition[realFrame];
+            glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y-(8.0f*float(frame)/100.0f), pObj->vPosition[realFrame].z);
 
-        glRotatef((float(frame)/100.0f)*90.0f, -1.0f, 0.0f, 0.0f);
-        float factor = (1.0f-(float(frame)/100.0f))*0.5f+0.5f;
-        glScalef(factor, factor, factor);
+            glRotatef((float(frame)/100.0f)*90.0f, -1.0f, 0.0f, 0.0f);
+            float factor = (1.0f-(float(frame)/100.0f))*0.5f+0.5f;
+            glScalef(factor, factor, factor);
 
-        glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
-        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+            glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
+            glTranslatef(vPosition.x, vPosition.y, vPosition.z);
 
-        processed = true;
-    }
-    // Enemy model 2 - umiraci sekvence
-    else if (modelId == 12 && anim == ANIM_DYING)
-    {
-        t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Voko");
-        if (!pObj)
-            return;
-
-        CVector3 vPosition = object->vPosition[realFrame];
-        glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y-(8.0f*float(frame)/100.0f), pObj->vPosition[realFrame].z);
-
-        glRotatef((float(frame)/100.0f)*90.0f, -1.0f, 0.0f, 0.0f);
-        float factor = (1.0f-(float(frame)/100.0f))*0.5f+0.5f;
-        glScalef(factor, factor, factor);
-
-        glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
-        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
-
-        processed = true;
+            processed = true;
+        }
     }
 
     // Pokud se "nechytnul" ani jeden z nami deklarovanych objektu na danou animaci, vyuzijeme standardni postupy
