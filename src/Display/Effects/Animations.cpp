@@ -376,6 +376,9 @@ bool CustomAnimator::HaveModelCustomAnim(uint32 id)
     // Model hlavni postavy + headless postavy (meme mod)
     if (id == 9 || id == 11)
         return true;
+    // enemy-1.3DS, enemy-2.3DS
+    if (id == 10 || id == 12)
+        return true;
 
     return false;
 }
@@ -658,6 +661,44 @@ void CustomAnimator::AnimateModelObjectByFrame(t3DObject *object, t3DModel* mode
         float scalingFactor = (1.0f + (frame/100.0f)*0.3f);
         glScalef(scalingFactor, scalingFactor, scalingFactor);
         model->customScale[realFrame] = scalingFactor;
+
+        glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
+        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+        processed = true;
+    }
+    // Enemy model 1 - umiraci sekvence
+    else if (modelId == 10 && anim == ANIM_DYING)
+    {
+        t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Loft01");
+        if (!pObj)
+            return;
+
+        CVector3 vPosition = object->vPosition[realFrame];
+        glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y-(8.0f*float(frame)/100.0f), pObj->vPosition[realFrame].z);
+
+        glRotatef((float(frame)/100.0f)*90.0f, -1.0f, 0.0f, 0.0f);
+        float factor = (1.0f-(float(frame)/100.0f))*0.5f+0.5f;
+        glScalef(factor, factor, factor);
+
+        glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
+        glTranslatef(vPosition.x, vPosition.y, vPosition.z);
+
+        processed = true;
+    }
+    // Enemy model 2 - umiraci sekvence
+    else if (modelId == 12 && anim == ANIM_DYING)
+    {
+        t3DObject* pObj = sStorage->FindModelObjectInNonStored(model, "Voko");
+        if (!pObj)
+            return;
+
+        CVector3 vPosition = object->vPosition[realFrame];
+        glTranslatef(pObj->vPosition[realFrame].x, pObj->vPosition[realFrame].y-(8.0f*float(frame)/100.0f), pObj->vPosition[realFrame].z);
+
+        glRotatef((float(frame)/100.0f)*90.0f, -1.0f, 0.0f, 0.0f);
+        float factor = (1.0f-(float(frame)/100.0f))*0.5f+0.5f;
+        glScalef(factor, factor, factor);
 
         glTranslatef(-pObj->vPosition[realFrame].x, -pObj->vPosition[realFrame].y, -pObj->vPosition[realFrame].z);
         glTranslatef(vPosition.x, vPosition.y, vPosition.z);

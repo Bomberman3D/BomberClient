@@ -842,7 +842,8 @@ void MovementHolder::Mutate(MovementType moveType)
     if (moveType == MOVEMENT_NONE)
     {
         m_moveType = moveType;
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_IDLE, 0, 5);
+        if (!m_src->IsDead())
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_IDLE, 0, 5);
         m_path.clear();
         return;
     }
@@ -1169,5 +1170,17 @@ void EnemyTemplate::SetDead(bool dead, bool force)
     m_isDead = dead;
 
     if (dead)
+    {
         m_AI->OnDead();
+
+        if (pRecord->AnimTicket)
+            sAnimator->ChangeModelAnim(pRecord->AnimTicket, ANIM_DYING, 0, 0, ANIM_FLAG_NOT_REPEAT);
+        else
+            pRecord->AnimTicket = sAnimator->GetModelAnimTicket(pRecord->modelId, ANIM_DYING, 1, ANIM_FLAG_NOT_REPEAT);
+
+        // Special things after death such as feature removal and so
+
+        if (pRecord->modelId == 10)
+            sDisplay->ClearModelFeatures(pRecord);
+    }
 }
