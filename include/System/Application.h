@@ -37,6 +37,7 @@ class Application
         void PMessageBox(const char* caption, const char* format, ... );
 
         void Update();
+        void ProcessInterThreadRequests();
 
         void SetStage(uint32 newstage, uint32 newphase = 0, bool cleanup = true);
         uint32 GetStage() { return m_currStage->GetType(); };

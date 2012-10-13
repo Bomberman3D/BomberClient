@@ -6,6 +6,8 @@
 
 #define SOLID_BOX_HEIGHT 0.7f
 
+struct DisplayListRecord;
+
 // Typy pole mapy
 enum FieldType
 {
@@ -171,7 +173,7 @@ class MapManager
         bool LoadMap(uint32 id);
         void FillDynamicRecords();
 
-        const Map* GetMap() { return (const Map*)pMap; };
+        Map* GetMap() { return pMap; };
 
     private:
         void SetMapData(uint32 id);

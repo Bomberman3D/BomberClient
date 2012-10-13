@@ -4,6 +4,7 @@
 #include <Spinlock.h>
 #include <Application.h>
 #include <Storage.h>
+#include <Gameplay.h>
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
 
@@ -80,13 +81,16 @@ void PacketHandlers::HandleEnterGame(SmartPacket* data)
     sStorage->m_myId = myId;
     sStorage->m_instanceId = instanceId;
 
-    sApplication->SetStage(STAGE_LOADING);
+    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_MAP_CHANGE, 1);     // TODO: get map id from server
+    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_GAME_TYPE_CHANGE, GAME_TYPE_MP_CLASSIC); // TODO: get game type from server
+    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_STAGE_CHANGE, STAGE_LOADING);
+    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_SUBSTAGE_CHANGE, 0);
 }
 
 void PacketHandlers::HandleMapInitialData(SmartPacket* data)
 {
     uint32 count;
-    uint32 tmpx, tmpy;
+    uint16 tmpx, tmpy;
     uint8 type;
 
     uint32 tmp_id;
@@ -104,24 +108,24 @@ void PacketHandlers::HandleMapInitialData(SmartPacket* data)
 
     *data >> count;
 
-    /*gDisplayStore.NeedDLToken(DL_TOKEN_NETWORKTHREAD);
-
-    while (!gDisplayStore.HasDLToken(DL_TOKEN_NETWORKTHREAD))
+    ThreadRequestDynamicElement* tmp;
+    for (uint32 i = 0; i < count; i++)
     {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
-    }*/
+        *data >> tmpx;
+        *data >> tmpy;
+        *data >> type;
 
-    for (int i = 0; i < count; i++)
-    {
-        *data >> tmpx >> tmpy >> type;
+        tmp = new ThreadRequestDynamicElement;
+        tmp->x = tmpx;
+        tmp->y = tmpy;
+        tmp->rec.type = type;
+        tmp->rec.state = 0;
+        tmp->rec.misc = 0;
+        tmp->rec.special = NULL;
 
-        // rozbitelna bedna                //if (type == 1)
-        //    gDisplay
-        //sDisplay->DrawModel(tmpx-0.51f,0.0f,tmpy-0.51f,5,ANIM_IDLE,true,0.6f);
+        sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_DYNAMIC_MAP_ELEMENT, (void*)tmp);
     }
-    /*gDisplay.SetGameState(GAME_GAME);
-    gDisplay.SetGameStateStage(255);
+    tmp = NULL;
 
-    gDisplayStore.UnNeedDLToken(DL_TOKEN_NETWORKTHREAD);
-    gDisplayStore.NextDLToken();*/
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_DYNAMIC_MAP_FILL, NULL);
 }

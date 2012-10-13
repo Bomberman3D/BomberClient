@@ -23,7 +23,8 @@ static const OpcodeHandler PacketHandlerAssign[] = {
     {SMSG_INITIATE_SESSION_RESPONSE, &PacketHandlers::HandleInitiateSessionResponse},
     {SMSG_VALIDATE_VERSION_RESPONSE, &PacketHandlers::HandleValidateVersionResponse},
     {SMSG_INSTANCE_LIST,             &PacketHandlers::HandleInstanceList},
-    {SMSG_ENTER_GAME_RESULT,         &PacketHandlers::HandleEnterGame}
+    {SMSG_ENTER_GAME_RESULT,         &PacketHandlers::HandleEnterGame},
+    {SMSG_MAP_INITIAL_DATA,          &PacketHandlers::HandleMapInitialData}
 };
 
 #endif

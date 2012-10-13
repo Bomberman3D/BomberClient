@@ -570,9 +570,10 @@ void GameplayMgr::PauseGame()
     m_pauseTime = clock();
     sSoundMgr->MusicPause();
 
+    BlockMovement();
+
     if (IsSingleGameType())
     {
-        BlockMovement();
         sTimer->PauseTimers();
         sParticleEmitterMgr->PauseEmitters();
         sDisplay->DisableRestrictedAnimations(ANIM_RESTRICTION_NOT_PAUSED);

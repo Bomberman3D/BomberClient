@@ -94,6 +94,8 @@ void Application::Update()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    ProcessInterThreadRequests();
+
     m_currStage->OnBeforeDraw();
     sDisplay->Update();
     m_currStage->OnDraw();
@@ -478,9 +480,9 @@ bool Application::Init()
 
     sStorage->Load();
 
-    //sNetwork->Initialize();
-    //if (sNetwork->IsInitialized())
-    //    boost::thread NetworkThread(runNetworkWorker);
+    sNetwork->Initialize();
+    if (sNetwork->IsInitialized())
+        boost::thread NetworkThread(runNetworkWorker);
 
     sApplication->ApplyRenderContext(RC_MAIN);
 
@@ -691,4 +693,66 @@ void Application::ApplyRenderContext(RenderingContext cont)
             PMessageBox("RC swich error", "Unhandled rendering context: %u", uint32(cont));
             break;
     }
+}
+
+/** \brief Zpracovani vsech mezivlaknovych pozadavku
+ *
+ * Tato funkce se stara o zpracovani pozadavku, ktere nemohou byt zpracovany pomoci jineho vlakna, nez hlavniho
+ */
+void Application::ProcessInterThreadRequests()
+{
+    sLockMgr->NeedToken(LOCK_STORAGE, THREAD_MAIN);
+
+    while (!sLockMgr->HasToken(LOCK_STORAGE, THREAD_MAIN))
+        boost::this_thread::yield();
+
+    if (!sStorage->m_interThreadRequests.empty())
+    {
+        for (std::list<std::pair<uint32, uint32>>::iterator itr = sStorage->m_interThreadRequests.begin(); itr != sStorage->m_interThreadRequests.end(); )
+        {
+            switch (itr->first)
+            {
+                case REQUEST_STAGE_CHANGE:
+                    sApplication->SetStage(itr->second);
+                    break;
+                case REQUEST_SUBSTAGE_CHANGE:
+                    sApplication->SetStagePhase(itr->second);
+                    break;
+                case REQUEST_MAP_CHANGE:
+                    sGameplayMgr->SetSetting(SETTING_MAP_ID, itr->second);
+                    // TODO: another stuff?
+                    break;
+                case REQUEST_GAME_TYPE_CHANGE:
+                    sGameplayMgr->SetGameType(GameType(itr->second));
+                    break;
+            }
+            itr = sStorage->m_interThreadRequests.erase(itr);
+        }
+    }
+
+    if (!sStorage->m_interThreadObjectRequests.empty())
+    {
+        for (std::list<std::pair<uint32, void*>>::iterator itr = sStorage->m_interThreadObjectRequests.begin(); itr != sStorage->m_interThreadObjectRequests.end(); )
+        {
+            if (itr->second != NULL || itr->first == REQUEST_DYNAMIC_MAP_FILL)
+            {
+                switch (itr->first)
+                {
+                    case REQUEST_DYNAMIC_MAP_ELEMENT:
+                    {
+                        ThreadRequestDynamicElement* tmp = (ThreadRequestDynamicElement*)(itr->second);
+                        sMapManager->GetMap()->AddDynamicCell(tmp->x, tmp->y, tmp->rec.type, tmp->rec.state, tmp->rec.misc, NULL);
+                        break;
+                    }
+                    case REQUEST_DYNAMIC_MAP_FILL:
+                        // Musi byt handlovano zde, aby se zamezilo tomu, ze se to zavola driv, nez plneni dynamickych zaznamu
+                        sMapManager->FillDynamicRecords();
+                        break;
+                }
+            }
+            itr = sStorage->m_interThreadObjectRequests.erase(itr);
+        }
+    }
+
+    sLockMgr->UnNeedToken(LOCK_STORAGE, THREAD_MAIN);
 }

@@ -175,3 +175,27 @@ void Storage::GetAllModelArtkitIds(uint32 modelId, std::vector<uint32> *dest)
         }
     }
 }
+
+void Storage::MakeInterThreadRequest(LockThread requester, InterThreadRequest type, uint32 value)
+{
+    sLockMgr->NeedToken(LOCK_STORAGE, requester);
+
+    while (!sLockMgr->HasToken(LOCK_STORAGE, requester))
+        boost::this_thread::yield();
+
+    m_interThreadRequests.push_back(std::make_pair(uint32(type), value));
+
+    sLockMgr->UnNeedToken(LOCK_STORAGE, requester);
+}
+
+void Storage::MakeInterThreadObjectRequest(LockThread requester, InterThreadRequest type, void* value)
+{
+    sLockMgr->NeedToken(LOCK_STORAGE, requester);
+
+    while (!sLockMgr->HasToken(LOCK_STORAGE, requester))
+        boost::this_thread::yield();
+
+    m_interThreadObjectRequests.push_back(std::make_pair(uint32(type), value));
+
+    sLockMgr->UnNeedToken(LOCK_STORAGE, requester);
+}

@@ -221,6 +221,8 @@ class ClassicMultiGameType: public GameTypeTemplate
         {
             m_type = GAME_TYPE_MP_CLASSIC;
         }
+        ModelDisplayListRecord* SpawnNewPlayer();
+        void FillGameTypeResources();
         void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnGameLeave();
         void OnUpdate();

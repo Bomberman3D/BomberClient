@@ -119,6 +119,10 @@ void GameSettingsStage::OnDraw()
         // Tlacitko "Pripojit"
         sDisplay->Draw2D(16, WIDTH-200, HEIGHT-60, 200, 40);
     }
+    else if (m_subStage == 5)
+    {
+        sDisplay->PrintText(MAIN_FONT, 150, 150, FONT_SIZE_N, 0, NOCOLOR, "Získávání dat o instanci...");
+    }
     ////////////
     // Singleplayer
     else if (m_subStage == 100)
@@ -308,7 +312,10 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         // "Pripojit"
         if (x > WIDTH-200 && x < WIDTH && y > HEIGHT-60 && y < HEIGHT-20)
         {
-            //
+            SmartPacket enter(CMSG_ENTER_GAME);
+            enter << m_selected;
+            enter << m_nickfield.c_str();
+            sNetwork->SendPacket(&enter);
         }
     }
     ////////////

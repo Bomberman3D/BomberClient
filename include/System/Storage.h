@@ -3,6 +3,9 @@
 
 #include <Global.h>
 #include <Singleton.h>
+#include <Spinlock.h>
+#include <Display.h>
+#include <Map.h>
 
 #include <ImageLoader.h>
 #include <ModelLoader.h>
@@ -16,6 +19,24 @@ enum ModelAnimType
     ANIM_DISAPPEAR = 4,
     ANIM_DYING     = 5,
     MAX_ANIM
+};
+
+enum InterThreadRequest
+{
+    REQUEST_STAGE_CHANGE         = 0,
+    REQUEST_SUBSTAGE_CHANGE      = 1,
+    REQUEST_MAP_CHANGE           = 2,
+    REQUEST_GAME_TYPE_CHANGE     = 3,
+    REQUEST_DYNAMIC_MAP_ELEMENT  = 4,
+    REQUEST_DYNAMIC_MAP_FILL     = 5,
+    MAX_REQUEST
+};
+
+struct ThreadRequestDynamicElement
+{
+    uint32 x;
+    uint32 y;
+    Map::DynamicCell rec;
 };
 
 // Definice jednotlivych ulozist
@@ -248,6 +269,8 @@ class Storage
         ObjectModifierData* GetObjectModifierData(uint32 modelId, const char* objectname);
         ObjectArtkitData* GetObjectArtkitData(uint32 modelId, const char* objectname, uint32 artkitId);
         void GetAllModelArtkitIds(uint32 modelId, std::vector<uint32>* dest);
+        void MakeInterThreadRequest(LockThread requester, InterThreadRequest type, uint32 value);
+        void MakeInterThreadObjectRequest(LockThread requester, InterThreadRequest type, void* value);
 
         // StorageLoader.cpp
         bool LoadTextureData();
@@ -302,6 +325,10 @@ class Storage
         std::string m_nickName;
         uint32 m_myId;
         uint32 m_instanceId;
+
+        // Mezivlaknove pozadavky
+        std::list<std::pair<uint32, uint32>> m_interThreadRequests;
+        std::list<std::pair<uint32, void*>>  m_interThreadObjectRequests;
 };
 
 #define sStorage Singleton<Storage>::instance()

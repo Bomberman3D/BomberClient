@@ -58,7 +58,7 @@ void Network::Connect(std::string host, uint32 port)
 
 void Network::Worker()
 {
-    char *buf = new char[BUFFER_LEN];
+    uint8 *buf = new uint8[BUFFER_LEN];
     int result;
 
     while(1)
@@ -69,7 +69,7 @@ void Network::Worker()
             continue;
         }
 
-        result = recv(m_mySocket, buf, BUFFER_LEN, 0);
+        result = recv(m_mySocket, (char*)buf, BUFFER_LEN, 0);
         if (result > 0)
         {
             HandlePacket(BuildPacket(buf, result));
@@ -112,7 +112,7 @@ void Network::SendPacket(SmartPacket *data)
     send(m_mySocket, buff, psize, 0);
 }
 
-SmartPacket* Network::BuildPacket(const char *buffer, uint32 size)
+SmartPacket* Network::BuildPacket(uint8 *buffer, uint32 size)
 {
     if (size < 8)
     {
@@ -135,6 +135,7 @@ SmartPacket* Network::BuildPacket(const char *buffer, uint32 size)
     //and parse the body of packet
     for(size_t i = 0; i < psize; i++)
         *packet << (unsigned char)buffer[8+i];
+    //packet->fetchData(buffer + 8, psize);
 
     return packet;
 }

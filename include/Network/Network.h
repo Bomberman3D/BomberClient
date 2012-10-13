@@ -27,7 +27,7 @@ class Network
         void Worker();
 
         void SendPacket(SmartPacket *data);
-        SmartPacket* BuildPacket(const char *buffer, uint32 size);
+        SmartPacket* BuildPacket(uint8* buffer, uint32 size);
         void HandlePacket(SmartPacket *data);
 
     protected:

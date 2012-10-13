@@ -422,11 +422,18 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             uint32 bx = floor(sGameplayMgr->GetPlayerRec()->x)+1;
             uint32 by = floor(sGameplayMgr->GetPlayerRec()->z)+1;
 
-            if (sGameplayMgr->AddBomb(bx, by))
+            if (sGameplayMgr->IsSingleGameType())
             {
-                pMap->AddDynamicCell(bx, by, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
-                sMapManager->FillDynamicRecords();
-                sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+                if (sGameplayMgr->AddBomb(bx, by))
+                {
+                    pMap->AddDynamicCell(bx, by, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
+                    sMapManager->FillDynamicRecords();
+                    sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+                }
+            }
+            else
+            {
+                // TODO: multiplayer
             }
         }
         // jsme zapauzovani
