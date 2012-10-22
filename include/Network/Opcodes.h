@@ -28,11 +28,12 @@ enum Opcodes
     SMSG_ENTER_GAME_RESULT         = 0x09,
     CMSG_MOVE_START                = 0x0A,
     CMSG_MOVE_STOP                 = 0x0B,
-    SMSG_MOVE_START                = 0x0C,
-    SMSG_MOVE_STOP                 = 0x0D,
-    SMSG_MOVE_HEARTHBEAT           = 0x0E,
-    SMSG_MAP_INITIAL_DATA          = 0x0F,
-    SMSG_NEW_PLAYER                = 0x10,
+    CMSG_MOVE_HEARTBEAT            = 0x0C,
+    SMSG_MOVE_START                = 0x0D,
+    SMSG_MOVE_STOP                 = 0x0E,
+    SMSG_MOVE_HEARTBEAT            = 0x0F,
+    SMSG_MAP_INITIAL_DATA          = 0x10,
+    SMSG_NEW_PLAYER                = 0x11,
     MAX_OPCODE
 };
 

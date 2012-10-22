@@ -5,6 +5,7 @@
 #include <Effects/Animations.h>
 #include <Effects/ParticleEmitter.h>
 #include <SoundMgr.h>
+#include <Network.h>
 
 /** \brief Konstruktor
  *
@@ -15,7 +16,10 @@ GameplayMgr::GameplayMgr()
     m_game = NULL;
     m_lastMovementUpdate = 0;
     m_gameEndTime = 0;
+    m_lastMoveHeartbeat = 0;
     m_stepSoundIndicator = 0;
+    m_lastUpdatedMoveAngle = 0.0f;
+    m_forceHeartbeatSend = false;
 
     m_settings.resize(SETTING_MAX);
     m_settings[SETTING_ENEMY_COUNT] = 4;
@@ -594,9 +598,10 @@ void GameplayMgr::UnpauseGame()
     m_pauseTime = 0;
     sSoundMgr->MusicUnpause();
 
+    UnblockMovement();
+
     if (IsSingleGameType())
     {
-        UnblockMovement();
         sTimer->UnpauseTimers();
         sParticleEmitterMgr->UnpauseEmitters();
         sDisplay->EnableRestrictedAnimations(ANIM_RESTRICTION_NOT_PAUSED);
@@ -724,7 +729,7 @@ void GameplayMgr::ConsoleSubmit()
  */
 void GameplayMgr::UpdatePlayerMoveAngle()
 {
-    if (m_movementBlocked)
+    if (m_movementBlocked || !sApplication->IsAppActive())
         return;
 
     // Otoceni hrace (hracskeho modelu) o uhel prepocitany podle pohybu mysi
@@ -744,6 +749,10 @@ void GameplayMgr::UpdatePlayerMoveAngle()
         if (sDisplay->GetAngleX() < 20.0f)
             sDisplay->SetAngleX(20.0f);
     }
+
+    // Update uhlu pohybu pokud se lisi od posledniho updatu o vice jak 30 stupnu
+    if (fabs((180.0f * (PI/2-m_moveAngle) / PI) - m_lastUpdatedMoveAngle) > 30.0f)
+        SendMoveHeartbeat();
 }
 
 /** \brief Funkce starajici se o pohyb hrace
@@ -752,8 +761,14 @@ void GameplayMgr::UpdatePlayerMoveAngle()
  */
 void GameplayMgr::UpdatePlayerMotion()
 {
+    if (!IsSingleGameType())
+        UpdateOtherPlayersMotion();
+
     if (m_movementBlocked)
         return;
+
+    if (IsMoving() && !IsSingleGameType() && m_lastMoveHeartbeat+1000 < clock())
+        SendMoveHeartbeat();
 
     if (m_lastMovementUpdate < clock())
     {
@@ -832,6 +847,12 @@ void GameplayMgr::UpdatePlayerMotion()
             if (sAnimator->GetAnimId(m_playerRec->AnimTicket) == ANIM_WALK)
                 sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0);
         }
+
+        if (m_forceHeartbeatSend)
+        {
+            SendMoveHeartbeat();
+            m_forceHeartbeatSend = false;
+        }
     }
 
     // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci
@@ -847,4 +868,136 @@ void GameplayMgr::UpdatePlayerMotion()
         m_playerX = nX;
         m_playerY = nY;
     }
+}
+
+void GameplayMgr::UpdateOtherPlayersMotion()
+{
+    if (sNetwork->players.empty())
+        return;
+
+    for (PlayerList::iterator itr = sNetwork->players.begin(); itr != sNetwork->players.end(); ++itr)
+    {
+        if (!(*itr) || !(*itr)->rec)
+            continue;
+
+        if ((*itr)->lastMovementUpdate < clock())
+        {
+            float dist = (float(clock()-(*itr)->lastMovementUpdate)+1.0f)*0.002f*(*itr)->speed;
+            float angle_rad = PI * (-(*itr)->rec->rotate + 90.0f) / 180.0f;
+
+            (*itr)->lastMovementUpdate = clock();
+
+            // nehybe se
+            if (sAnimator->GetAnimId((*itr)->rec->AnimTicket) != ANIM_WALK)
+                continue;
+
+            float newx = (*itr)->rec->x + dist*cos(angle_rad);
+            float newz = (*itr)->rec->z;
+            uint16 collision = sDisplay->CheckCollision(newx, 0.0f, newz);
+
+            // Pokud na tehle ose nekolidujeme, muzeme se posunout
+            if (!(collision & AXIS_X))
+                (*itr)->rec->x = newx;
+
+            // Nasleduje posun po ose Z
+            newx = (*itr)->rec->x;
+            newz = (*itr)->rec->z + dist*sin(angle_rad);
+            collision = sDisplay->CheckCollision(newx, 0.0f, newz);
+
+            // A opet pokud nekolidujeme na dane ose, posuneme hrace
+            if (!(collision & AXIS_Z))
+                (*itr)->rec->z = newz;
+        }
+    }
+}
+
+void GameplayMgr::SetMoveElement(uint8 direction)
+{
+    if (direction >= MOVE_MAX)
+        return;
+
+    if (!IsSingleGameType() && !IsMoving())
+    {
+        SendMoveState(true);
+        m_forceHeartbeatSend = true;
+    } else if (direction != MOVE_FORWARD)
+        m_forceHeartbeatSend = true;
+
+    m_moveElements[direction] = true;
+}
+
+void GameplayMgr::UnsetMoveElement(uint8 direction)
+{
+    if (direction >= MOVE_MAX)
+        return;
+
+    m_moveElements[direction] = false;
+
+    if (!IsSingleGameType() && !IsMoving())
+    {
+        SendMoveState(false);
+        m_forceHeartbeatSend = true;
+    } else if (direction != MOVE_FORWARD)
+        m_forceHeartbeatSend = true;
+}
+
+bool GameplayMgr::IsMoving()
+{
+    for (uint32 i = 0; i < MOVE_MAX; i++)
+        if (m_moveElements[i])
+            return true;
+
+    return false;
+}
+
+void GameplayMgr::SendMoveState(bool start)
+{
+    if (IsSingleGameType())
+        return;
+
+    if (start)
+    {
+        SmartPacket ms(CMSG_MOVE_START);
+        if (GetPlayerRec())
+            ms << float(GetPlayerRec()->rotate);
+        else
+            ms << float(0.0f);
+        sNetwork->SendPacket(&ms);
+    }
+    else
+    {
+        SmartPacket ms(CMSG_MOVE_STOP);
+        if (GetPlayerRec())
+            ms << float(GetPlayerRec()->rotate);
+        else
+            ms << float(0.0f);
+        sNetwork->SendPacket(&ms);
+    }
+}
+
+void GameplayMgr::SendMoveHeartbeat()
+{
+    m_lastMoveHeartbeat = clock();
+
+    if (!GetPlayerRec() || IsSingleGameType())
+        return;
+
+    ModelDisplayListRecord* pl = GetPlayerRec();
+
+    SmartPacket hb(CMSG_MOVE_HEARTBEAT);
+
+    // position
+    hb << float(pl->x);
+    hb << float(pl->y);
+    hb << float(pl->z);
+
+    // rotation
+    hb << float(pl->rotate);
+
+    m_lastUpdatedMoveAngle = pl->rotate;
+
+    // speed
+    hb << float(GetPlayerSpeedCoef());
+
+    sNetwork->SendPacket(&hb);
 }

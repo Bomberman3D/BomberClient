@@ -4,6 +4,7 @@
 #include <Global.h>
 #include <Singleton.h>
 #include <SmartPacket.h>
+#include <Opcodes.h>
 
 #include <windows.h>
 #include <winsock.h>
@@ -12,6 +13,23 @@
 #define DEFAULT_PORT 2530
 
 #define BUFFER_LEN 1*1024
+
+struct Player
+{
+    Player()
+    {
+        memset(this, 0, sizeof(Player));
+    }
+
+    uint32 id;
+    float x, y, speed;
+    uint32 artkit;
+    ModelDisplayListRecord* rec;
+    clock_t lastMovementUpdate;
+    std::string name;
+};
+
+typedef std::list<Player*> PlayerList;
 
 class Network
 {
@@ -29,6 +47,9 @@ class Network
         void SendPacket(SmartPacket *data);
         SmartPacket* BuildPacket(uint8* buffer, uint32 size);
         void HandlePacket(SmartPacket *data);
+
+        PlayerList players;
+        Player* GetPlayerById(uint32 id);
 
     protected:
         bool m_connected;

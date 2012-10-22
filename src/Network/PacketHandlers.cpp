@@ -64,24 +64,26 @@ void PacketHandlers::HandleEnterGame(SmartPacket* data)
     uint8 result;
     float startPosX, startPosZ;
     uint32 myId;
+    uint32 mapId;
     uint32 instanceId;
 
     *data >> result;
     *data >> startPosX >> startPosZ; //TODO: IMPLEMENT!
     *data >> myId;
+    *data >> mapId;
     *data >> instanceId;
 
     if (result != 0)
     {
         //TODO: zobrazit chybu
-        //sApplication->SetState(STAGE_MENU);
+        sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_STAGE_CHANGE, STAGE_MENU);
         return;
     }
 
     sStorage->m_myId = myId;
     sStorage->m_instanceId = instanceId;
 
-    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_MAP_CHANGE, 1);     // TODO: get map id from server
+    sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_MAP_CHANGE, mapId);
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_GAME_TYPE_CHANGE, GAME_TYPE_MP_CLASSIC); // TODO: get game type from server
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_STAGE_CHANGE, STAGE_LOADING);
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_SUBSTAGE_CHANGE, 0);
@@ -104,6 +106,20 @@ void PacketHandlers::HandleMapInitialData(SmartPacket* data)
         *data >> tmp_x >> tmp_y;
         *data >> tmp_offset;
         tmp_name = data->readstr();
+
+        if (tmp_id == 0 || tmp_id == sStorage->m_myId)
+            continue;
+
+        Player* pl = new Player;
+        pl->id = tmp_id;
+        pl->x = tmp_x;
+        pl->y = tmp_y;
+        pl->speed = 1.0f;
+        pl->artkit = tmp_offset;
+        pl->rec = NULL;
+        pl->name = tmp_name.c_str();
+
+        sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ADD, pl);
     }
 
     *data >> count;
@@ -128,4 +144,120 @@ void PacketHandlers::HandleMapInitialData(SmartPacket* data)
     tmp = NULL;
 
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_DYNAMIC_MAP_FILL, NULL);
+}
+
+void PacketHandlers::HandleNewPlayer(SmartPacket* data)
+{
+    uint32 id;
+    uint8 offset;
+    float x, y;
+    std::string nick;
+
+    *data >> id;
+
+    if (id == 0 || id == sStorage->m_myId)
+        return;
+
+    *data >> x;
+    *data >> y;
+    *data >> offset;
+    nick = data->readstr();
+
+    Player* pl = new Player;
+    pl->id = id;
+    pl->name = nick.c_str();
+    pl->x = x;
+    pl->y = y;
+    pl->speed = 1.0f;
+    pl->artkit = offset;
+    pl->rec = NULL;
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ADD, pl);
+}
+
+void PacketHandlers::HandleMoveStart(SmartPacket* data)
+{
+    uint32 id;
+    float rot;
+
+    *data >> id;
+    *data >> rot;
+
+    if (id == 0 || id == sStorage->m_myId)
+        return;
+
+    Player* pl = sNetwork->GetPlayerById(id);
+    if (!pl)
+        return;
+
+    ThreadRequestPlayerAnim* req = new ThreadRequestPlayerAnim;
+    req->id = id;
+    req->anim = ANIM_WALK;
+    req->flags = 0;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ANIM, req);
+
+    ThreadRequestPlayerRotation* req2 = new ThreadRequestPlayerRotation;
+    req2->id = id;
+    req2->rotation = rot;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ROTATION, req2);
+}
+
+void PacketHandlers::HandleMoveStop(SmartPacket* data)
+{
+    uint32 id;
+    float rot;
+
+    *data >> id;
+    *data >> rot;
+
+    if (id == 0 || id == sStorage->m_myId)
+        return;
+
+    Player* pl = sNetwork->GetPlayerById(id);
+    if (!pl)
+        return;
+
+    ThreadRequestPlayerAnim* req = new ThreadRequestPlayerAnim;
+    req->id = id;
+    req->anim = ANIM_IDLE;
+    req->flags = 0;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ANIM, req);
+
+    ThreadRequestPlayerRotation* req2 = new ThreadRequestPlayerRotation;
+    req2->id = id;
+    req2->rotation = rot;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ROTATION, req2);
+}
+
+void PacketHandlers::HandleMoveHeartbeat(SmartPacket* data)
+{
+    uint32 id;
+    float x, y, z, rot, speed;
+
+    *data >> id;
+
+    if (id == 0 || id == sStorage->m_myId)
+        return;
+
+    *data >> x;
+    *data >> y;
+    *data >> z;
+    *data >> rot;
+    *data >> speed;
+
+    Player* pl = sNetwork->GetPlayerById(id);
+    if (!pl)
+        return;
+
+    ThreadRequestPlayerPos* req = new ThreadRequestPlayerPos;
+    req->id = id;
+    req->x = x;
+    req->y = y;
+    req->z = z;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_POS, req);
+
+    ThreadRequestPlayerRotation* req2 = new ThreadRequestPlayerRotation;
+    req2->id = id;
+    req2->rotation = rot;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ROTATION, req2);
 }

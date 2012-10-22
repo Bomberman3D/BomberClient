@@ -72,7 +72,17 @@ void Network::Worker()
         result = recv(m_mySocket, (char*)buf, BUFFER_LEN, 0);
         if (result > 0)
         {
-            HandlePacket(BuildPacket(buf, result));
+            SmartPacket* parsed = BuildPacket(buf, result);
+            HandlePacket(parsed);
+
+            int32 totalparsed = parsed->GetSize() + 8;
+            while (totalparsed < result)
+            {
+                parsed = BuildPacket(buf+totalparsed, result-totalparsed);
+                HandlePacket(parsed);
+
+                totalparsed += parsed->GetSize() + 8;
+            }
         }
         else if (result == 0)
         {
@@ -148,4 +158,16 @@ void Network::HandlePacket(SmartPacket *data)
     for (uint32 i = 0; i < sizeof(PacketHandlerAssign)/sizeof(OpcodeHandler); i++)
         if (PacketHandlerAssign[i].opcode == data->GetOpcode())
             PacketHandlerAssign[i].Handler(data);
+}
+
+Player* Network::GetPlayerById(uint32 id)
+{
+    if (players.empty())
+        return NULL;
+
+    for (PlayerList::iterator itr = players.begin(); itr != players.end(); ++itr)
+        if ((*itr) && (*itr)->id == id)
+            return (*itr);
+
+    return NULL;
 }

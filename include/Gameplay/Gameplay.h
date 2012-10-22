@@ -220,8 +220,12 @@ class GameplayMgr
         void PlayerDied();
         void UpdatePlayerMoveAngle();
         void UpdatePlayerMotion();
-        void SetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = true; };
-        void UnsetMoveElement(uint8 direction) { if (direction < MOVE_MAX) m_moveElements[direction] = false; };
+        void UpdateOtherPlayersMotion();
+        void SetMoveElement(uint8 direction);
+        void UnsetMoveElement(uint8 direction);
+        bool IsMoving();
+        void SendMoveState(bool start);
+        void SendMoveHeartbeat();
         void BlockMovement() { m_movementBlocked = true; };
         void UnblockMovement() { m_movementBlocked = false; };
         void PauseGame();
@@ -253,12 +257,15 @@ class GameplayMgr
         std::vector<std::vector<std::vector<DangerousField*>>> DangerousMap;
         std::vector<bool> m_moveElements;
         clock_t m_lastMovementUpdate;
+        float m_lastUpdatedMoveAngle;
+        bool m_forceHeartbeatSend;
         float m_moveAngle;
         bool m_movementBlocked;
         bool m_playerDead;
         bool m_gamePaused;
         clock_t m_pauseTime;
         clock_t m_gameEndTime;
+        clock_t m_lastMoveHeartbeat;
         uint8 m_stepSoundIndicator;
 
         bool m_console;

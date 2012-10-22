@@ -39,6 +39,9 @@ class Application
         void Update();
         void ProcessInterThreadRequests();
 
+        bool IsAppActive() { return appActive; };
+        void SetAppActive(bool active) { appActive = active; };
+
         void SetStage(uint32 newstage, uint32 newphase = 0, bool cleanup = true);
         uint32 GetStage() { return m_currStage->GetType(); };
         void SetStagePhase(uint32 newphase);
@@ -62,6 +65,7 @@ class Application
         uint32 Stage;
         bool StageChanged;
         StageControl* m_currStage;
+        bool appActive;
 
         bool keys[256];
         bool mouse[2];

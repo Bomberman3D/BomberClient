@@ -416,6 +416,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             ReSizeGLScene(LOWORD(lParam),HIWORD(lParam));
             return 0;
         }
+        case WM_ACTIVATE:
+        {
+            if (wParam == WA_INACTIVE)
+                sApplication->SetAppActive(false);
+            else
+                sApplication->SetAppActive(true);
+            return 0;
+        }
     }
 
     return DefWindowProc(hWnd,uMsg,wParam,lParam);
@@ -745,9 +753,50 @@ void Application::ProcessInterThreadRequests()
                         break;
                     }
                     case REQUEST_DYNAMIC_MAP_FILL:
+                    {
                         // Musi byt handlovano zde, aby se zamezilo tomu, ze se to zavola driv, nez plneni dynamickych zaznamu
                         sMapManager->FillDynamicRecords();
                         break;
+                    }
+                    case REQUEST_PLAYER_ADD:
+                    {
+                        Player* pl = (Player*)(itr->second);
+                        pl->rec = sDisplay->DrawModel(9, pl->x, pl->y, 0.5f, ANIM_IDLE, 3.5f, 1.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE, false, pl->artkit);
+                        sNetwork->players.push_back(pl);
+                        break;
+                    }
+                    case REQUEST_PLAYER_ANIM:
+                    {
+                        ThreadRequestPlayerAnim* tmp = (ThreadRequestPlayerAnim*)(itr->second);
+                        Player* pl = sNetwork->GetPlayerById(tmp->id);
+                        if (!pl)
+                            break;
+
+                        sAnimator->ChangeModelAnim(pl->rec->AnimTicket, tmp->anim, 0, 0, tmp->flags);
+                        break;
+                    }
+                    case REQUEST_PLAYER_POS:
+                    {
+                        ThreadRequestPlayerPos* tmp = (ThreadRequestPlayerPos*)(itr->second);
+                        Player* pl = sNetwork->GetPlayerById(tmp->id);
+                        if (!pl)
+                            break;
+
+                        pl->rec->x = tmp->x;
+                        pl->rec->y = tmp->y;
+                        pl->rec->z = tmp->z;
+                        break;
+                    }
+                    case REQUEST_PLAYER_ROTATION:
+                    {
+                        ThreadRequestPlayerRotation* tmp = (ThreadRequestPlayerRotation*)(itr->second);
+                        Player* pl = sNetwork->GetPlayerById(tmp->id);
+                        if (!pl)
+                            break;
+
+                        pl->rec->rotate = tmp->rotation;
+                        break;
+                    }
                 }
             }
             itr = sStorage->m_interThreadObjectRequests.erase(itr);

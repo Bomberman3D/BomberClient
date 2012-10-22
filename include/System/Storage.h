@@ -29,6 +29,10 @@ enum InterThreadRequest
     REQUEST_GAME_TYPE_CHANGE     = 3,
     REQUEST_DYNAMIC_MAP_ELEMENT  = 4,
     REQUEST_DYNAMIC_MAP_FILL     = 5,
+    REQUEST_PLAYER_ADD           = 6,
+    REQUEST_PLAYER_ANIM          = 7,
+    REQUEST_PLAYER_POS           = 8,
+    REQUEST_PLAYER_ROTATION      = 9,
     MAX_REQUEST
 };
 
@@ -37,6 +41,25 @@ struct ThreadRequestDynamicElement
     uint32 x;
     uint32 y;
     Map::DynamicCell rec;
+};
+
+struct ThreadRequestPlayerAnim
+{
+    uint32 id;
+    uint32 anim;
+    uint32 flags;
+};
+struct ThreadRequestPlayerPos
+{
+    uint32 id;
+    float x;
+    float y;
+    float z;
+};
+struct ThreadRequestPlayerRotation
+{
+    uint32 id;
+    float rotation;
 };
 
 // Definice jednotlivych ulozist

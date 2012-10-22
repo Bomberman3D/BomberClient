@@ -11,6 +11,10 @@ namespace PacketHandlers
     void HandleInstanceList(SmartPacket* data);
     void HandleEnterGame(SmartPacket* data);
     void HandleMapInitialData(SmartPacket* data);
+    void HandleMoveStart(SmartPacket* data);
+    void HandleMoveStop(SmartPacket* data);
+    void HandleMoveHeartbeat(SmartPacket* data);
+    void HandleNewPlayer(SmartPacket* data);
 };
 
 struct OpcodeHandler
@@ -24,7 +28,11 @@ static const OpcodeHandler PacketHandlerAssign[] = {
     {SMSG_VALIDATE_VERSION_RESPONSE, &PacketHandlers::HandleValidateVersionResponse},
     {SMSG_INSTANCE_LIST,             &PacketHandlers::HandleInstanceList},
     {SMSG_ENTER_GAME_RESULT,         &PacketHandlers::HandleEnterGame},
-    {SMSG_MAP_INITIAL_DATA,          &PacketHandlers::HandleMapInitialData}
+    {SMSG_MAP_INITIAL_DATA,          &PacketHandlers::HandleMapInitialData},
+    {SMSG_MOVE_START,                &PacketHandlers::HandleMoveStart},
+    {SMSG_MOVE_STOP,                 &PacketHandlers::HandleMoveStop},
+    {SMSG_MOVE_HEARTBEAT,            &PacketHandlers::HandleMoveHeartbeat},
+    {SMSG_NEW_PLAYER,                &PacketHandlers::HandleNewPlayer}
 };
 
 #endif
