@@ -797,6 +797,46 @@ void Application::ProcessInterThreadRequests()
                         pl->rec->rotate = tmp->rotation;
                         break;
                     }
+                    case REQUEST_PLANT_BOMB:
+                    {
+                        ThreadRequestPlantBomb* tmp = (ThreadRequestPlantBomb*)(itr->second);
+                        if (sGameplayMgr->AddBomb(tmp->x, tmp->y, tmp->id, tmp->reach))
+                        {
+                            Map* pMap = sMapManager->GetMap();
+
+                            pMap->AddDynamicCell(tmp->x, tmp->y, DYNAMIC_TYPE_BOMB, 0, 0, NULL);
+                            sMapManager->FillDynamicRecords();
+                            if (tmp->id == sStorage->m_myId)
+                                sDisplay->m_ignoreTargetCollision = DYNAMIC_TYPE_BOMB;
+                        }
+                        break;
+                    }
+                    case REQUEST_PLAYER_DEATH:
+                    {
+                        ThreadRequestPlayerDeath* tmp = (ThreadRequestPlayerDeath*)(itr->second);
+
+                        if (tmp->id == sStorage->m_myId)
+                            sGameplayMgr->PlayerDied();
+                        else
+                        {
+                            Player* pl = sNetwork->GetPlayerById(tmp->id);
+                            if (!pl)
+                                break;
+
+                            sAnimator->ChangeModelAnim(pl->rec->AnimTicket, ANIM_DYING, 0, 0, ANIM_FLAG_NOT_REPEAT);
+                        }
+                        break;
+                    }
+                    case REQUEST_BOX_DESTROY:
+                    {
+                        ThreadRequestBoxDestroy* tmp = (ThreadRequestBoxDestroy*)(itr->second);
+                        Map* map = sMapManager->GetMap();
+                        if (!map)
+                            break;
+
+                        map->DestroyDynamicRecords(tmp->x, tmp->y, DYNAMIC_TYPE_BOX);
+                        break;
+                    }
                 }
             }
             itr = sStorage->m_interThreadObjectRequests.erase(itr);

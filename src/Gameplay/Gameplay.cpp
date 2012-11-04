@@ -94,7 +94,8 @@ void GameplayMgr::Update()
                 }
 
                 m_game->OnBombBoom(*itr);
-                m_plActiveBombs--;
+                if (IsSingleGameType())
+                    m_plActiveBombs--;
                 itr = BombMap.erase(itr);
                 continue;
             }
@@ -291,11 +292,27 @@ GameType GameplayMgr::GetGameType()
     return m_game->GetType();
 }
 
+/** \brief Funkce starajici se o pridani bomby v multiplayer modu
+ *
+ * Posle oznameni o pridani bomby (kteremu nemusi byt vyhoveno serverem)
+ */
+void GameplayMgr::SendAddBomb(uint32 x, uint32 y)
+{
+    // Jako prvni zkontrolujeme a popripade ohandlujeme multiplayer pripad - je to rychle
+    if (IsSingleGameType())
+        return;
+
+    SmartPacket bomb(CMSG_PLANT_BOMB);
+    bomb << uint32(x);
+    bomb << uint32(y);
+    sNetwork->SendPacket(&bomb);
+}
+
 /** \brief Funkce starajici se o pridani bomby
  *
  * Prida bombu na zadane souradnice ve 2D mape. Vypocita dosah, oznaci budouci nebezpecna pole a vlozi zaznam bomby do mapy
  */
-bool GameplayMgr::AddBomb(uint32 x, uint32 y)
+bool GameplayMgr::AddBomb(uint32 x, uint32 y, uint32 owner, uint32 reach)
 {
     if (m_plActiveBombs >= m_plMaxBombs && !IsCheatOn(CHEAT_UNLIMITED_BOMBS))
         return false;
@@ -303,14 +320,16 @@ bool GameplayMgr::AddBomb(uint32 x, uint32 y)
     BombRecord* bomb = new BombRecord;
     bomb->x = x;
     bomb->y = y;
+    bomb->ownerId = owner;
     bomb->boomTime = clock() + 2500;
-    bomb->reach = IsCheatOn(CHEAT_MAX_FLAME)?10:GetFlameReach();
+    bomb->reach = (owner>0)?(reach):(IsCheatOn(CHEAT_MAX_FLAME)?10:GetFlameReach());
     bomb->sizzleSound = sSoundMgr->PlayEffect(2, true, true);
     BombMap.push_back(bomb);
 
     sSoundMgr->PlayEffect(25);
 
-    m_plActiveBombs++;
+    if (IsSingleGameType())
+        m_plActiveBombs++;
 
     if (sGameplayMgr->GetGameType() == GAME_TYPE_SP_CLASSIC)
         localPlayerStats.ClassicSingleStats.bombsPlanted += 1;
@@ -751,7 +770,7 @@ void GameplayMgr::UpdatePlayerMoveAngle()
     }
 
     // Update uhlu pohybu pokud se lisi od posledniho updatu o vice jak 30 stupnu
-    if (fabs((180.0f * (PI/2-m_moveAngle) / PI) - m_lastUpdatedMoveAngle) > 30.0f)
+    if (fabs(GetPlayerRec()->rotate - m_lastUpdatedMoveAngle) > 30.0f)
         SendMoveHeartbeat();
 }
 

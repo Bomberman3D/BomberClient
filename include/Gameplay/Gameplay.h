@@ -35,7 +35,8 @@ struct BombRecord
     uint32 y;
     uint32 reach;
     clock_t boomTime;
-    //pozdeji i data o vlastnikovi?
+
+    uint32 ownerId;
 
     SoundEffectRecord* sizzleSound;
 };
@@ -54,6 +55,10 @@ struct BombRecord
 
 /** \var BombRecord::boomTime
  *  \brief Cas, kdy ma bomba vybouchnout [ms]
+ */
+
+/** \var BombRecord::ownerId
+ *  \brief ID vlastnika - aktivni pouze v multiplayer modu
  */
 
 /** \var BombRecord::sizzleSound
@@ -192,7 +197,8 @@ class GameplayMgr
         void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true) { if (m_game) m_game->OnBoxDestroy(x,y,by_bomb); };
         void OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY);
 
-        bool AddBomb(uint32 x, uint32 y);
+        bool AddBomb(uint32 x, uint32 y, uint32 owner = 0, uint32 reach = 0);
+        void SendAddBomb(uint32 x, uint32 y);
         void PreBoomBomb(uint32 x, uint32 y);
 
         float GetPlayerSpeedCoef() { return IsCheatOn(CHEAT_MAX_SPEED)?2.0f:m_plSpeedCoef; };

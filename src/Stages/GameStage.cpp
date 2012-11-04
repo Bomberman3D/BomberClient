@@ -413,11 +413,16 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
         // bloky if .. else if .. pouzity kvuli prehlednosti
 
         // Pokladame bomby pouze kdyz hrajeme (ne v menu nebo kdyz jsme mrtvi)
-        if(m_subStage == 0)
+        if (m_subStage == 0)
         {
             Map* pMap = (Map*)sMapManager->GetMap();
             if (!pMap)
                 return;
+
+            if (m_lastBombPlant + 300 > clock())
+                return;
+
+            m_lastBombPlant = clock();
 
             uint32 bx = floor(sGameplayMgr->GetPlayerRec()->x)+1;
             uint32 by = floor(sGameplayMgr->GetPlayerRec()->z)+1;
@@ -433,7 +438,8 @@ void GameStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             }
             else
             {
-                // TODO: multiplayer
+                // jen pozadat server o vlozeni bomby
+                sGameplayMgr->SendAddBomb(bx, by);
             }
         }
         // jsme zapauzovani

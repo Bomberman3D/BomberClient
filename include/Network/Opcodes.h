@@ -34,6 +34,13 @@ enum Opcodes
     SMSG_MOVE_HEARTBEAT            = 0x0F,
     SMSG_MAP_INITIAL_DATA          = 0x10,
     SMSG_NEW_PLAYER                = 0x11,
+    CMSG_PLANT_BOMB                = 0x12,
+    SMSG_PLANT_BOMB                = 0x13,
+    SMSG_PLAYER_DIED               = 0x14,
+    SMSG_BOX_DESTROYED             = 0x15,
+    SMSG_NEW_BONUS                 = 0x16,
+    CMSG_BONUS_TAKEN               = 0x17,
+    SMSG_BONUS_TAKEN               = 0x18,
     MAX_OPCODE
 };
 

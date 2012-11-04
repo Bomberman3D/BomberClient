@@ -33,6 +33,9 @@ enum InterThreadRequest
     REQUEST_PLAYER_ANIM          = 7,
     REQUEST_PLAYER_POS           = 8,
     REQUEST_PLAYER_ROTATION      = 9,
+    REQUEST_PLANT_BOMB           = 10,
+    REQUEST_PLAYER_DEATH         = 11,
+    REQUEST_BOX_DESTROY          = 12,
     MAX_REQUEST
 };
 
@@ -60,6 +63,22 @@ struct ThreadRequestPlayerRotation
 {
     uint32 id;
     float rotation;
+};
+struct ThreadRequestPlantBomb
+{
+    uint32 id;
+    uint32 x;
+    uint32 y;
+    uint32 reach;
+};
+struct ThreadRequestPlayerDeath
+{
+    uint32 id;
+    float x, z;
+};
+struct ThreadRequestBoxDestroy
+{
+    uint32 x, y;
 };
 
 // Definice jednotlivych ulozist

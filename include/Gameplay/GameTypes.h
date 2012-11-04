@@ -226,6 +226,8 @@ class ClassicMultiGameType: public GameTypeTemplate
         void OnGameInit(ModelDisplayListRecord* pPlayerRec);
         void OnGameLeave();
         void OnUpdate();
+        void OnBombBoom(BombRecord* bomb);
+        void OnBoxDestroy(uint32 x, uint32 y, bool by_bomb = true);
 };
 
 #endif

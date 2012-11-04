@@ -261,3 +261,50 @@ void PacketHandlers::HandleMoveHeartbeat(SmartPacket* data)
     req2->rotation = rot;
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_ROTATION, req2);
 }
+
+void PacketHandlers::HandlePlantBomb(SmartPacket* data)
+{
+    uint32 owner;
+    uint32 x, y, reach;
+
+    *data >> owner;
+    *data >> x;
+    *data >> y;
+    *data >> reach;
+
+    ThreadRequestPlantBomb* req = new ThreadRequestPlantBomb;
+    req->id = owner;
+    req->x = x;
+    req->y = y;
+    req->reach = reach;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLANT_BOMB, req);
+}
+
+void PacketHandlers::HandlePlayerDied(SmartPacket* data)
+{
+    uint32 id;
+    float x, z;
+
+    *data >> id;
+    *data >> x;
+    *data >> z;
+
+    ThreadRequestPlayerDeath* req = new ThreadRequestPlayerDeath;
+    req->id = id;
+    req->x = x;
+    req->z = z;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_DEATH, req);
+}
+
+void PacketHandlers::HandleBoxDestroyed(SmartPacket* data)
+{
+    uint32 x, y;
+
+    *data >> x;
+    *data >> y;
+
+    ThreadRequestBoxDestroy* req = new ThreadRequestBoxDestroy;
+    req->x = x;
+    req->y = y;
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_BOX_DESTROY, req);
+}

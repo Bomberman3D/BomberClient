@@ -216,6 +216,7 @@ class GameStage: public StageControl
         GameStage()
         {
             m_type = STAGE_GAME;
+            m_lastBombPlant = 0;
         }
         void OnEnter();
         void OnLeave();
@@ -227,6 +228,7 @@ class GameStage: public StageControl
 
     protected:
         uint8 m_consoleHistoryLine;
+        clock_t m_lastBombPlant;
 };
 
 /** \class CreditsStage
