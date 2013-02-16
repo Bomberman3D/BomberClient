@@ -366,6 +366,7 @@ class Storage
         std::string m_instanceList;
         std::string m_nickName;
         uint32 m_myId;
+        uint32 m_myModelArtkit;
         uint32 m_instanceId;
 
         // Mezivlaknove pozadavky

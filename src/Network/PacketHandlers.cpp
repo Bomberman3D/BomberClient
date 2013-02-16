@@ -64,12 +64,14 @@ void PacketHandlers::HandleEnterGame(SmartPacket* data)
     uint8 result;
     float startPosX, startPosZ;
     uint32 myId;
+    uint32 myArtkit;
     uint32 mapId;
     uint32 instanceId;
 
     *data >> result;
     *data >> startPosX >> startPosZ; //TODO: IMPLEMENT!
     *data >> myId;
+    *data >> myArtkit;
     *data >> mapId;
     *data >> instanceId;
 
@@ -82,6 +84,7 @@ void PacketHandlers::HandleEnterGame(SmartPacket* data)
 
     sStorage->m_myId = myId;
     sStorage->m_instanceId = instanceId;
+    sStorage->m_myModelArtkit = myArtkit;
 
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_MAP_CHANGE, mapId);
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_GAME_TYPE_CHANGE, GAME_TYPE_MP_CLASSIC); // TODO: get game type from server
