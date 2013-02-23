@@ -9,6 +9,7 @@
 #include <Gameplay.h>
 #include <Timer.h>
 #include <SoundMgr.h>
+#include <Network.h>
 
 void GameStage::OnEnter()
 {
@@ -145,6 +146,21 @@ void GameStage::OnDraw()
 
             // Vykreslit hraci puntik
             sDisplay->Draw2D(53, 20+bx*field_size, 20+by*field_size, field_size, field_size);
+
+            // Vykreslit kazdemu hraci v multiplayeru puntik
+            if (!sGameplayMgr->IsSingleGameType() && sNetwork->IsConnected())
+            {
+                for (PlayerList::const_iterator itr = sNetwork->players.begin(); itr != sNetwork->players.end(); ++itr)
+                {
+                    if ((*itr) && (*itr)->rec)
+                    {
+                        bx = floor((*itr)->rec->x)+1;
+                        by = floor((*itr)->rec->z)+1;
+
+                        sDisplay->Draw2D(54, 20+bx*field_size, 20+by*field_size, field_size, field_size);
+                    }
+                }
+            }
 
             // A taky puntik pro vsechny nepratele :)
             if (enemies && !enemies->empty())
