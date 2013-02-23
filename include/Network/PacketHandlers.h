@@ -18,6 +18,8 @@ namespace PacketHandlers
     void HandlePlantBomb(SmartPacket* data);
     void HandleBoxDestroyed(SmartPacket* data);
     void HandlePlayerDied(SmartPacket* data);
+    void HandleScoreBoard(SmartPacket* data);
+    void HandleRespawn(SmartPacket* data);
 };
 
 struct OpcodeHandler
@@ -38,7 +40,9 @@ static const OpcodeHandler PacketHandlerAssign[] = {
     {SMSG_NEW_PLAYER,                &PacketHandlers::HandleNewPlayer},
     {SMSG_PLANT_BOMB,                &PacketHandlers::HandlePlantBomb},
     {SMSG_PLAYER_DIED,               &PacketHandlers::HandlePlayerDied},
-    {SMSG_BOX_DESTROYED,             &PacketHandlers::HandleBoxDestroyed}
+    {SMSG_BOX_DESTROYED,             &PacketHandlers::HandleBoxDestroyed},
+    {SMSG_SCOREBOARD,                &PacketHandlers::HandleScoreBoard},
+    {SMSG_RESPAWN,                   &PacketHandlers::HandleRespawn}
 };
 
 #endif

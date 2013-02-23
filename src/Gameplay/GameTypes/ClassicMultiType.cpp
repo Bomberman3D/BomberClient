@@ -4,7 +4,7 @@
 
 ModelDisplayListRecord* ClassicMultiGameType::SpawnNewPlayer()
 {
-    return sDisplay->DrawModel(9, 0.5f, 0, 0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED, false, sStorage->m_myModelArtkit);
+    return sDisplay->DrawModel(9, sStorage->m_serverStartPos[0]-0.5f, 0, sStorage->m_serverStartPos[1]-0.5f, ANIM_IDLE, 3.5f, 90.0f, true, false, 0, 0, ANIM_RESTRICTION_NOT_PAUSED, false, sStorage->m_myModelArtkit);
 }
 
 void ClassicMultiGameType::FillGameTypeResources()

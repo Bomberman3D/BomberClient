@@ -561,23 +561,49 @@ void GameplayMgr::SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t s
 
 /** \brief Funkce starajici se o potrebne rutiny pri splneni podminek smrti hrace
  */
-void GameplayMgr::PlayerDied()
+void GameplayMgr::PlayerDied(bool dead)
 {
-    if (m_playerDead)
+    if (m_playerDead && dead)
         return;
 
-    if (IsCheatOn(CHEAT_IMMORTAL))
+    if (IsCheatOn(CHEAT_IMMORTAL) && dead)
         return;
 
-    BlockMovement();
+    if (dead)
+    {
+        BlockMovement();
 
-    m_playerDead = true;
+        m_playerDead = true;
 
-    sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_DYING, 0, 0, ANIM_FLAG_NOT_REPEAT);
+        sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_DYING, 0, 0, ANIM_FLAG_NOT_REPEAT);
 
-    sSoundMgr->PlayEffect(9);
+        sSoundMgr->PlayEffect(9);
 
-    sApplication->SetStagePhase(3);
+        sApplication->SetStagePhase(3);
+    }
+    else
+    {
+        UnblockMovement();
+
+        m_playerDead = false;
+
+        sAnimator->ChangeModelAnim(m_playerRec->AnimTicket, ANIM_IDLE, 0, 0, 0);
+
+        sApplication->SetStagePhase(0);
+    }
+}
+
+/** \brief Odeslani pozadavku na respawn
+ *
+ * Odesle serveru pozadavek na obnoveni hlavni postavy
+ */
+void GameplayMgr::SendRespawnRequest()
+{
+    if (IsSingleGameType() || !sNetwork->IsConnected())
+        return;
+
+    SmartPacket data(CMSG_RESPAWN_REQUEST);
+    sNetwork->SendPacket(&data);
 }
 
 /** \brief Pauza hry

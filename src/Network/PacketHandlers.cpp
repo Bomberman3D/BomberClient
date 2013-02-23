@@ -86,6 +86,9 @@ void PacketHandlers::HandleEnterGame(SmartPacket* data)
     sStorage->m_instanceId = instanceId;
     sStorage->m_myModelArtkit = myArtkit;
 
+    sStorage->m_serverStartPos[0] = startPosX;
+    sStorage->m_serverStartPos[1] = startPosZ;
+
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_MAP_CHANGE, mapId);
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_GAME_TYPE_CHANGE, GAME_TYPE_MP_CLASSIC); // TODO: get game type from server
     sStorage->MakeInterThreadRequest(THREAD_NETWORK, REQUEST_STAGE_CHANGE, STAGE_LOADING);
@@ -287,15 +290,18 @@ void PacketHandlers::HandlePlayerDied(SmartPacket* data)
 {
     uint32 id;
     float x, z;
+    uint32 respawnDelay;
 
     *data >> id;
     *data >> x;
     *data >> z;
+    *data >> respawnDelay;
 
     ThreadRequestPlayerDeath* req = new ThreadRequestPlayerDeath;
     req->id = id;
     req->x = x;
     req->z = z;
+    req->respawnDelay = respawnDelay;
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_PLAYER_DEATH, req);
 }
 
@@ -310,4 +316,44 @@ void PacketHandlers::HandleBoxDestroyed(SmartPacket* data)
     req->x = x;
     req->y = y;
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_BOX_DESTROY, req);
+}
+
+void PacketHandlers::HandleScoreBoard(SmartPacket* data)
+{
+    uint32 count;
+
+    *data >> count;
+
+    if (count == 0)
+        return;
+
+    ThreadRequestFillScoreBoard* req = new ThreadRequestFillScoreBoard;
+
+    for (uint32 i = 0; i < count; i++)
+    {
+        ScoreBoardData d;
+        d.nickName = data->readstr();
+        *data >> d.kills;
+        *data >> d.deaths;
+
+        req->scores.push_back(d);
+    }
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_FILL_SCOREBOARD, req);
+}
+
+void PacketHandlers::HandleRespawn(SmartPacket* data)
+{
+    uint32 id;
+    float posX, posZ;
+
+    *data >> id;
+    *data >> posX >> posZ;
+
+    ThreadRequestRespawnPlayer* req = new ThreadRequestRespawnPlayer;
+    req->id = id;
+    req->x = posX;
+    req->z = posZ;
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_RESPAWN_PLAYER, req);
 }

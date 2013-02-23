@@ -761,7 +761,7 @@ void Application::ProcessInterThreadRequests()
                     case REQUEST_PLAYER_ADD:
                     {
                         Player* pl = (Player*)(itr->second);
-                        pl->rec = sDisplay->DrawModel(9, pl->x, pl->y, 0.5f, ANIM_IDLE, 3.5f, 1.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE, false, pl->artkit);
+                        pl->rec = sDisplay->DrawModel(9, pl->x, 0.0f, pl->y, ANIM_IDLE, 3.5f, 1.0f, true, false, 0, 0, ANIM_RESTRICTION_NONE, false, pl->artkit);
                         sNetwork->players.push_back(pl);
                         break;
                     }
@@ -816,7 +816,15 @@ void Application::ProcessInterThreadRequests()
                         ThreadRequestPlayerDeath* tmp = (ThreadRequestPlayerDeath*)(itr->second);
 
                         if (tmp->id == sStorage->m_myId)
+                        {
                             sGameplayMgr->PlayerDied();
+                            if (tmp->respawnDelay)
+                                sStorage->m_respawnTime = time(NULL) + tmp->respawnDelay;
+                            else
+                                sStorage->m_respawnTime = 0;
+
+                            sStorage->m_respawnRequest = false;
+                        }
                         else
                         {
                             Player* pl = sNetwork->GetPlayerById(tmp->id);
@@ -835,6 +843,40 @@ void Application::ProcessInterThreadRequests()
                             break;
 
                         map->DestroyDynamicRecords(tmp->x, tmp->y, DYNAMIC_TYPE_BOX);
+                        break;
+                    }
+                    case REQUEST_FILL_SCOREBOARD:
+                    {
+                        ThreadRequestFillScoreBoard* tmp = (ThreadRequestFillScoreBoard*)(itr->second);
+                        sStorage->m_scoreBoard.clear();
+
+                        sStorage->m_scoreBoard = tmp->scores;
+                        sStorage->m_scoreBoard.SortByKills();
+                        break;
+                    }
+                    case REQUEST_RESPAWN_PLAYER:
+                    {
+                        ThreadRequestRespawnPlayer* tmp = (ThreadRequestRespawnPlayer*)(itr->second);
+                        if (tmp->id == sStorage->m_myId)
+                        {
+                            sGameplayMgr->PlayerDied(false);
+                            sStorage->m_respawnRequest = false;
+                            if (ModelDisplayListRecord* rec = sGameplayMgr->GetPlayerRec())
+                            {
+                                rec->x = tmp->x-0.5f;
+                                rec->z = tmp->z-0.5f;
+                            }
+                        }
+                        else
+                        {
+                            Player* pl = sNetwork->GetPlayerById(tmp->id);
+                            if (!pl)
+                                break;
+
+                            sAnimator->ChangeModelAnim(pl->rec->AnimTicket, ANIM_IDLE, 0, 0, 0);
+                            pl->rec->x = tmp->x-0.5f;
+                            pl->rec->z = tmp->z-0.5f;
+                        }
                         break;
                     }
                 }

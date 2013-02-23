@@ -223,7 +223,8 @@ class GameplayMgr
         bool WouldBeDangerousField(uint32 x, uint32 y);
         void SetDangerous(uint32 x, uint32 y, BombRecord* origin, clock_t since, uint32 howLong);
 
-        void PlayerDied();
+        void PlayerDied(bool dead = true);
+        void SendRespawnRequest();
         void UpdatePlayerMoveAngle();
         void UpdatePlayerMotion();
         void UpdateOtherPlayersMotion();

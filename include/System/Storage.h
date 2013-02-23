@@ -21,6 +21,38 @@ enum ModelAnimType
     MAX_ANIM
 };
 
+// Runtime storage
+
+/** \struct ScoreBoardData
+ *  \brief Struktura pouzivana pro uchovavani skore v multiplayer hre
+ */
+struct ScoreBoardData
+{
+    std::string nickName;
+    uint32 kills;
+    uint32 deaths;
+};
+
+/**
+ *  \brief Radici funkce pro nasi extenzi std::listu, radi podle poctu zabiti od nejvyssiho po nejnizsi
+ */
+static bool SortByKillsFunction(ScoreBoardData a, ScoreBoardData b)
+{
+    return a.kills > b.kills;
+}
+
+/** \class ScoreBoard
+ *  \brief Extenze std::listu pro ukladani dat o skore pro multiplayer hru
+ */
+class ScoreBoard: public std::list<ScoreBoardData>
+{
+    public:
+        void SortByKills()
+        {
+            sort(SortByKillsFunction);
+        };
+};
+
 enum InterThreadRequest
 {
     REQUEST_STAGE_CHANGE         = 0,
@@ -36,6 +68,8 @@ enum InterThreadRequest
     REQUEST_PLANT_BOMB           = 10,
     REQUEST_PLAYER_DEATH         = 11,
     REQUEST_BOX_DESTROY          = 12,
+    REQUEST_FILL_SCOREBOARD      = 13,
+    REQUEST_RESPAWN_PLAYER       = 14,
     MAX_REQUEST
 };
 
@@ -75,10 +109,20 @@ struct ThreadRequestPlayerDeath
 {
     uint32 id;
     float x, z;
+    uint32 respawnDelay;
 };
 struct ThreadRequestBoxDestroy
 {
     uint32 x, y;
+};
+struct ThreadRequestFillScoreBoard
+{
+    ScoreBoard scores;
+};
+struct ThreadRequestRespawnPlayer
+{
+    uint32 id;
+    float x, z;
 };
 
 // Definice jednotlivych ulozist
@@ -290,7 +334,6 @@ struct EnemyTemplateData
  *  \brief Vychozi uroven AI
  */
 
-
 /** \class Storage
  *  \brief Trida uchovavajici veskera staticka data a cast dynamickych, stara se take o jejich nacteni
  */
@@ -368,6 +411,10 @@ class Storage
         uint32 m_myId;
         uint32 m_myModelArtkit;
         uint32 m_instanceId;
+        ScoreBoard m_scoreBoard;
+        time_t m_respawnTime;
+        float m_serverStartPos[2];
+        bool m_respawnRequest;
 
         // Mezivlaknove pozadavky
         std::list<std::pair<uint32, uint32>> m_interThreadRequests;

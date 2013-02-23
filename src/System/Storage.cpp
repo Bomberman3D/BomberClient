@@ -7,6 +7,7 @@
  */
 Storage::Storage()
 {
+    m_respawnTime = 0;
 }
 
 /** \brief Stezejni funkce pro nacteni vsech SQLite ulozist

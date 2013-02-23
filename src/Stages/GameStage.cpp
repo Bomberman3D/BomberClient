@@ -177,6 +177,24 @@ void GameStage::OnDraw()
             else
                 sDisplay->PrintText(MAIN_FONT, 450, 52, FONT_SIZE_H3, 0, COLOR(0,0,127), "0:00");
         }
+
+        // Skore
+        if (sApplication->IsKeyPressed(VK_TAB))
+        {
+            sDisplay->Draw2D(15, 150, 120, WIDTH-150-150, 320);
+
+            uint32 mover = 0;
+            sDisplay->PrintText(MAIN_FONT, 160, 130, 1.0f, 0,     COLOR(255,127,127), "Nick");
+            sDisplay->PrintText(MAIN_FONT, 160+200*WIDTH/1024.0f, 130, 1.0f, 0, COLOR(255,127,127), "Poèet zabití");
+            sDisplay->PrintText(MAIN_FONT, 160+350*WIDTH/1024.0f, 130, 1.0f, 0, COLOR(255,127,127), "Poèet smrtí");
+            for (ScoreBoard::const_iterator itr = sStorage->m_scoreBoard.begin(); itr != sStorage->m_scoreBoard.end(); ++itr)
+            {
+                sDisplay->PrintText(MAIN_FONT, 160, 160+mover*20, 1.0f, 0, NOCOLOR, "%s", (*itr).nickName.c_str(), (*itr).kills, (*itr).deaths);
+                sDisplay->PrintText(MAIN_FONT, 160+200*WIDTH/1024.0f, 160+mover*20, 1.0f, 0, NOCOLOR, "%u", (*itr).kills);
+                sDisplay->PrintText(MAIN_FONT, 160+350*WIDTH/1024.0f, 160+mover*20, 1.0f, 0, NOCOLOR, "%u", (*itr).deaths);
+                mover++;
+            }
+        }
     }
     // Hra zapauzovana
     else if (m_subStage == 2)
@@ -207,17 +225,41 @@ void GameStage::OnDraw()
         sDisplay->Draw2D(14, WIDTH/8, 2*HEIGHT/7, 3*WIDTH/4, 100);
         sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5, 2*HEIGHT/7+25, FONT_SIZE_N, 0, COLOR(255, 0, 0), "Jsi mrtev!");
 
-        sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 160);
+        if (sGameplayMgr->IsSingleGameType())
+        {
+            sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 160);
 
-        if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125, 2*HEIGHT/7+125+60))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Pokraèovat");
-        else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Pokraèovat");
+            if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125, 2*HEIGHT/7+125+60))
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Pokraèovat");
+            else
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Pokraèovat");
 
-        if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125+60, 2*HEIGHT/7+125+130))
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Hlavní menu");
+            if (IN_RANGE(mousePos.x, mousePos.y, WIDTH/2-38*6*0.6f, WIDTH/2+38*6*0.6f, 2*HEIGHT/7+125+60, 2*HEIGHT/7+125+130))
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 255, 0)  , "Hlavní menu");
+            else
+                sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Hlavní menu");
+        }
         else
-            sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5.5f*0.6f, 2*HEIGHT/7+125+70, FONT_SIZE_2, 0, COLOR(255, 0, 255), "Hlavní menu");
+        {
+            sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 160);
+            if (sStorage->m_respawnTime)
+            {
+                int32 delta = (int32)((int64)sStorage->m_respawnTime-(int64)time(NULL));
+                if (delta < 0)
+                {
+                    delta = 0;
+                    if (!sStorage->m_respawnRequest)
+                    {
+                        sGameplayMgr->SendRespawnRequest();
+                        sStorage->m_respawnRequest = true;
+                    }
+                }
+                if (!sStorage->m_respawnRequest)
+                    sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_3, 0, COLOR(255, 255, 0)  , "Oživení za %u...", delta);
+                else
+                    sDisplay->PrintText(FONT_ONE, WIDTH/2-38*5*0.6f, 2*HEIGHT/7+125, FONT_SIZE_3, 0, COLOR(255, 255, 0)  , "Èekám na oživení...", delta);
+            }
+        }
     }
     // Statistiky (po smrti)
     else if (m_subStage == 4 || m_subStage == 5)
