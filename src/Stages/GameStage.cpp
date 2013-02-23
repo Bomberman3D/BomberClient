@@ -312,23 +312,86 @@ void GameStage::OnDraw()
     }
 
     // Vykresleni konzole
-    if (sGameplayMgr->IsConsoleOpened())
+    if (sGameplayMgr->IsSingleGameType())
     {
-        if (!sDisplay->IsIn2DMode())
-            sDisplay->Setup2DMode();
+        if (sGameplayMgr->IsConsoleOpened())
+        {
+            if (!sDisplay->IsIn2DMode())
+                sDisplay->Setup2DMode();
 
-        // Pozadi
-        sDisplay->Draw2D(14, 5, 0, WIDTH-10, 140);
+            // Pozadi
+            sDisplay->Draw2D(14, 5, 0, WIDTH-10, 140);
 
-        // Historie vystupu
-        for (uint32 i = 0; i < CONSOLE_OUTPUT_LINES; i++)
-            sDisplay->PrintText(MAIN_FONT, 10, 5+i*20, 1.0f, 0, NOCOLOR, "%s", sGameplayMgr->GetConsoleOutput(i));
+            // Historie vystupu
+            for (uint32 i = 0; i < CONSOLE_OUTPUT_LINES; i++)
+                sDisplay->PrintText(MAIN_FONT, 10, 5+i*20, 1.0f, 0, NOCOLOR, "%s", sGameplayMgr->GetConsoleOutput(i));
 
-        // Aktualni vstup
-        sDisplay->PrintText(MAIN_FONT, 10, 5+CONSOLE_OUTPUT_LINES*20+15, 1.0f, 0, COLOR(255,200,200), "> %s", sGameplayMgr->GetConsoleInput());
+            // Aktualni vstup
+            sDisplay->PrintText(MAIN_FONT, 10, 5+CONSOLE_OUTPUT_LINES*20+15, 1.0f, 0, COLOR(255,200,200), "> %s", sGameplayMgr->GetConsoleInput());
+        }
+    }
+    else // V multiplayeru vyuzivame konzoli jako chat, a zobrazujeme ji stale
+    {
+        if (m_subStage == 0)
+        {
+            if (!sDisplay->IsIn2DMode())
+                sDisplay->Setup2DMode();
+
+            // Pozadi
+            if (sGameplayMgr->IsConsoleOpened())
+                sDisplay->Draw2D(80, 0, HEIGHT-90, WIDTH/2, 90);
+
+            // Historie vystupu
+            for (uint32 i = 0; i < CONSOLE_OUTPUT_LINES; i++)
+                sDisplay->PrintText(MAIN_FONT, 5, HEIGHT - 6*14 + i*14, 0.7f, 0, NOCOLOR, "%s", sGameplayMgr->GetConsoleOutput(i));
+
+            // Aktualni vstup
+            if (sGameplayMgr->IsConsoleOpened())
+                sDisplay->PrintText(MAIN_FONT, 5, HEIGHT-14, 0.7f, 0, COLOR(255,200,200), "> %s", sGameplayMgr->GetConsoleInput());
+        }
     }
 
-     sDisplay->Setup3DMode();
+    sDisplay->Setup3DMode();
+}
+
+bool IsAllowedChatKey(unsigned char key)
+{
+    static uint8 addAllowed[] = {'.',',',':','?','!','_','-','/','\\','"','\'',')','('};
+
+    if ((key >= 'a' && key <= 'z')
+        || (key >= 'A' && key <= 'Z')
+        || (key >= '0' && key <= '9')
+        || key == VK_SPACE)
+        return true;
+
+    for (uint32 i = 0; i < sizeof(addAllowed)/sizeof(uint8); i++)
+        if (key == addAllowed[i])
+            return true;
+
+    return false;
+}
+
+void GameStage::OnPrintableChar(uint16 key)
+{
+    if (sGameplayMgr->IsConsoleOpened())
+    {
+        // tisknutelne znaky
+        if (IsAllowedChatKey(key))
+        {
+            if (!sGameplayMgr->IsSingleGameType())
+            {
+                if ((key >= 'a' && key <= 'z') && sApplication->IsKeyPressed(VK_SHIFT))
+                    key = (key-'a')+'A';
+                if ((key >= 'A' && key <= 'Z') && !sApplication->IsKeyPressed(VK_SHIFT))
+                    key = (key-'A')+'a';
+            }
+
+            char* newline = new char[strlen(sGameplayMgr->GetConsoleInput())+1];
+            sprintf(newline, "%s%c", sGameplayMgr->GetConsoleInput(), key);
+            sGameplayMgr->SetConsoleInput(newline);
+            m_consoleHistoryLine = 0;
+        }
+    }
 }
 
 void GameStage::OnKeyStateChange(uint16 key, bool press)
@@ -354,7 +417,7 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
         }
     }
 
-    // Pokud je substage rovna 2 (menu), zadny pohyb !
+    // Pokud je substage rovna 2 (menu), muzeme otevrit konzoli
     if (m_subStage == 2)
     {
         if (key == 192 && press)
@@ -369,22 +432,24 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
         }
     }
 
+    // v multiplayeru konzole = chat, a otevira se enterem
+    if (m_subStage == 0)
+    {
+        if (key == VK_RETURN && press)
+        {
+            if (!sGameplayMgr->IsConsoleOpened())
+            {
+                sGameplayMgr->OpenConsole();
+                return;
+            }
+        }
+    }
+
     // Psani do konzole
     if (sGameplayMgr->IsConsoleOpened() && press)
     {
-        // tisknutelne znaky
-        if ((key >= 'a' && key <= 'z')
-            || (key >= 'A' && key <= 'Z')
-            || (key >= '0' && key <= '9')
-            || key == VK_SPACE)
-        {
-            char* newline = new char[strlen(sGameplayMgr->GetConsoleInput())+1];
-            sprintf(newline, "%s%c", sGameplayMgr->GetConsoleInput(), key);
-            sGameplayMgr->SetConsoleInput(newline);
-            m_consoleHistoryLine = 0;
-        }
         // backspace
-        else if (key == VK_BACK)
+        if (key == VK_BACK)
         {
             char* newline = new char[strlen(sGameplayMgr->GetConsoleInput())];
             sprintf(newline, "%s", sGameplayMgr->GetConsoleInput());
@@ -393,7 +458,7 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
             m_consoleHistoryLine = 0;
         }
         // sipka nahoru - historie
-        else if (key == VK_UP)
+        else if (key == VK_UP && sGameplayMgr->IsSingleGameType())
         {
             if (m_consoleHistoryLine < CONSOLE_INPUT_HISTORY)
             {
@@ -402,7 +467,7 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
             }
         }
         // sipka dolu - historie
-        else if (key == VK_DOWN)
+        else if (key == VK_DOWN && sGameplayMgr->IsSingleGameType())
         {
             if (m_consoleHistoryLine > 0)
             {
@@ -418,8 +483,8 @@ void GameStage::OnKeyStateChange(uint16 key, bool press)
         }
     }
 
-    // Pokud je substage rovna 2 (menu), zadny pohyb !
-    if (m_subStage == 2)
+    // Pokud je substage rovna 2 (menu) nebo je otevrena konzole, zadny pohyb !
+    if (m_subStage == 2 || sGameplayMgr->IsConsoleOpened())
         return;
 
     // Dame vedet globalnimu kontroleru, ze hrac se chce pohybovat

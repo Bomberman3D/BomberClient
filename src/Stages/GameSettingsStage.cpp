@@ -316,6 +316,8 @@ void GameSettingsStage::OnMouseButtonPress(uint32 x, uint32 y, bool left)
             enter << m_selected;
             enter << m_nickfield.c_str();
             sNetwork->SendPacket(&enter);
+
+            sStorage->m_nickName = m_nickfield.c_str();
         }
     }
     ////////////

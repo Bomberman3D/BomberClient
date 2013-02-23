@@ -48,6 +48,7 @@ class Application
         uint32 GetStagePhase() { return m_currStage->GetSubStage(); };
 
         void KeyStateChange(uint8 key, bool press);
+        void PrintableCharPress(uint16 chr);
         void MouseButtonStateChange(bool left, bool press);
         void SetMouseXY(uint32 x, uint32 y)
         {

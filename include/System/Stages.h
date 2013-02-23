@@ -28,6 +28,7 @@ class StageControl
         virtual void OnDraw() {};
         virtual void OnBeforeDraw() {};
         virtual void OnKeyStateChange(uint16 key, bool press) {};
+        virtual void OnPrintableChar(uint16 chr) {};
         virtual void OnMouseButtonPress(uint32 x, uint32 y, bool left = true) {};
         virtual void OnUpdate() {};
 
@@ -223,6 +224,7 @@ class GameStage: public StageControl
         void OnDraw();
         void OnBeforeDraw();
         void OnKeyStateChange(uint16 key, bool press);
+        void OnPrintableChar(uint16 chr);
         void OnMouseButtonPress(uint32 x, uint32 y, bool left = true);
         void OnUpdate();
 

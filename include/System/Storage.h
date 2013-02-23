@@ -21,6 +21,13 @@ enum ModelAnimType
     MAX_ANIM
 };
 
+enum ChatMessageType
+{
+    CHAT_MSG_PLAYER_CHAT    = 0,
+    CHAT_MSG_SERVER         = 1,
+    MAX_CHAT_MSG
+};
+
 // Runtime storage
 
 /** \struct ScoreBoardData
@@ -70,6 +77,7 @@ enum InterThreadRequest
     REQUEST_BOX_DESTROY          = 12,
     REQUEST_FILL_SCOREBOARD      = 13,
     REQUEST_RESPAWN_PLAYER       = 14,
+    REQUEST_CHAT_MESSAGE         = 15,
     MAX_REQUEST
 };
 
@@ -123,6 +131,12 @@ struct ThreadRequestRespawnPlayer
 {
     uint32 id;
     float x, z;
+};
+struct ThreadRequestChatMessage
+{
+    uint8 type;
+    uint32 sourceId;
+    std::string message;
 };
 
 // Definice jednotlivych ulozist

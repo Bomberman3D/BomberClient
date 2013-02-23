@@ -677,6 +677,20 @@ void GameplayMgr::UnpauseGame()
     SetCursorPos(middleX, middleY);
 }
 
+/** \brief Odeslani zpravy z chatu
+ *
+ * Slouzi k odeslani zpravy, ktera se nasledne rozesle vsem hracum v instanci
+ */
+void GameplayMgr::SendChat(const char *msg)
+{
+    if (IsSingleGameType() || !sNetwork->IsConnected())
+        return;
+
+    SmartPacket chat(CMSG_CHAT);
+    chat << msg;
+    sNetwork->SendPacket(&chat);
+}
+
 /** \brief Vystup na herni konzoli
  *
  * Vyroluje vsechny polozky ve vystupu o jednu nahoru (jedna se tedy zahodi) a novy vypis da na novou radku
@@ -705,6 +719,18 @@ void GameplayMgr::ConsoleSubmit()
     if (!IsConsoleOpened())
         return;
 
+    // v multiplayeru konzole = chat
+    if (!IsSingleGameType() && sNetwork->IsConnected())
+    {
+        if (m_consoleInput.size() > 0)
+        {
+            SendChat(m_consoleInput.c_str());
+            m_consoleInput = "";
+        }
+        CloseConsole();
+        return;
+    }
+
     // = potvrzeni prazdneho radku, nema cenu handlovat dale
     if (m_consoleInput.size() == 0)
         return;
@@ -720,7 +746,7 @@ void GameplayMgr::ConsoleSubmit()
     ConsoleWrite(">> %s", m_consoleInput.c_str());
 
     // prikazy pouzitelne jen pri hrani
-    if (sApplication->GetStage() == STAGE_GAME)
+    if (sApplication->GetStage() == STAGE_GAME && IsSingleGameType())
     {
         // Testovaci vystupy
         if (m_consoleInput.compare(0, m_consoleInput.size(), "POS X") == 0)

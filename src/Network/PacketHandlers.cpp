@@ -357,3 +357,21 @@ void PacketHandlers::HandleRespawn(SmartPacket* data)
 
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_RESPAWN_PLAYER, req);
 }
+
+void PacketHandlers::HandleChatMessage(SmartPacket* data)
+{
+    uint8 type;
+    uint32 source;
+    std::string message;
+
+    *data >> type;
+    *data >> source;
+    message = data->readstr();
+
+    ThreadRequestChatMessage* req = new ThreadRequestChatMessage;
+    req->type = type;
+    req->sourceId = source;
+    req->message = message.c_str();
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_CHAT_MESSAGE, req);
+}

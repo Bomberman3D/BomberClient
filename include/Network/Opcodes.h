@@ -44,6 +44,8 @@ enum Opcodes
     SMSG_SCOREBOARD                = 0x19,
     CMSG_RESPAWN_REQUEST           = 0x1A,
     SMSG_RESPAWN                   = 0x1B,
+    CMSG_CHAT                      = 0x1C,
+    SMSG_CHAT                      = 0x1D,
     MAX_OPCODE
 };
 

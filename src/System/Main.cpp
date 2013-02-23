@@ -378,6 +378,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             sApplication->KeyStateChange(wParam, false);
             return 0;
         }
+        case WM_CHAR:
+        {
+            sApplication->PrintableCharPress(wParam);
+            return 0;
+        }
         case WM_LBUTTONDOWN:
         {
             sApplication->MouseButtonStateChange(true, true);
@@ -654,6 +659,17 @@ void Application::KeyStateChange(uint8 key, bool press)
     }
 }
 
+/** \brief Funkce volana po stisknuti tisknutelneho znaku
+ *
+ * Oddelene od hlavniho key press/release kodu proto, ze prichazi rovnou jako znak od OS, cili
+ * podleha veskeremu zvolenemu nastaveni jako znakova sada, locales a podobne
+ */
+void Application::PrintableCharPress(uint16 chr)
+{
+    if (m_currStage)
+        m_currStage->OnPrintableChar(chr);
+}
+
 /** \brief Funkce pro zaznamenani zmeny stavu tlacitek mysi
  *
  * Tahle funkce je volana po zaznamenani zmeny stavu leveho nebo praveho tlacitka
@@ -877,6 +893,31 @@ void Application::ProcessInterThreadRequests()
                             pl->rec->x = tmp->x-0.5f;
                             pl->rec->z = tmp->z-0.5f;
                         }
+                        break;
+                    }
+                    case REQUEST_CHAT_MESSAGE:
+                    {
+                        ThreadRequestChatMessage* tmp = (ThreadRequestChatMessage*)(itr->second);
+                        std::string mesg = "";
+                        if (tmp->type == CHAT_MSG_PLAYER_CHAT)
+                        {
+                            if (sStorage->m_myId == tmp->sourceId)
+                            {
+                                mesg += sStorage->m_nickName.c_str();
+                                mesg += ": ";
+                            }
+                            else
+                            {
+                                Player* pl = sNetwork->GetPlayerById(tmp->sourceId);
+                                if (pl)
+                                {
+                                    mesg += pl->name.c_str();
+                                    mesg += ": ";
+                                }
+                            }
+                        }
+                        mesg += tmp->message;
+                        sGameplayMgr->ConsoleWrite(mesg.c_str());
                         break;
                     }
                 }

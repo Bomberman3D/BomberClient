@@ -235,6 +235,7 @@ class GameplayMgr
         void SendMoveHeartbeat();
         void BlockMovement() { m_movementBlocked = true; };
         void UnblockMovement() { m_movementBlocked = false; };
+        void SendChat(const char* msg);
         void PauseGame();
         void UnpauseGame();
         bool IsGamePaused() { return m_gamePaused; };
@@ -246,7 +247,7 @@ class GameplayMgr
         PlayerStats localPlayerStats;
 
         bool IsConsoleOpened() { return m_console; };
-        void OpenConsole() { if (IsGamePaused()) m_console = true; };
+        void OpenConsole() { if (IsGamePaused() || !IsSingleGameType()) m_console = true; };
         void CloseConsole() { m_console = false; };
         const char* GetConsoleOutput(uint32 line) { if (line >= CONSOLE_OUTPUT_LINES) return ""; else return m_consoleOutput[line].c_str(); };
         const char* GetConsoleInputHistory(uint32 line) { if (line >= CONSOLE_INPUT_HISTORY) return ""; else return m_consoleInputHistory[line].c_str(); };
