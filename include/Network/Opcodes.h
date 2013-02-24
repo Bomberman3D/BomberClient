@@ -46,6 +46,7 @@ enum Opcodes
     SMSG_RESPAWN                   = 0x1B,
     CMSG_CHAT                      = 0x1C,
     SMSG_CHAT                      = 0x1D,
+    SMSG_DYNAMIC_RECORD_DESTROY    = 0x1E,
     MAX_OPCODE
 };
 

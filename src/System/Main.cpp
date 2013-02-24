@@ -920,6 +920,28 @@ void Application::ProcessInterThreadRequests()
                         sGameplayMgr->ConsoleWrite(mesg.c_str());
                         break;
                     }
+                    case REQUEST_ADD_BONUS:
+                    {
+                        ThreadRequestAddBonus* tmp = (ThreadRequestAddBonus*)(itr->second);
+                        Map* pMap = sMapManager->GetMap();
+
+                        if (pMap)
+                        {
+                            pMap->AddDynamicCell(tmp->x, tmp->y, DYNAMIC_TYPE_BONUS, 0, tmp->type);
+                            sMapManager->FillDynamicRecords();
+                        }
+                        break;
+                    }
+                    case REQUEST_DYNAMIC_DESTROY:
+                    {
+                        ThreadRequestDynamicFieldDestroy* tmp = (ThreadRequestDynamicFieldDestroy*)(itr->second);
+
+                        Map* pMap = sMapManager->GetMap();
+
+                        if (pMap)
+                            pMap->DestroyDynamicRecords(tmp->x, tmp->y, tmp->type);
+                        break;
+                    }
                 }
             }
             itr = sStorage->m_interThreadObjectRequests.erase(itr);

@@ -141,6 +141,9 @@ void GameStage::OnDraw()
                         }
                     }
                     sDisplay->Draw2D(textureId, 20+i*field_size, 20+j*field_size, field_size, field_size);
+
+                    if (!sGameplayMgr->IsSingleGameType() && pMap->IsDynamicRecordPresent(i, j, DYNAMIC_TYPE_BONUS))
+                        sDisplay->Draw2D(55, 20+i*field_size, 20+j*field_size, field_size, field_size);
                 }
             }
 
@@ -257,7 +260,7 @@ void GameStage::OnDraw()
         }
         else
         {
-            sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 160);
+            sDisplay->Draw2D(15, WIDTH/4, 2*HEIGHT/7+100, WIDTH/2, 100);
             if (sStorage->m_respawnTime)
             {
                 int32 delta = (int32)((int64)sStorage->m_respawnTime-(int64)time(NULL));

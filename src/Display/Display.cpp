@@ -892,10 +892,15 @@ void DisplayMgr::DrawBillboards()
 
         // Zabezpeceni proti vykreslovani billboardu, ktere jsou od nas vzdalene vice jak 14 jednotek
         // - Zvysuje vykon
-        if (pythagoras_c(fabs(temp->x-fabs(m_targetX)), fabs(temp->z-fabs(m_targetZ))) > 14.0f)
+        // Vyjimkou jsou veci, co zas tolik nezatezuji - bonusy a podobne. Jde nam hlavne o zamezeni zobrazeni velkeho
+        // mnozstvi napriklad castic vybuchu
+        if (!(temp->textureId >= 33 && temp->textureId <= 35))
         {
-            ++itr;
-            continue;
+            if (pythagoras_c(fabs(temp->x-fabs(m_targetX)), fabs(temp->z-fabs(m_targetZ))) > 14.0f)
+            {
+                ++itr;
+                continue;
+            }
         }
 
         glLoadIdentity();

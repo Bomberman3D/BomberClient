@@ -99,7 +99,7 @@ void PacketHandlers::HandleMapInitialData(SmartPacket* data)
 {
     uint32 count;
     uint16 tmpx, tmpy;
-    uint8 type;
+    uint8 type, misc;
 
     uint32 tmp_id;
     float tmp_x, tmp_y;
@@ -136,13 +136,14 @@ void PacketHandlers::HandleMapInitialData(SmartPacket* data)
         *data >> tmpx;
         *data >> tmpy;
         *data >> type;
+        *data >> misc;
 
         tmp = new ThreadRequestDynamicElement;
         tmp->x = tmpx;
         tmp->y = tmpy;
         tmp->rec.type = type;
         tmp->rec.state = 0;
-        tmp->rec.misc = 0;
+        tmp->rec.misc = misc;
         tmp->rec.special = NULL;
 
         sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_DYNAMIC_MAP_ELEMENT, (void*)tmp);
@@ -374,4 +375,37 @@ void PacketHandlers::HandleChatMessage(SmartPacket* data)
     req->message = message.c_str();
 
     sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_CHAT_MESSAGE, req);
+}
+
+void PacketHandlers::HandleNewBonus(SmartPacket* data)
+{
+    uint32 x, y, misc;
+
+    *data >> x >> y;
+    *data >> misc;
+
+    ThreadRequestAddBonus* req = new ThreadRequestAddBonus;
+    req->x = x;
+    req->y = y;
+    req->type = misc;
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_ADD_BONUS, req);
+}
+
+void PacketHandlers::HandleDestroyDynamic(SmartPacket* data)
+{
+    uint32 x, y, type, misc;
+
+    *data >> x >> y;
+    *data >> type;
+    *data >> misc;
+
+    ThreadRequestDynamicFieldDestroy* req = new ThreadRequestDynamicFieldDestroy;
+
+    req->x = x;
+    req->y = y;
+    req->type = type;
+    req->misc = misc;
+
+    sStorage->MakeInterThreadObjectRequest(THREAD_NETWORK, REQUEST_DYNAMIC_DESTROY, req);
 }

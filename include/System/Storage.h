@@ -78,6 +78,8 @@ enum InterThreadRequest
     REQUEST_FILL_SCOREBOARD      = 13,
     REQUEST_RESPAWN_PLAYER       = 14,
     REQUEST_CHAT_MESSAGE         = 15,
+    REQUEST_ADD_BONUS            = 16,
+    REQUEST_DYNAMIC_DESTROY      = 17,
     MAX_REQUEST
 };
 
@@ -137,6 +139,19 @@ struct ThreadRequestChatMessage
     uint8 type;
     uint32 sourceId;
     std::string message;
+};
+struct ThreadRequestAddBonus
+{
+    uint32 x;
+    uint32 y;
+    uint8 type;
+};
+struct ThreadRequestDynamicFieldDestroy
+{
+    uint32 x;
+    uint32 y;
+    uint8 type;
+    uint8 misc;
 };
 
 // Definice jednotlivych ulozist

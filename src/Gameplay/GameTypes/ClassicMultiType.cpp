@@ -1,6 +1,7 @@
 #include <Global.h>
 #include <GameTypes.h>
 #include <Gameplay.h>
+#include <Network.h>
 
 ModelDisplayListRecord* ClassicMultiGameType::SpawnNewPlayer()
 {
@@ -133,4 +134,41 @@ void ClassicMultiGameType::OnBoxDestroy(uint32 x, uint32 y, bool by_bomb)
 {
     BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.8f, 0.8f, true, true);
     sParticleEmitterMgr->AddEmitter(templ, x-0.5f, 0.0f, y-0.5f, 0.6f, 0.6f, 90.0f, 0.0f, 0, 0, 150, 30, 5.0f, 0.1f, 10, 5, 0, 0, 0, DEFAULT_BOMB_FLAME_DURATION);
+}
+
+void ClassicMultiGameType::OnPlayerFieldChange(uint32 oldX, uint32 oldY, uint32 newX, uint32 newY)
+{
+    Map* pMap = (Map*)sMapManager->GetMap();
+    if (!pMap)
+        return;
+
+    Map::DynamicCellSet* pSet = pMap->GetDynamicCellSet(newX, newY);
+    if (!pSet || pSet->empty())
+        return;
+
+    for (Map::DynamicCellSet::iterator itr = pSet->begin(); itr != pSet->end(); ++itr)
+    {
+        if (itr->type == DYNAMIC_TYPE_BONUS)
+        {
+            switch (itr->misc)
+            {
+                case BONUS_FLAME:
+                case BONUS_BOMB:
+                    break;
+                case BONUS_SPEED:
+                    if (sGameplayMgr->GetPlayerSpeedCoef() < 1.6f)
+                        sGameplayMgr->SetPlayerSpeedCoef(0.1f, true);
+                    break;
+            }
+
+            sSoundMgr->PlayEffect(3);
+            SmartPacket data(CMSG_BONUS_TAKEN);
+            data << uint32(newX);
+            data << uint32(newY);
+            sNetwork->SendPacket(&data);
+        }
+    }
+
+    // vyzadovano, aby se neopakovalo vzeti bonusu
+    pMap->DestroyDynamicRecords(newX, newY, DYNAMIC_TYPE_BONUS);
 }

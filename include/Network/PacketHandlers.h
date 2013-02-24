@@ -21,6 +21,8 @@ namespace PacketHandlers
     void HandleScoreBoard(SmartPacket* data);
     void HandleRespawn(SmartPacket* data);
     void HandleChatMessage(SmartPacket* data);
+    void HandleNewBonus(SmartPacket* data);
+    void HandleDestroyDynamic(SmartPacket* data);
 };
 
 struct OpcodeHandler
@@ -44,7 +46,9 @@ static const OpcodeHandler PacketHandlerAssign[] = {
     {SMSG_BOX_DESTROYED,             &PacketHandlers::HandleBoxDestroyed},
     {SMSG_SCOREBOARD,                &PacketHandlers::HandleScoreBoard},
     {SMSG_RESPAWN,                   &PacketHandlers::HandleRespawn},
-    {SMSG_CHAT,                      &PacketHandlers::HandleChatMessage}
+    {SMSG_CHAT,                      &PacketHandlers::HandleChatMessage},
+    {SMSG_NEW_BONUS,                 &PacketHandlers::HandleNewBonus},
+    {SMSG_DYNAMIC_RECORD_DESTROY,    &PacketHandlers::HandleDestroyDynamic}
 };
 
 #endif
