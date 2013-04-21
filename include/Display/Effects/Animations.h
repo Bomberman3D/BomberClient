@@ -99,6 +99,7 @@ class Animator
         void DestroyAnimTicket(uint32 id);
         uint32 GetModelAnimTicket(uint32 modelId, uint32 animId, uint32 frameSkipSpeed = 1, uint8 flags = 0);
         void ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame = 0, uint32 frameSkipSpeed = 0, uint8 flags = 0);
+        void ChangeModelAnimFrameSpeed(uint32 ticketId, uint32 frameSkipSpeed);
         uint32 GetActualTexture(uint32 id);
         uint32 GetActualFrame(uint32 id);
         uint32 GetAnimId(uint32 id);

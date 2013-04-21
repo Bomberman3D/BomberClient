@@ -634,6 +634,7 @@ MovementHolder::MovementHolder(EnemyTemplate* src)
     m_path.clear();
     m_tryPath.clear();
     m_src = src;
+    m_target = NULL;
     m_moveType = MOVEMENT_NONE;
     m_lastMoveUpdate = clock();
     m_nodeStartTime = 0;
@@ -662,7 +663,11 @@ void MovementHolder::Generator()
         case MOVEMENT_TARGETTED:
         {
             // Pokud se pohybujeme za cilem, musi cil existovat
-            ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
+            ModelDisplayListRecord* pTarget = m_target;
+
+            if (!pTarget)
+                pTarget = sDisplay->GetTargetModel();
+
             if (!pTarget)
             {
                 m_path.clear();
@@ -766,7 +771,11 @@ bool MovementHolder::TryGenerator(MovementType moveType)
     {
         case MOVEMENT_TARGETTED:
         {
-            ModelDisplayListRecord* pTarget = sDisplay->GetTargetModel();
+            ModelDisplayListRecord* pTarget = m_target;
+
+            if (!pTarget)
+                pTarget = sDisplay->GetTargetModel();
+
             if (!pTarget)
             {
                 m_moveType = MOVEMENT_NONE;
@@ -853,7 +862,7 @@ void MovementHolder::Mutate(MovementType moveType)
 
     // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 1);
 }
 
 /** \brief Pokusi se o zmenu movement generatoru, pokud existuje cesta
@@ -877,7 +886,7 @@ bool MovementHolder::TryMutate(MovementType moveType)
 
         // Zmenime animaci modelu - je treba presunout asi, tady se mi to nelibi
         if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
+            sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 1);
 
         return true;
     }
@@ -924,7 +933,7 @@ void MovementHolder::Update()
 
     // Opet zmena animace modelu na chuzi, tady se mi to taky nelibi, bude treba vymyslet nejake hezci umisteni
     if (sAnimator->GetAnimId(m_src->pRecord->AnimTicket) != ANIM_WALK)
-        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 0);
+        sAnimator->ChangeModelAnim(m_src->pRecord->AnimTicket, ANIM_WALK, 0, 1);
 
     float timePass = 500 * m_speedMod * MOVEMENT_DELAY_COEF;
     float timeDiff = tnow-m_nodeStartTime;
@@ -1048,9 +1057,6 @@ void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
             sDisplay->AddModelFeature(pRecord, MF_TYPE_EMITTER, 0.0f, 2.0f, 0.0f, sParticleEmitterMgr->AddEmitter(
                 BillboardDisplayListRecord::Create(61, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.3f, 0.3f, 270.0f, 0.0f, 0.0f, 0.0f,    120, 10,   0.9f, 0.05f,   10,1,   0,0, 0,-1));
             break;
-        case 11: // Headless bomberman - pouze Meme mody
-            sDisplay->AddModelFeature(pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(65, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
-            break;
     }
 
     m_AI->OnCreate();
@@ -1121,31 +1127,36 @@ void EnemyTemplate::Update()
                  * level 5 = navic jeste spolupracuje s jinymi neprateli
                  */
 
-                if (m_AILevel >= 3)
+                // OnMovementUpdate metoda AI vraci, zdali byl prepsan standardni postup zmeny movement generatoru
+
+                if (!m_AI || !m_AI->OnMovementUpdate())
                 {
-                    // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
-                    if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                    if (m_AILevel >= 3)
                     {
-                        if (!m_movement->TryMutate(MOVEMENT_TARGETTED))
+                        // Nejdrive zkusime, zdali se nejak muzeme dostat k cili
+                        if (m_movement->GetMovementType() != MOVEMENT_TARGETTED)
+                        {
+                            if (!m_movement->TryMutate(MOVEMENT_TARGETTED))
+                                m_movement->TryMutate(MOVEMENT_OUTOFZERO);
+                        }
+                    }
+                    if (m_AILevel >= 2)
+                    {
+                        // Pokud cesta neexistuje, muze to byt i tim, ze stojime na zablokovanem miste bombou nebo plamenem
+                        if (!m_movement->HasPath())
                             m_movement->TryMutate(MOVEMENT_OUTOFZERO);
                     }
-                }
-                if (m_AILevel >= 2)
-                {
-                    // Pokud cesta neexistuje, muze to byt i tim, ze stojime na zablokovanem miste bombou nebo plamenem
-                    if (!m_movement->HasPath())
-                        m_movement->TryMutate(MOVEMENT_OUTOFZERO);
-                }
-                if (m_AILevel >= 1)
-                {
-                    // Pokud stale cesta neexistuje, jdeme tedy nahodne
-                    if ((m_movement->GetMovementType() == MOVEMENT_TARGETTED || m_movement->GetMovementType() == MOVEMENT_OUTOFZERO) && !m_movement->HasPath())
+                    if (m_AILevel >= 1)
                     {
-                        // 2 a vice se umi vyhybat nebezpecnym polim, nizsi do nich muzou vejit a "spachat sebevrazdu"
-                        if (m_AILevel < 2)
-                            m_movement->TryMutate(MOVEMENT_RANDOM_BARE);
-                        else
-                            m_movement->TryMutate(MOVEMENT_RANDOM);
+                        // Pokud stale cesta neexistuje, jdeme tedy nahodne
+                        if ((m_movement->GetMovementType() == MOVEMENT_TARGETTED || m_movement->GetMovementType() == MOVEMENT_OUTOFZERO) && !m_movement->HasPath())
+                        {
+                            // 2 a vice se umi vyhybat nebezpecnym polim, nizsi do nich muzou vejit a "spachat sebevrazdu"
+                            if (m_AILevel < 2)
+                                m_movement->TryMutate(MOVEMENT_RANDOM_BARE);
+                            else
+                                m_movement->TryMutate(MOVEMENT_RANDOM);
+                        }
                     }
                 }
 

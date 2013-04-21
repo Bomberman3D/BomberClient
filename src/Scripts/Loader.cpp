@@ -4,4 +4,5 @@
 void LoadScripts()
 {
     LoadDummyEnemyScripts();
+    LoadMemeEnemyScripts();
 }

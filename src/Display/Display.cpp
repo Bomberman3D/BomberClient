@@ -894,7 +894,7 @@ void DisplayMgr::DrawBillboards()
         // - Zvysuje vykon
         // Vyjimkou jsou veci, co zas tolik nezatezuji - bonusy a podobne. Jde nam hlavne o zamezeni zobrazeni velkeho
         // mnozstvi napriklad castic vybuchu
-        if (!(temp->textureId >= 33 && temp->textureId <= 35))
+        if (temp->textureId >= 57 && temp->textureId <= 60)
         {
             if (pythagoras_c(fabs(temp->x-fabs(m_targetX)), fabs(temp->z-fabs(m_targetZ))) > 14.0f)
             {

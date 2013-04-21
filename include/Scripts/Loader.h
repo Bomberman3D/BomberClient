@@ -8,5 +8,6 @@ extern void LoadScripts();
 
 // Samotne skripty
 extern void LoadDummyEnemyScripts();
+extern void LoadMemeEnemyScripts();
 
 #endif

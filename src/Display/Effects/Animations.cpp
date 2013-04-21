@@ -353,6 +353,22 @@ void Animator::ChangeModelAnim(uint32 ticketId, uint32 animId, uint32 startFrame
         itr->second.frameSkipSpeed = frameSkipSpeed;
 }
 
+/** \brief Zmena rychlosti animace podle tiketu
+ *
+ * Stara se o zmenu rychlost animace (frame skip)
+ */
+void Animator::ChangeModelAnimFrameSpeed(uint32 ticketId, uint32 frameSkipSpeed)
+{
+    if (ticketId == 0)
+        return;
+
+    AnimMap::iterator itr = Anims.find(ticketId);
+    if (itr == Anims.end() || itr->second.animType != ANIM_TYPE_MODEL)
+        return;
+
+    itr->second.frameSkipSpeed = frameSkipSpeed;
+}
+
 /** \brief Konstruktor
  *
  * Prazdny

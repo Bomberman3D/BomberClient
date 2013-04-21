@@ -20,6 +20,7 @@ struct EnemyAI
         virtual void OnCreate() {};
 
         virtual void OnUpdate() {};
+        virtual bool OnMovementUpdate() { return false; };
         virtual void OnDead() {};
         virtual void OnDamageHit() {};
         virtual bool AvoidDeath() { return false; };

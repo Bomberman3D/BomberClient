@@ -153,6 +153,10 @@
 				RelativePath="..\src\Scripts\Loader.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\Scripts\EnemyScripts\MemeEnemy.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="include"

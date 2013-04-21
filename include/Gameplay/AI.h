@@ -215,6 +215,9 @@ class MovementHolder
         void Generator();
         bool TryGenerator(MovementType moveType);
 
+        void SetTargettedMovementTarget(ModelDisplayListRecord* target) { m_target = target; };
+        ModelDisplayListRecord* GetTargettedMovementTarget() { return m_target; };
+
     private:
         MovementType m_moveType;
 
@@ -229,6 +232,7 @@ class MovementHolder
         clock_t m_lastMoveUpdate;
 
         EnemyTemplate* m_src;
+        ModelDisplayListRecord* m_target;
 };
 
 /** \fn MovementHolder::GetMovementType

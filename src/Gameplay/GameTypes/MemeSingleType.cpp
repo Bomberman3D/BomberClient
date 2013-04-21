@@ -16,9 +16,9 @@ void MemeSingleGameType::FillGameTypeResources()
 {
     gameResources.PlayerModelIDs.push_back(11);
 
-    // nepratele 1-5 jsou prirazeni poporade
-    // model bude prepsan ve specialni metode jejich skriptu
-    gameResources.EnemyIDs.push_back(0+sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL));
+    gameResources.EnemyIDs.push_back(6);
+    gameResources.EnemyIDs.push_back(7);
+    gameResources.EnemyIDs.push_back(8);
 
     // 62-69 jsou textury rage comics obliceju
     for (uint32 i = 62; i <= 69; i++)
@@ -118,9 +118,6 @@ void MemeSingleGameType::OnUpdate()
             }
 
             (*itr)->Update();
-
-            if ((*itr)->pRecord && sDisplay->ModelIntersection(sGameplayMgr->GetPlayerRec(), (*itr)->pRecord))
-                sGameplayMgr->PlayerDied();
 
             ++itr;
         }
