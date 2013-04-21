@@ -743,8 +743,11 @@ void Loaders::LoadModel(uint32 id)
 
 void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
 {
-    if (pModel->displayListSize == 0)
+    for (std::vector<t3DObject>::iterator itr = pModel->pObject.begin(); itr != pModel->pObject.end(); ++itr)
     {
+        if ((*itr).displayListSize != 0)
+            continue;
+
         glLoadIdentity();
 
         uint32 maxFrame = 0;
@@ -752,8 +755,8 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
             if (maxFrame < sStorage->ModelAnimation[modelId].Anim[an].frameLast)
                 maxFrame = sStorage->ModelAnimation[modelId].Anim[an].frameLast;
 
-        pModel->displayList = glGenLists(maxFrame+1);
-        pModel->displayListSize = maxFrame + 1;
+        (*itr).displayList = glGenLists(maxFrame+1);
+        (*itr).displayListSize = maxFrame + 1;
 
         uint32 maxkit = 0;
         std::vector<uint32> artkitIds;
@@ -762,111 +765,134 @@ void Loaders::GenDisplayLists(t3DModel* pModel, uint32 modelId)
         {
             maxkit = artkitIds.size();
 
-            pModel->displayListArtkit.resize(maxkit+1);
+            (*itr).displayListArtKits.resize(maxkit+1);
         }
+
+        t3DObject *pObject = &(*itr);
 
         for (uint32 kit = 0; kit <= maxkit; kit++)
         {
             if (kit != 0 && (artkitIds.size() <= kit || !artkitIds[kit]))
                 continue;
 
-            if (kit != 0)
-                pModel->displayListArtkit[kit] = glGenLists(maxFrame+1);
-
-            for (uint32 a = 0; a <= maxFrame; a++)
+            if (sCustomAnimator->HaveModelCustomAnim(modelId))
             {
                 if (kit == 0)
-                    glNewList(pModel->displayList + a,GL_COMPILE);
+                    glNewList((*itr).displayList, GL_COMPILE);
                 else
-                    glNewList(pModel->displayListArtkit[kit] + a,GL_COMPILE);
-
-                for (int i = 0; i < pModel->numOfObjects; i++)
                 {
-                    if (pModel->pObject.size() <= 0)
-                        break;
+                    (*itr).displayListArtKits[kit] = glGenLists(1);
+                    glNewList((*itr).displayListArtKits[kit], GL_COMPILE);
+                }
 
-                    t3DObject *pObject = &pModel->pObject[i];
+                glPushMatrix();
+
+                GenModelObject(modelId, pModel, pObject, kit);
+
+                glPopMatrix();
+
+                glEndList();
+            }
+            else
+            {
+                if (kit != 0)
+                    (*itr).displayListArtKits[kit] = glGenLists(maxFrame+1);
+
+                for (uint32 a = 0; a <= maxFrame; a++)
+                {
+                    if (kit == 0)
+                        glNewList((*itr).displayList + a, GL_COMPILE);
+                    else
+                        glNewList((*itr).displayListArtKits[kit] + a, GL_COMPILE);
 
                     glPushMatrix();
                     sDisplay->AnimateModelObjectByFrame(pModel, pObject, modelId, a);
 
-                    if (pObject->bHasTexture)
-                    {
-                        glEnable(GL_TEXTURE_2D);
-                        glColor3ub(255, 255, 255);
-                        glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].textureId);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                    }
-                    else
-                    {
-                        glDisable(GL_TEXTURE_2D);
-                        ObjectArtkitData* adata = sStorage->GetObjectArtkitData(modelId, pObject->strName, kit);
-                        if (adata)
-                        {
-                            glColor3ub(adata->colors[0], adata->colors[1], adata->colors[2]);
-                        }
-                        else if (pModel->pMaterials.size() && pObject->materialID >= 0)
-                        {
-                            BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
-                            glColor3ub(pColor[0], pColor[1], pColor[2]);
-                        }
-                    }
-
-                    /*
-                    glShadeModel(GL_SMOOTH);
-                    GLfloat mShininess[] = {2+4};
-                    GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
-                    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
-                    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
-                    */
-
-                    glBegin(GL_TRIANGLES);
-
-                    for (int j = 0; j < pObject->numOfFaces; j++)
-                    {
-                        for (int whichVertex = 0; whichVertex < 3; whichVertex++)
-                        {
-                            int index = pObject->pFaces[j].vertIndex[whichVertex];
-
-                            if (pObject->pNormals)
-                            {
-                                CVector3* pNormal = &pObject->pNormals[index];
-                                glNormal3f(pNormal->x, pNormal->y, pNormal->z);
-                            }
-
-                            if (pObject->bHasTexture && pObject->pTexVerts != NULL)
-                            {
-                                CVector2* pTexVert = &pObject->pTexVerts[index];
-
-                                // Pokud existuji modifiery pro opakovatelnost textur, nacteme je
-                                float mod_x = 1.0f, mod_y = 1.0f;
-                                if (pObject->strName)
-                                {
-                                    if (ObjectModifierData* pMod = sStorage->GetObjectModifierData(modelId, &(pObject->strName[0])))
-                                    {
-                                        mod_x = pMod->texture_repeat_x;
-                                        mod_y = pMod->texture_repeat_y;
-                                    }
-                                }
-
-                                glTexCoord2f(pTexVert->x * mod_x, pTexVert->y * mod_y);
-                            }
-
-                            if (pObject->pVerts)
-                            {
-                                CVector3* pVert = &pObject->pVerts[index];
-                                glVertex3f(pVert->x, pVert->y, pVert->z);
-                            }
-                        }
-                    }
-
-                    glEnd();
+                    GenModelObject(modelId, pModel, pObject, kit);
 
                     glPopMatrix();
+
+                    glEndList();
                 }
-                glEndList();
             }
         }
     }
+
+    pModel->hasDisplayList = true;
+}
+
+void Loaders::GenModelObject(uint32 modelId, t3DModel* pModel, t3DObject* pObject, uint32 artkit)
+{
+    if (pObject->bHasTexture)
+    {
+        glEnable(GL_TEXTURE_2D);
+        glColor3ub(255, 255, 255);
+        glBindTexture(GL_TEXTURE_2D, pModel->pMaterials[pObject->materialID].textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+    else
+    {
+        glDisable(GL_TEXTURE_2D);
+        ObjectArtkitData* adata = sStorage->GetObjectArtkitData(modelId, pObject->strName, artkit);
+        if (adata)
+        {
+            glColor3ub(adata->colors[0], adata->colors[1], adata->colors[2]);
+        }
+        else if (pModel->pMaterials.size() && pObject->materialID >= 0)
+        {
+            BYTE *pColor = pModel->pMaterials[pObject->materialID].color;
+            glColor3ub(pColor[0], pColor[1], pColor[2]);
+        }
+    }
+
+    /*
+    glShadeModel(GL_SMOOTH);
+    GLfloat mShininess[] = {2+4};
+    GLfloat mSpecular[] = {0.4f, 0.4f, 0.4f, 1.0f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mShininess);
+    */
+
+    glBegin(GL_TRIANGLES);
+
+    for (int j = 0; j < pObject->numOfFaces; j++)
+    {
+        for (int whichVertex = 0; whichVertex < 3; whichVertex++)
+        {
+            int index = pObject->pFaces[j].vertIndex[whichVertex];
+
+            if (pObject->pNormals)
+            {
+                CVector3* pNormal = &pObject->pNormals[index];
+                glNormal3f(pNormal->x, pNormal->y, pNormal->z);
+            }
+
+            if (pObject->bHasTexture && pObject->pTexVerts != NULL)
+            {
+                CVector2* pTexVert = &pObject->pTexVerts[index];
+
+                // Pokud existuji modifiery pro opakovatelnost textur, nacteme je
+                float mod_x = 1.0f, mod_y = 1.0f;
+                if (pObject->strName)
+                {
+                    if (ObjectModifierData* pMod = sStorage->GetObjectModifierData(modelId, &(pObject->strName[0])))
+                    {
+                        mod_x = pMod->texture_repeat_x;
+                        mod_y = pMod->texture_repeat_y;
+                    }
+                }
+
+                glTexCoord2f(pTexVert->x * mod_x, pTexVert->y * mod_y);
+            }
+
+            if (pObject->pVerts)
+            {
+                CVector3* pVert = &pObject->pVerts[index];
+                glVertex3f(pVert->x, pVert->y, pVert->z);
+            }
+        }
+    }
+
+    glEnd();
 }

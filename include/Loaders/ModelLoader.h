@@ -158,6 +158,12 @@ struct tMaterialInfo
  */
 struct t3DObject
 {
+    t3DObject()
+    {
+        displayList = 0;
+        displayListSize = 0;
+    }
+
     int32 numOfVerts;
     int32 numOfFaces;
     int32 numTexVertex;
@@ -181,6 +187,10 @@ struct t3DObject
     CVector3 *pNormals;
     CVector2 *pTexVerts;
     tFace *pFaces;
+
+    GLuint displayList;
+    uint32 displayListSize;
+    std::vector<GLuint> displayListArtKits;
 };
 
 /** \var t3DObject::numOfVerts
@@ -255,6 +265,18 @@ struct t3DObject
  *  \brief Vsechny steny objektu
  */
 
+/** \var t3DObject::displayList
+ *  \brief ID vygenerovaneho OpenGL display listu
+ */
+
+/** \var t3DObject::displayListSize
+ *  \brief Velikost vygenerovaneho OpenGL display listu, nebo 0 pokud neni vygenerovany
+ */
+
+/** \var t3DObject::displayListArtKits
+ *  \brief Vygenerovane display listy v pripade artkitu
+ */
+
 
 /** \struct t3DModel
  *  \brief Struktura modelu
@@ -263,9 +285,6 @@ struct t3DModel
 {
     t3DModel()
     {
-        displayList = 0;
-        displayListSize = 0;
-        displayListArtkit.clear();
         numOfObjects = 0;
         numOfMaterials = 0;
         numberOfFrames = 1;
@@ -274,6 +293,7 @@ struct t3DModel
         Maximum.x = 0; Minimum.x = 0;
         Maximum.y = 0; Minimum.y = 0;
         Maximum.z = 0; Minimum.z = 0;
+        hasDisplayList = false;
     }
     int32 numOfObjects;
     int32 numOfMaterials;
@@ -287,9 +307,7 @@ struct t3DModel
     CVector3 Maximum;
     CVector3 Minimum;
 
-    GLuint displayList;
-    uint32 displayListSize;
-    std::vector<GLuint> displayListArtkit;
+    bool hasDisplayList;
 };
 
 /** \fn t3DModel::t3DModel
@@ -330,16 +348,8 @@ struct t3DModel
  *  \brief Minimalni bod modelu (nemodifikovany globalnim a vlastnim modifikatorem velikosti)
  */
 
-/** \var t3DModel::displayList
- *  \brief ID vygenerovaneho OpenGL display listu
- */
-
-/** \var t3DModel::displayListSize
- *  \brief Velikost vygenerovaneho OpenGL display listu, nebo 0 pokud neni vygenerovany
- */
-
-/** \var t3DModel::displayListArtkit
- *  \brief Pole vsech ID OpenGL displaylistu generovanych pro artkity
+/** \var t3DModel::hasDisplayList
+ *  \brief Priznakovy atribut, ktery udava, zdali byly vygenerovany display listy pro objekty modelu
  */
 
 namespace Loaders
@@ -384,6 +394,7 @@ namespace Loaders
 
     void LoadModel(uint32 id);
     void GenDisplayLists(t3DModel* pModel, uint32 modelId);
+    void GenModelObject(uint32 modelId, t3DModel* pModel, t3DObject* pObject, uint32 artkit);
 };
 
 #endif

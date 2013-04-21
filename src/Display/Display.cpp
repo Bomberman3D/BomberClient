@@ -579,13 +579,43 @@ void DisplayMgr::DrawModels()
         glScalef(temp->scale, temp->scale, temp->scale);
 
         // Pokud mame vygenerovany GL display list pro dany model
-        if (sStorage->Models[temp->modelId]->displayListSize != 0)
+        if (sStorage->Models[temp->modelId]->hasDisplayList)
         {
             // Vykreslime to pomoci display listu
             if (temp->artkit > 0)
-                glCallList(sStorage->Models[temp->modelId]->displayListArtkit[temp->artkit] + sAnimator->GetActualFrame(temp->AnimTicket));
+            {
+                for (std::vector<t3DObject>::iterator iter = sStorage->Models[temp->modelId]->pObject.begin(); iter != sStorage->Models[temp->modelId]->pObject.end(); ++iter)
+                {
+                    glPushMatrix();
+
+                    if (sCustomAnimator->HaveModelCustomAnim(temp->modelId))
+                    {
+                        AnimateModelObjectByFrame(pModel, &(*iter), temp->modelId, sAnimator->GetActualFrame(temp->AnimTicket));
+                        glCallList((*iter).displayListArtKits[temp->artkit]);
+                    }
+                    else
+                        glCallList((*iter).displayListArtKits[temp->artkit] + sAnimator->GetActualFrame(temp->AnimTicket));
+
+                    glPopMatrix();
+                }
+            }
             else
-                glCallList(sStorage->Models[temp->modelId]->displayList + sAnimator->GetActualFrame(temp->AnimTicket));
+            {
+                for (std::vector<t3DObject>::iterator iter = sStorage->Models[temp->modelId]->pObject.begin(); iter != sStorage->Models[temp->modelId]->pObject.end(); ++iter)
+                {
+                    glPushMatrix();
+
+                    if (sCustomAnimator->HaveModelCustomAnim(temp->modelId))
+                    {
+                        AnimateModelObjectByFrame(pModel, &(*iter), temp->modelId, sAnimator->GetActualFrame(temp->AnimTicket));
+                        glCallList((*iter).displayList);
+                    }
+                    else
+                        glCallList((*iter).displayList + sAnimator->GetActualFrame(temp->AnimTicket));
+
+                    glPopMatrix();
+                }
+            }
             // A nemusime se dale o nic starat
             ++itr;
             continue;
