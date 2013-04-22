@@ -97,9 +97,9 @@ void MapManager::FillDynamicRecords()
                             if (pMap->dynfield[i][j][k].special == NULL)
                             {
                                 pMap->dynfield[i][j][k].special = (void*)(sDisplay->DrawModel(8, i-0.5f, 0.0f, j-0.5f, ANIM_IDLE, 0.175f, 0.0f, true, true, 0, 8, ANIM_RESTRICTION_NOT_PAUSED));
-                                sDisplay->AddModelFeature((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special, MF_TYPE_EMITTER, 17.4f, 18.539f, 21.02f, sParticleEmitterMgr->AddEmitter(
+                                sDisplay->AddModelFeature((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special, MF_TYPE_EMITTER, 17.4f, 18.539f, 21.02f, sParticleEmitterMgr->AddAreaEmitter(
                                     BillboardDisplayListRecord::Create(55, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.15f, 0.15f, 0.0f, 0.0f, 360.0f, 360.0f,    40, 5,   1.0f, 0.2f,   2,1,   0,0, 0,100000));
-                                sDisplay->AddModelFeature((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special, MF_TYPE_EMITTER, 17.4f, 18.539f, 21.02f, sParticleEmitterMgr->AddEmitter(
+                                sDisplay->AddModelFeature((ModelDisplayListRecord*)pMap->dynfield[i][j][k].special, MF_TYPE_EMITTER, 17.4f, 18.539f, 21.02f, sParticleEmitterMgr->AddAreaEmitter(
                                     BillboardDisplayListRecord::Create(56, 0,0,0, 0.2f, 0.2f, true, true), 0,0,0,0.15f, 0.15f, 0.0f, 0.0f, 360.0f, 360.0f,    40, 5,   1.0f, 0.2f,   2,1,   0,0, 0,100000));
                             }
                             break;

@@ -13,6 +13,7 @@ static float frand(float f) { return frand() * f; }
 static float frand(float f, float g) { return frand(g - f) + f; }
 static uint32 urand(uint32 a) { return rand()%a; }
 static uint32 urand(uint32 a, uint32 b) { return urand(b - a) + a; }
+static int32 irand(int32 a, int32 b) { return ((int32)urand(abs(b - a))) + a; }
 
 static float pythagoras_c(float a, float b) { return sqrt(a*a+b*b); }
 

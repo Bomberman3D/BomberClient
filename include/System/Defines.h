@@ -41,7 +41,7 @@ static float numBounds(float value)
  */
 struct CVector3
 {
-    CVector3() {};
+    CVector3(): x(0), y(0), z(0) {};
     CVector3(float nx, float ny, float nz): x(nx), y(ny), z(nz) {};
 
     float x, y, z;
@@ -55,6 +55,13 @@ struct CVector3
         x *= a;
         y *= a;
         z *= a;
+    }
+    void makeUnit()
+    {
+        if (mySize() == 0)
+            return;
+
+        multiply(1/mySize());
     }
     void unitMultiply(float a)
     {
@@ -108,8 +115,10 @@ struct CVector3
     CVector3 rotate(CVector3 &axis, float angle)
     {
         CVector3 v = *this;
+        float size = v.mySize();
+        v.makeUnit();
 
-        return ((v - axis * (axis * v)) * cos(angle)) + (axis.vectorMultiply(v) * sin(angle)) + (axis * (axis * v));
+        return (((v - axis * float(axis * v)) * cos(angle)) + (axis.vectorMultiply(v) * sin(angle)) + (axis * float(axis * v)))*size;
     }
 };
 

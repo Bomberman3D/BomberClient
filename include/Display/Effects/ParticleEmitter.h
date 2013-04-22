@@ -14,6 +14,14 @@ enum EmitterType
     EMITTER_MAX,
 };
 
+// Zdroj emittovani
+enum EmitterSource
+{
+    EMITTER_SOURCE_POINT  = 0,
+    EMITTER_SOURCE_AREA   = 1,
+    EMITTER_SOURCE_MAX
+};
+
 /** \struct Particle
  *  \brief Struktura zaznamu jedne castice
  */
@@ -64,6 +72,7 @@ struct Emitter
 {
     // Staticka data, nastavi se pri vytvoreni
     EmitterType m_type;
+    EmitterSource m_sourceType;
     DisplayListRecord* m_template;
     float m_centerX, m_centerY, m_centerZ;
     float m_width, m_height;
@@ -199,10 +208,14 @@ class ParticleEmitterMgr
         ParticleEmitterMgr();
         void Update();
 
-        Emitter* AddEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
-                            float angleMedX, float angleMedY, float angleTolX, float angleTolY,
-                            uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
-                            uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, uint8 animFlags, int32 duration);
+        Emitter* AddAreaEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ, float width, float height,
+                                float angleMedX, float angleMedY, float angleTolX, float angleTolY,
+                                uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
+                                uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, uint8 animFlags, int32 duration);
+        Emitter* AddPointEmitter(DisplayListRecord* templ, float centerX, float centerY, float centerZ,
+                                 float angleMedX, float angleMedY, float angleTolX, float angleTolY,
+                                 uint32 timeMed, uint32 timeTol, float speedMed, float speedTol, uint32 particleTimeMed,
+                                 uint32 particleTimeTol, uint32 anim, uint32 animFrameSkip, uint8 animFlags, int32 duration);
         void RemoveEmitter(Emitter* which);
 
         void FlushEmitters();
