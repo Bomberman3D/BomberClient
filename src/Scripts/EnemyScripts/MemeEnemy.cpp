@@ -140,6 +140,7 @@ class MemeRageEnemyScript: public EnemyScript
                     BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(84, 0, 0, 0, 0.3f, 0.3f, true, true);
                     Emitter* pEmit = sParticleEmitterMgr->AddPointEmitter(templ, me->pRecord->x-0.5f, 0.1f, me->pRecord->z-0.5f, 90.0f, 0, 90.0f, 180.0f, 100, 20, 15.0f, 0.5f, 30, 8, 0, 0, 0, 2500);
                     sDisplay->AddModelFeature(me->pRecord, MF_TYPE_EMITTER, 0.0f, 2.05f, 0.0f, pEmit);
+                    sDisplay->AddCameraShakePoint(me->pRecord, 5.0f, 15.0f, 2500);
                 }
             }
 

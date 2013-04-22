@@ -23,6 +23,7 @@ DisplayMgr::DisplayMgr()
 
     m_ignoreTargetCollision = 0;
     m_is2D = false;
+    m_cameraShakeDelay = 0;
 }
 
 /** \brief Destruktor
@@ -319,6 +320,47 @@ void DisplayMgr::Update()
 
     DrawModels();
     DrawBillboards();
+}
+
+/** \brief Zpracovani zemetreseni a posunuti pohledu podle toho
+ */
+float DisplayMgr::GetCameraShake()
+{
+    // Zemetreseni
+    float cameraShake = 0.0f;
+    if (!CameraShakes.empty() && (m_cameraShakeDelay == 0 || m_cameraShakeDelay < clock()))
+    {
+        float cdist = 0;
+        for (CameraShakeList::iterator itr = CameraShakes.begin(); itr != CameraShakes.end(); )
+        {
+            if (!(*itr) || (*itr)->m_endTime <= clock())
+            {
+                itr = CameraShakes.erase(itr);
+                continue;
+            }
+
+            // plus je tam kvuli tomu, ze my pocitame v kladnych souradnicich, ale do OpenGL vykreslujeme v zapornych, tzn. - * - = +
+            cdist = sqrt(pow((*itr)->x+m_targetX, 2) + pow((*itr)->y+m_targetY, 2) + pow((*itr)->z+m_targetZ, 2));
+            if (cdist > (*itr)->m_radius)
+            {
+                ++itr;
+                continue;
+            }
+
+            // neprekracujeme 1 dolu kvuli obrovske magnitude odchyleni
+            if (cdist < 1.0f)
+                cdist = 1.0f;
+
+            cameraShake = (float)irand(-1,1)*frand(0.5f, 1.0f)*(1.0f/cdist)*(*itr)->m_strength/500.0f;
+
+            ++itr;
+        }
+
+        if (cameraShake > 0.0f)
+            m_cameraShakeDelay = clock() + 100;
+    }
+
+    return cameraShake;
 }
 
 /** \brief Prijima pozadavek na vykresleni modelu a zaradi ho do displaylistu
@@ -935,7 +977,7 @@ void DisplayMgr::DrawBillboards()
 
         glLoadIdentity();
 
-        AdjustViewToTarget();
+        AdjustViewToTarget(true);
 
         if (temp->AnimTicket)
             BindTexture(sAnimator->GetActualTexture(temp->AnimTicket));
@@ -1292,6 +1334,30 @@ void DisplayMgr::DrawMap()
     }
 }
 
+/** \brief Vlozeni bodu zemetreseni podle hotoveho vstupu
+ */
+void DisplayMgr::AddCameraShakePoint(CameraShakeRecord *rec)
+{
+    if (rec)
+        CameraShakes.push_back(rec);
+}
+
+/** \brief Vytvoreni a vlozeni bodu zemetreseni
+ */
+void DisplayMgr::AddCameraShakePoint(float x, float y, float z, float radius, float strength, uint32 duration)
+{
+    CameraShakeRecord* pt = new CameraShakeRecord(x, y, z, radius, strength, duration);
+    AddCameraShakePoint(pt);
+}
+
+/** \brief Vytvoreni a vlozeni bodu zemetreseni podle vstupniho zaznamu z displaylistu
+ */
+void DisplayMgr::AddCameraShakePoint(DisplayListRecord* src, float radius, float strength, uint32 duration)
+{
+    CameraShakeRecord* pt = new CameraShakeRecord(src, radius, strength, duration);
+    AddCameraShakePoint(pt);
+}
+
 /** \brief Nastavi cilovy model, ke kteremu ma byt prizpusobena kamera
  *
  * Ukazatel neni overovan, proto musi byt predem zarucena validita
@@ -1305,7 +1371,7 @@ void DisplayMgr::SetTargetModel(ModelDisplayListRecord* pTarget)
  *
  * Pokud takovy model existuje, posune se na nej kamera, otoci se po smeru pripadne se i pootoci po ose X (3rd person)
  */
-void DisplayMgr::AdjustViewToTarget()
+void DisplayMgr::AdjustViewToTarget(bool withCameraShake)
 {
     if (m_targetmodel)
     {
@@ -1322,7 +1388,7 @@ void DisplayMgr::AdjustViewToTarget()
     if (m_targetmodel)
         m_angleY = 90.0f + m_tarangleY;
 
-    float camera_dist = 3.25f;
+    float camera_dist = 3.25f + (withCameraShake ? GetCameraShake()*2.0f : 0.0f);
     if (m_targetmodel)
     {
         m_viewX = m_targetX + camera_dist*cos(PI*(m_tarangleY)/180.0f);

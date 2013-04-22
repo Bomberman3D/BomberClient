@@ -326,6 +326,64 @@ struct BillboardDisplayListRecord: public DisplayListRecord
  *  \brief Priznak pro nataceni kolmo ke kamere po ose Y
  */
 
+
+/** \struct CameraShakeRecord
+ *  \brief Zaznam treseni obrazovkou
+ */
+struct CameraShakeRecord
+{
+    CameraShakeRecord(): x(0), y(0), z(0), m_radius(0), m_strength(0), m_endTime(0) {};
+    CameraShakeRecord(DisplayListRecord* src, float radius = 0, float strength = 0, uint32 duration = 0)
+    {
+        x = src->x;
+        y = src->y;
+        z = src->z;
+        m_radius = radius;
+        m_strength = strength;
+        m_endTime = clock() + duration;
+    }
+    CameraShakeRecord(float cx, float cy, float cz, float radius, float strength, uint32 duration)
+    {
+        x = cx;
+        y = cy;
+        z = cz;
+        m_radius = radius;
+        m_strength = strength;
+        m_endTime = clock() + duration;
+    }
+
+    float x, y, z;
+    float m_radius;
+    float m_strength;
+    clock_t m_endTime;
+};
+
+typedef std::list<CameraShakeRecord*> CameraShakeList;
+
+/** \var CameraShakeRecord::x
+ *  \brief Xova souradnice epicentra
+ */
+
+/** \var CameraShakeRecord::y
+ *  \brief Yova souradnice epicentra
+ */
+
+/** \var CameraShakeRecord::z
+ *  \brief Zova souradnice epicentra
+ */
+
+/** \var CameraShakeRecord::m_radius
+ *  \brief Maximalni vzdalenost bodu ovlivneneho tresenim
+ */
+
+/** \var CameraShakeRecord::m_strength
+ *  \brief Mira sily treseni (abstraktni jednotka)
+ */
+
+/** \var CameraShakeRecord::m_endTime
+ *  \brief Cas ukonceni treseni
+ */
+
 #define COLOR(r,g,b) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(0)))
 #define COLORA(r,g,b,a) uint32(uint32(uint8(r) << 24)|uint32(uint8(g) << 16)|uint32(uint8(b) << 8)|uint32(uint8(a)))
 
@@ -386,6 +444,12 @@ class DisplayMgr
         void DisableRestrictedAnimations(AnimRestriction animRes);
         void EnableRestrictedAnimations(AnimRestriction animRes);
 
+        // Treseni mapy
+        void AddCameraShakePoint(CameraShakeRecord* rec);
+        void AddCameraShakePoint(float x, float y, float z, float radius, float strength, uint32 duration);
+        void AddCameraShakePoint(DisplayListRecord* src, float radius, float strength, uint32 duration);
+        float GetCameraShake();
+
         // Prechod mezi 2D a 3D mody
         void Setup2DMode();
         void Setup3DMode();
@@ -402,7 +466,7 @@ class DisplayMgr
         void DrawMap();
 
         // Prace s objektem pozorovani
-        void AdjustViewToTarget();
+        void AdjustViewToTarget(bool withCameraShake);
         uint16 CheckCollision(float newx, float newy, float newz);
 
         // Interfacing s privatnimi promennymi
@@ -446,6 +510,9 @@ class DisplayMgr
         list<ModelDisplayListRecord*> ModelDisplayList;
         // Display list billboardu
         list<BillboardDisplayListRecord*> BillboardDisplayList;
+
+        CameraShakeList CameraShakes;
+        clock_t m_cameraShakeDelay;
 
         // Jsme ve 2D rezimu? Defaultne false
         bool m_is2D;

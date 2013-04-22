@@ -928,7 +928,7 @@ void GameplayMgr::UpdatePlayerMotion()
 
     // A nakonec vsechno prelozime tak, aby se pohled zarovnal k hraci
     // Nutne pro spravne zobrazeni
-    sDisplay->AdjustViewToTarget();
+    sDisplay->AdjustViewToTarget(true);
 
     // Pripadne obslouzeni vstupu na jine pole - univerzalni check pro treba vstup do plamenu, na bonus, ...
     uint32 nX = ceil(m_playerRec->x);
