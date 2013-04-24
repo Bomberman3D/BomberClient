@@ -258,6 +258,14 @@ class GameplayMgr
         uint32 GetCheatValue(uint32 id) { if (id >= MAX_CHEAT) return 0; else return m_cheatMap[id]; };
         bool IsCheatOn(uint32 id) { return (GetCheatValue(id) > 0); };
 
+        struct
+        {
+            uint32 maxHealth;
+            bool miniMap;
+            bool bonusCounter;
+            bool gameTimer;
+        } gameFeatures;
+
     private:
         std::vector<uint32> m_settings;
         GameTypeTemplate* m_game;

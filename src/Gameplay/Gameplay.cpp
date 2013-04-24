@@ -279,6 +279,12 @@ void GameplayMgr::SetGameType(GameType type)
 
     assert(m_game != NULL);
 
+    // Vydefaultovat gameFeatures strukturu
+    gameFeatures.bonusCounter = true;
+    gameFeatures.gameTimer = false;
+    gameFeatures.maxHealth = 0;
+    gameFeatures.miniMap = true;
+
     m_game->FillGameTypeResources();
 }
 

@@ -16,14 +16,17 @@ void MemeSingleGameType::FillGameTypeResources()
 {
     gameResources.PlayerModelIDs.push_back(11);
 
-    //gameResources.EnemyIDs.push_back(6); // derp
-    //gameResources.EnemyIDs.push_back(7); // derp
-    //gameResources.EnemyIDs.push_back(8); // troll
+    gameResources.EnemyIDs.push_back(6); // derp
+    gameResources.EnemyIDs.push_back(7); // derp
+    gameResources.EnemyIDs.push_back(8); // troll
     gameResources.EnemyIDs.push_back(9); // rage guy
 
     // 62-69 jsou textury rage comics obliceju
     for (uint32 i = 62; i <= 69; i++)
         gameResources.MiscTextureIDs.push_back(i);
+
+    sGameplayMgr->gameFeatures.maxHealth = 100;
+    sGameplayMgr->gameFeatures.gameTimer = true;
 }
 
 void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
