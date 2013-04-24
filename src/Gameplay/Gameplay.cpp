@@ -286,6 +286,8 @@ void GameplayMgr::SetGameType(GameType type)
     gameFeatures.miniMap = true;
 
     m_game->FillGameTypeResources();
+
+    SetHealth(gameFeatures.maxHealth);
 }
 
 /** \brief Vraci zvoleny typ hry

@@ -210,7 +210,7 @@ void GameStage::OnDraw()
         {
             sDisplay->Draw2D(50, 390, 120, 100, 30);
 
-            uint32 health = 100; // todo: ziskat z nadrazeny classy gameplaymgr
+            uint32 health = sGameplayMgr->GetHealth();
             uint32 sz = health;
             float space = 0;
             while (sz > 0)

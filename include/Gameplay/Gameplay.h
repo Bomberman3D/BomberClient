@@ -243,6 +243,22 @@ class GameplayMgr
 
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
 
+        uint32 GetHealth() { return m_health; };
+        void SetHealth(uint32 val)
+        {
+            if (val > gameFeatures.maxHealth)
+                m_health = gameFeatures.maxHealth;
+            else
+                m_health = val;
+        };
+        void ModifyHealth(int32 val)
+        {
+            if (-val > int32(m_health))
+                SetHealth(0);
+            else
+                SetHealth(uint32(m_health+val));
+        }
+
         // verejne pristupne, tady to nebude vadit
         PlayerStats localPlayerStats;
 
@@ -297,6 +313,7 @@ class GameplayMgr
         uint32 m_plFlameReach;
         uint32 m_plMaxBombs;
 
+        uint32 m_health;
         uint32 m_plActiveBombs;
 };
 
