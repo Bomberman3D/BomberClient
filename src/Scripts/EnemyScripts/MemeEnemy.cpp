@@ -12,6 +12,7 @@ class MemeCommonEnemyScript: public EnemyScript
 
         void OnCreate()
         {
+            me->SetName("Derp");
             sDisplay->AddModelFeature(me->pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(65, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
         }
 
@@ -45,6 +46,7 @@ class MemeTrollEnemyScript: public EnemyScript
 
         void OnCreate()
         {
+            me->SetName("Troll");
             sDisplay->AddModelFeature(me->pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(62, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
             nextFlameThrow = clock() + 3000;
             nextMoveStart = 0;
@@ -101,13 +103,19 @@ class MemeRageEnemyScript: public EnemyScript
         clock_t nextEmitting;
         clock_t nextDestructing;
         clock_t nextFaceReturn;
+        clock_t nextDamageTick;
+        uint32 damageTicks;
 
         void OnCreate()
         {
+            me->SetName("Angry Jim");
             sDisplay->AddModelFeature(me->pRecord, MF_TYPE_BILLBOARD, 0.0f, 1.55f, 0.0f, sDisplay->DrawBillboard(85, 0, 0, 0, 0, 1, 0.4f, 0.45f, false, true));
             nextEmitting = clock() + 3000;
             nextDestructing = 0;
             nextFaceReturn = 0;
+
+            damageTicks = 0;
+            nextDamageTick = 0;
         }
 
         void OnUpdate()
@@ -141,6 +149,24 @@ class MemeRageEnemyScript: public EnemyScript
                     Emitter* pEmit = sParticleEmitterMgr->AddPointEmitter(templ, me->pRecord->x-0.5f, 0.1f, me->pRecord->z-0.5f, 90.0f, 0, 90.0f, 180.0f, 100, 20, 15.0f, 0.5f, 30, 8, 0, 0, 0, 2500);
                     sDisplay->AddModelFeature(me->pRecord, MF_TYPE_EMITTER, 0.0f, 2.05f, 0.0f, pEmit);
                     sDisplay->AddCameraShakePoint(me->pRecord, 5.0f, 15.0f, 2500);
+
+                    damageTicks = 5;
+                    nextDamageTick = clock();
+                }
+            }
+
+            if (damageTicks > 0)
+            {
+                if (nextDamageTick <= clock())
+                {
+                    ModelDisplayListRecord* rec = sGameplayMgr->GetPlayerRec();
+                    if (rec)
+                    {
+                        if (sqrt(pow(rec->x - me->pRecord->x, 2) + pow(rec->y - me->pRecord->y, 2) + pow(rec->z - me->pRecord->z, 2)) <= 5.0f)
+                            sGameplayMgr->ModifyHealth(-10);
+                    }
+                    nextDamageTick = clock() + 500;
+                    damageTicks--;
                 }
             }
 
