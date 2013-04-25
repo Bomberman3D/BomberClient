@@ -189,24 +189,44 @@ void DisplayMgr::PrintText(uint8 font, uint32 left, uint32 top, float scale, uin
     bool in3D = !IsIn2DMode();
 
     // Prepneme do 2D
-    if (in3D)
+    if (in3D && !(flags & TEXT_FLAG_3D))
         Setup2DMode();
+    if (!in3D && (flags & TEXT_FLAG_3D))
+        Setup3DMode();
 
-    glLoadIdentity();
-    glTranslated(left,top,0);
-    glColor4ub(CRED(color), CGREEN(color), CBLUE(color), 255-CALPHA(color));
+    if (!(flags & TEXT_FLAG_3D))
+    {
+        glLoadIdentity();
+        glTranslated(left,top,0);
+    }
+    else
+    {
+        scale = scale*0.018f;
+        glRotatef(90.0f, 0, 1.0f, 0);
+        glRotatef(180.0f, 0, 0, 1.0f);
+    }
+
     glScalef(scale, scale, scale);
+    glColor4ub(CRED(color), CGREEN(color), CBLUE(color), 255-CALPHA(color));
     glListBase(m_fontBase[font]-32);
     glCallLists(strlen(text),GL_UNSIGNED_BYTE,text);
     glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 
-    glLoadIdentity();
+    if (!(flags & TEXT_FLAG_3D))
+        glLoadIdentity();
+    else
+    {
+        glRotatef(90.0f, 0, -1.0f, 0);
+        glRotatef(180.0f, 0, 0, -1.0f);
+    }
 
     glColor4ub(255, 255, 255, 255);
 
     // A po vykresleni se vratime zpet do puvodniho modu pokud je to nutne
-    if (in3D)
+    if (in3D && !(flags & TEXT_FLAG_3D))
         Setup3DMode();
+    if (!in3D && (flags & TEXT_FLAG_3D))
+        Setup2DMode();
 }
 
 /** \brief Vykresleni odstavcoveho textu

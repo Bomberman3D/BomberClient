@@ -26,7 +26,10 @@ void MemeSingleGameType::FillGameTypeResources()
         gameResources.MiscTextureIDs.push_back(i);
 
     sGameplayMgr->gameFeatures.maxHealth = 100;
+    sGameplayMgr->gameFeatures.maxEnemyHealth = 100;
+    sGameplayMgr->gameFeatures.defBombDamage = 50;
     sGameplayMgr->gameFeatures.gameTimer = true;
+    sGameplayMgr->gameFeatures.enemyNamePlates = true;
 }
 
 void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
@@ -73,7 +76,7 @@ void MemeSingleGameType::OnGameInit(ModelDisplayListRecord* pPlayerRec)
                     // TODO: lepsi vyber modelu a tak.. asi to bude lepsi presunout do funkce
                     // TODO2: vyber AI urovne podle zvolene v nastaveni.. asi derivovat podtridu, ale je to fuk, de to zapodminkovat
                     MemeEnemy* pEnemy = new MemeEnemy;
-                    pEnemy->Init(gameResources.EnemyIDs[(rand()% gameResources.EnemyIDs.size() )], i, j, ++enemycount);
+                    pEnemy->Init(gameResources.EnemyIDs[(rand()% gameResources.EnemyIDs.size() )], i, j, ++enemycount, sGameplayMgr->gameFeatures.maxEnemyHealth);
                     pEnemy->m_movement->SetSpeedMod(1.0f - (float(sGameplayMgr->GetSetting(SETTING_ENEMY_SPEED)) / 10.0f));
                     pEnemy->m_movement->Mutate(MOVEMENT_TARGETTED);
                     m_enemies.push_back(pEnemy);

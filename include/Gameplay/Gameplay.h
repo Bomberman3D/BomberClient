@@ -75,6 +75,7 @@ struct DangerousField
     uint32  activeTime;
     bool    registered;
     BombRecord* origin;
+    uint32  damage;
 };
 
 /** \var DangerousField::activeSince
@@ -91,6 +92,10 @@ struct DangerousField
 
 /** \var DangerousField::origin
  *  \brief Zdrojovy zaznam bomby, dulezite napr. kvuli retezovym vybuchum
+ */
+
+/** \var DangerousField::damage
+ *  \brief Poskozeni, ktere tento field zpusobi po aktivaci. Aktivni jen v nekterych modech
  */
 
 /** \union PlayerStats
@@ -250,6 +255,9 @@ class GameplayMgr
                 m_health = gameFeatures.maxHealth;
             else
                 m_health = val;
+
+            if (m_health == 0)
+                PlayerDied(true);
         };
         void ModifyHealth(int32 val)
         {
@@ -276,10 +284,24 @@ class GameplayMgr
 
         struct
         {
+            void SetDefault()
+            {
+                maxHealth = 0;
+                maxEnemyHealth = 0;
+                defBombDamage = 0;
+                miniMap = true;
+                bonusCounter = true;
+                gameTimer = false;
+                enemyNamePlates = false;
+            }
+
             uint32 maxHealth;
+            uint32 maxEnemyHealth;
+            uint32 defBombDamage;
             bool miniMap;
             bool bonusCounter;
             bool gameTimer;
+            bool enemyNamePlates;
         } gameFeatures;
 
     private:

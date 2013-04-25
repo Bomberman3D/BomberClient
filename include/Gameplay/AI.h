@@ -255,11 +255,20 @@ class EnemyTemplate
 {
     public:
         EnemyTemplate();
-        void Init(uint32 enemyId, uint32 x, uint32 y, uint32 position);
+        void Init(uint32 enemyId, uint32 x, uint32 y, uint32 position, uint32 maxHealth = 0);
         void Update();
 
         bool IsDead() { return m_isDead; };
         void SetDead(bool dead = true, bool force = false);
+
+        uint32 GetHealth() { return m_health; };
+        uint32 GetMaxHealth() { return m_maxHealth; };
+        void SetMaxHealth(uint32 val) { m_maxHealth = val; };
+        void SetHealth(uint32 val);
+        void ModifyHealth(int32 val);
+
+        const char* GetName() { return m_name.c_str(); };
+        void SetName(const char* name) { m_name = name; };
 
         EnemyAI* AI() { return m_AI; };
 
@@ -274,6 +283,10 @@ class EnemyTemplate
         uint32 m_enemyX, m_enemyY;
         EnemyAI* m_AI;
         EnemyTemplateData* m_Data;
+        string m_name;
+
+        uint32 m_maxHealth;
+        uint32 m_health;
 };
 
 /** \fn EnemyTemplate::EnemyTemplate

@@ -74,6 +74,68 @@ void GameStage::OnDraw()
     // Hrajeme!
     if (m_subStage == 0)
     {
+        // Stitky se jmenem nad enemakama
+        if (sGameplayMgr->gameFeatures.enemyNamePlates)
+        {
+            EnemyList* enemies = sGameplayMgr->GetEnemies();
+            if (enemies && !enemies->empty())
+            {
+                sDisplay->Setup3DMode();
+                glDisable(GL_LIGHTING);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                for (EnemyList::const_iterator itr = enemies->begin(); itr != enemies->end(); ++itr)
+                {
+                    glLoadIdentity();
+                    sDisplay->AdjustViewToTarget(true);
+
+                    glTranslatef((*itr)->pRecord->x, (*itr)->pRecord->y+1.5f, (*itr)->pRecord->z);
+                    glRotatef(90.0f-sDisplay->GetAngleY(), 0.0f, 1.0f, 0.0f);
+
+                    sDisplay->BindTexture(50);
+
+                    const char* name = (*itr)->GetName();
+                    float width = (float)strlen(name) * 0.018f * 10 * FONT_SIZE_2;
+
+                    glBegin(GL_TRIANGLE_STRIP);
+                        glTexCoord2f(1.0f, 1.0f); glVertex3f(0, 0,    -width/2-0.09f);
+                        glTexCoord2f(0.0f, 1.0f); glVertex3f(0, 0,     width/2+0.09f);
+                        glTexCoord2f(1.0f, 0.0f); glVertex3f(0, 0.2f, -width/2-0.09f);
+                        glTexCoord2f(0.0f, 0.0f); glVertex3f(0, 0.2f,  width/2+0.09f);
+                    glEnd();
+
+                    if (sGameplayMgr->gameFeatures.maxEnemyHealth > 0)
+                    {
+                        // 0.9f je maximalni sirka HP pole, 0.8f kvuli oriznuti 0.05f na kazde strane pro HP bar (ramecek)
+                        float hpwidth = 0.8f * ((float)(*itr)->GetHealth()/(float)(*itr)->GetMaxHealth());
+                        glBegin(GL_TRIANGLE_STRIP);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(0,  0.0f, -0.45f);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(0,  0.0f,  0.45f);
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(0, -0.2f, -0.45f);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(0, -0.2f,  0.45f);
+                        glEnd();
+                        sDisplay->BindTexture(49);
+                        glTranslatef(-0.01f, 0, 0);
+                        glBegin(GL_TRIANGLE_STRIP);
+                            glTexCoord2f(1.0f, 1.0f); glVertex3f(0, -0.05f, -hpwidth/2);
+                            glTexCoord2f(0.0f, 1.0f); glVertex3f(0, -0.05f,  hpwidth/2);
+                            glTexCoord2f(1.0f, 0.0f); glVertex3f(0, -0.15f, -hpwidth/2);
+                            glTexCoord2f(0.0f, 0.0f); glVertex3f(0, -0.15f,  hpwidth/2);
+                        glEnd();
+                    }
+                    else
+                        glTranslatef(-0.01f, 0, 0);
+
+                    glTranslatef(0, 0.18f, (-width/2) - 0.05f);
+                    sDisplay->PrintText(MAIN_FONT, 0, 0, FONT_SIZE_2, TEXT_FLAG_3D, NOCOLOR, name);
+                }
+
+                glEnable(GL_LIGHTING);
+                sDisplay->Setup2DMode();
+            }
+        }
+
         if (!sDisplay->IsIn2DMode())
             sDisplay->Setup2DMode();
 

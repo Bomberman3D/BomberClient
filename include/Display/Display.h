@@ -166,6 +166,7 @@ enum TextFlags
 {
     TEXT_FLAG_CENTERED_X    = 0x01,
     TEXT_FLAG_CENTERED_Y    = 0x02,
+    TEXT_FLAG_3D            = 0x04,
 };
 
 /** \struct DisplayListRecord

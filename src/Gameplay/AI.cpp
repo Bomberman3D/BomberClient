@@ -997,7 +997,7 @@ EnemyTemplate::EnemyTemplate()
  *
  * Zde dojde k vytvoreni modelu, jeho featur, zvetseni/zmenseni a podobne. Zaroven se zde nastavuje uroven jeho inteligence pomoci udaju zadanych hracem
  */
-void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
+void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position, uint32 maxHealth)
 {
     m_AILevel = (uint8)sGameplayMgr->GetSetting(SETTING_ENEMY_AI_LEVEL);
 
@@ -1014,6 +1014,11 @@ void EnemyTemplate::Init(uint32 enemyId, uint32 x, uint32 y, uint32 position)
             break;
         }
     }
+
+    m_maxHealth = maxHealth;
+    m_health = m_maxHealth;
+
+    SetName("Enemy");
 
     // Pokud AI neprepise ID modelu, vrati to same
     modelId = m_AI->OverrideModelId(modelId);
@@ -1194,4 +1199,31 @@ void EnemyTemplate::SetDead(bool dead, bool force)
         if (pRecord->modelId == 10)
             sDisplay->ClearModelFeatures(pRecord);
     }
+}
+
+/** \brief Nastaveni zdravi
+ *
+ * Nic vic nezli nastaveni health jedne potvory
+ */
+void EnemyTemplate::SetHealth(uint32 val)
+{
+    if (val > m_maxHealth)
+        m_health = m_maxHealth;
+    else
+        m_health = val;
+
+    if (m_health == 0)
+        SetDead(true);
+}
+
+/** \brief Upraveni zdravi
+ *
+ * S urcitymi podminkami upravi health prisery
+ */
+void EnemyTemplate::ModifyHealth(int32 val)
+{
+    if (-val > int32(m_health))
+        SetHealth(0);
+    else
+        SetHealth(uint32(m_health+val));
 }

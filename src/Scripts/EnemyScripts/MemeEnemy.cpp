@@ -59,7 +59,7 @@ class MemeTrollEnemyScript: public EnemyScript
                 nextMoveStart = clock() + 1000;
 
                 BillboardDisplayListRecord* templ = BillboardDisplayListRecord::Create(31, 0, 0, 0, 0.5f, 0.5f, true, true);
-                Emitter* pEmit = sParticleEmitterMgr->AddPointEmitter(templ, me->pRecord->x-0.5f, 0.1f, me->pRecord->z-0.5f, 0, me->pRecord->rotate, 0, 0, 100, 20, 10.0f, 0.1f, 30, 8, 1, 0, ANIM_FLAG_NOT_REPEAT, 1000);
+                Emitter* pEmit = sParticleEmitterMgr->AddPointEmitter(templ, me->pRecord->x-0.5f, 0.1f, me->pRecord->z-0.5f, 0, me->pRecord->rotate-90.0f, 0, 0, 100, 20, 10.0f, 0.1f, 30, 8, 1, 0, ANIM_FLAG_NOT_REPEAT, 1000);
                 sDisplay->AddModelFeature(me->pRecord, MF_TYPE_EMITTER, 0.0f, 1.55f, 0.0f, pEmit);
             }
 
