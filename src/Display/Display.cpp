@@ -1157,6 +1157,32 @@ void DisplayMgr::Draw2D(uint32 textureId, float left, float top, float width, fl
     glEnd();
 }
 
+/** \brief Vykresleni barevneho obdelniku do roviny
+ *
+ * Podle zadanych parametru okamzite vykresli obdelnik dane barvy na zadane pozici, o zadane vysce a sirce
+ */
+void DisplayMgr::Draw2DColor(uint32 color, float left, float top, float width, float height)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+    GLboolean m_textureEnable = glIsEnabled(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
+
+    glBegin(GL_QUADS);
+      glColor4ub(uint8(color >> 24), uint8(color >> 16), uint8(color >> 8), uint8(color));
+        glTexCoord2f(1.0f, 0.0f); glVertex2d(left+width, top+0);
+        glTexCoord2f(1.0f, 1.0f); glVertex2d(left+width, top+height);
+        glTexCoord2f(0.0f, 1.0f); glVertex2d(left+0, top+height);
+        glTexCoord2f(0.0f, 0.0f); glVertex2d(left+0, top+0);
+    glEnd();
+
+    glColor3ub(255, 255, 255);
+
+    if (m_textureEnable)
+        glEnable(GL_TEXTURE_2D);
+}
+
 /** \brief Funkce starajici se o okamzite vykresleni mapy
  *
  * Okamzite vykresli mapu na absolutnich souradnicich, vcetne skyboxu

@@ -71,6 +71,15 @@ void GameStage::OnDraw()
     mousePos.x = sApplication->GetMouseX();
     mousePos.y = sApplication->GetMouseY();
 
+    if (sGameplayMgr->GetDamageScreenTime()+1000 >= clock())
+    {
+        if (!sDisplay->IsIn2DMode())
+            sDisplay->Setup2DMode();
+
+        float alpha = float(clock()-sGameplayMgr->GetDamageScreenTime()) / 1000.0f;
+        sDisplay->Draw2DColor(0xFF000000 | uint8(96 * (1.0f-alpha)), 0, 0, WIDTH, HEIGHT);
+    }
+
     // Hrajeme!
     if (m_subStage == 0)
     {

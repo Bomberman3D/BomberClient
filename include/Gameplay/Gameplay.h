@@ -249,23 +249,11 @@ class GameplayMgr
         ModelDisplayListRecord* GetPlayerRec() { return m_playerRec; };
 
         uint32 GetHealth() { return m_health; };
-        void SetHealth(uint32 val)
-        {
-            if (val > gameFeatures.maxHealth)
-                m_health = gameFeatures.maxHealth;
-            else
-                m_health = val;
+        void SetHealth(uint32 val);
+        void ModifyHealth(int32 val);
 
-            if (m_health == 0)
-                PlayerDied(true);
-        };
-        void ModifyHealth(int32 val)
-        {
-            if (-val > int32(m_health))
-                SetHealth(0);
-            else
-                SetHealth(uint32(m_health+val));
-        }
+        void SetDamageScreen() { m_damageScreenStart = clock(); }
+        clock_t GetDamageScreenTime() { return m_damageScreenStart; }
 
         // verejne pristupne, tady to nebude vadit
         PlayerStats localPlayerStats;
@@ -321,6 +309,7 @@ class GameplayMgr
         clock_t m_gameEndTime;
         clock_t m_lastMoveHeartbeat;
         uint8 m_stepSoundIndicator;
+        clock_t m_damageScreenStart;
 
         bool m_console;
         uint32 m_cheatMap[MAX_CHEAT];

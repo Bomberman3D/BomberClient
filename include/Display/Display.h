@@ -462,6 +462,7 @@ class DisplayMgr
 
         // 2D funkce
         void Draw2D(uint32 textureId, float left, float top, float width, float height);
+        void Draw2DColor(uint32 color, float left, float top, float width, float height);
 
         // Prace s mapou
         void DrawMap();

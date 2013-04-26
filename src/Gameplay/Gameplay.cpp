@@ -20,6 +20,7 @@ GameplayMgr::GameplayMgr()
     m_stepSoundIndicator = 0;
     m_lastUpdatedMoveAngle = 0.0f;
     m_forceHeartbeatSend = false;
+    m_damageScreenStart = 0;
 
     m_settings.resize(SETTING_MAX);
     m_settings[SETTING_ENEMY_COUNT] = 4;
@@ -680,6 +681,36 @@ void GameplayMgr::UnpauseGame()
     int middleX = sConfig->WindowWidth >> 1;
     int middleY = sConfig->WindowHeight >> 1;
     SetCursorPos(middleX, middleY);
+}
+
+/** \brief Nastaveni zdravi hrace
+ *
+ * Tato metoda osetri spravne hodnoty a nastavi zdravi hrace. Pokud je treba, hrace zabije
+ */
+void GameplayMgr::SetHealth(uint32 val)
+{
+    if (val > gameFeatures.maxHealth)
+        m_health = gameFeatures.maxHealth;
+    else
+        m_health = val;
+
+    if (m_health == 0 && !m_playerDead)
+        PlayerDied(true);
+}
+
+/** \brief Upraveni zdravi hrace
+ *
+ * Tato metoda osetri vstupni hodnoty a nastavi zdravi hrace. Take se stara o nastaveni zacervenani obrazovky pri zaporne hodnote
+ */
+void GameplayMgr::ModifyHealth(int32 val)
+{
+    if (-val > int32(m_health))
+        SetHealth(0);
+    else
+        SetHealth(uint32(m_health+val));
+
+    if (val < 0)
+        SetDamageScreen();
 }
 
 /** \brief Odeslani zpravy z chatu
